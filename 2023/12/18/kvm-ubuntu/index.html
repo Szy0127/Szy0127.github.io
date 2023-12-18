@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="KVM-Ubuntuhello worldsys_fd &#x3D; open(&quot;&#x2F;dev&#x2F;kvm&quot;) 之后用ioctl(fd,CMD,0)给kvm发送指令 fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd  KVM_CREATE_VM：创建VM 拿到VM对应的fd  KVM_SET_USER_MEMORY_REGION：注册kvm_userspace_memor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2023/12/18/kvm-ubuntu/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="KVM-Ubuntuhello worldsys_fd &#x3D; open(&quot;&#x2F;dev&#x2F;kvm&quot;) 之后用ioctl(fd,CMD,0)给kvm发送指令 fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd  KVM_CREATE_VM：创建VM 拿到VM对应的fd  KVM_SET_USER_MEMORY_REGION：注册kvm_userspace_memor">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20230628204908934.png">
+<meta property="article:published_time" content="2023-12-18T10:31:00.818Z">
+<meta property="article:modified_time" content="2023-09-20T11:16:10.567Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20230628204908934.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-kvm-ubuntu" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2023/12/18/kvm-ubuntu/" class="article-date">
+  <time class="dt-published" datetime="2023-12-18T10:31:00.818Z" itemprop="datePublished">2023-12-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="KVM-Ubuntu"><a href="#KVM-Ubuntu" class="headerlink" title="KVM-Ubuntu"></a>KVM-Ubuntu</h1><h2 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h2><p><code>sys_fd = open(&quot;/dev/kvm&quot;)</code></p>
+<p>之后用<code>ioctl(fd,CMD,0)</code>给kvm发送指令</p>
+<p>fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd</p>
+<ul>
+<li><p><code>KVM_CREATE_VM</code>：创建VM 拿到VM对应的fd</p>
+</li>
+<li><p><code>KVM_SET_USER_MEMORY_REGION</code>：注册<code>kvm_userspace_memory_region</code>结构体，需要自己设置一个地址(可用mmap)作为VM地址空间的起始位置。这里VMM的一个char数组，对应到VM的整个地址空间</p>
+</li>
+<li><p><code>KVM_CREATE_VCPU</code>：用VM的fd创建VCPU，拿到fd，之后运行VM都是通过vcpu</p>
+<p>需要把拿到的fd通过mmap映射到<code>kvm_run</code>结构体上 方便拿到退出原因 io信息</p>
+</li>
+<li><p><code>KVM_SET_SREGS</code>：设置<code>kvm_sregs</code>结构体，其中包括了cr0 cr3 cr4等系统寄存器，可以自己配置页表，地址用GPA，但是PTE用HVA</p>
+</li>
+<li><p><code>KVM_RUN</code>：运行VM，VM发生exit时这句语句返回</p>
+</li>
+<li><p><code>KVM_GET_REGS</code>：拿寄存器到<code>kvm_regs</code>结构体，可通过<code>.rax</code>访问</p>
+</li>
+</ul>
+<p>输出用<code>outb</code></p>
+<p>配合</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> KVM_EXIT_IO:</span><br><span class="line">	<span class="keyword">if</span> (vcpu-&gt;kvm_run-&gt;io.direction == KVM_EXIT_IO_OUT</span><br><span class="line">		&amp;&amp; vcpu-&gt;kvm_run-&gt;io.port == <span class="number">0xEA</span>) &#123;</span><br><span class="line">		<span class="type">char</span> *p = (<span class="type">char</span> *)vcpu-&gt;kvm_run;</span><br><span class="line">		fwrite(p + vcpu-&gt;kvm_run-&gt;io.data_offset,</span><br><span class="line">		vcpu-&gt;kvm_run-&gt;io.size, <span class="number">1</span>, <span class="built_in">stdout</span>);</span><br><span class="line">		fflush(<span class="built_in">stdout</span>);</span><br><span class="line">	<span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><h3 id="core"><a href="#core" class="headerlink" title="core"></a>core</h3><p><a target="_blank" rel="noopener" href="https://ubuntu.com/download/kvm">Install Ubuntu Core on KVM | Ubuntu</a></p>
+<p><code>sudo qemu-system-x86_64 -smp 2 -m 2048 -net nic,model=virtio -net user,hostfwd=tcp::8022-:22,hostfwd=tcp::8090-:80 -nographic -drive file=/usr/share/OVMF/OVMF_CODE.fd,if=pflash,format=raw,unit=0,readonly=on -drive file=ubuntu-core-20-amd64.img,cache=none,format=raw,id=disk1,if=none -device virtio-blk-pci,drive=disk1,bootindex=1 -machine accel=kvm</code></p>
+<p>需要设置<code>-nographic</code>这样启动界面会在执行qemu的shell中被打印 可以输入和按回车选择</p>
+<p>这个官方镜像的启动是需要输入ubuntu账号的，并且需要在ubuntu网站中上传自己的rsa key 然后ssh登录虚拟机的时候需要</p>
+<p>启动qemu的窗口会显示无用的信息 需要另开窗口<code>ssh -p 8022 szy0127@localhost</code>登录虚拟机</p>
+<p>ubuntu官方提供的img镜像apt和dpkg都没有，连安装命令都很困难</p>
+<p>关闭qemu后虚拟机退出，重启后数据都在</p>
+<h3 id="cloud"><a href="#cloud" class="headerlink" title="cloud"></a>cloud</h3><p><a target="_blank" rel="noopener" href="https://cloudinit.readthedocs.io/en/latest/tutorial/qemu.html">Core tutorial with QEMU - cloud-init 23.2 documentation (cloudinit.readthedocs.io)</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64                                            \</span><br><span class="line">    -net nic                                                    \</span><br><span class="line">    -net tap,ifname=tap0,script=no,downscript=no\</span><br><span class="line">    -machine accel=kvm:tcg                                      \</span><br><span class="line">    -cpu host                                                   \</span><br><span class="line">    -m 512                                                      \</span><br><span class="line">    -nographic                                                  \</span><br><span class="line">    -hda jammy-server-cloudimg-amd64.img                        \</span><br><span class="line">    -smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64 \</span><br><span class="line">        -cpu host \</span><br><span class="line">        --enable-kvm \</span><br><span class="line">        -smp 1 \</span><br><span class="line">        -m 1G \</span><br><span class="line">        -nographic \</span><br><span class="line">        -device virtio-blk-pci,drive=vdisk \</span><br><span class="line">        -drive if=none,id=vdisk,file=jammy-server-cloudimg-amd64.img,format=qcow2 \</span><br><span class="line">        -device virtio-net-pci,netdev=vnet,mac=52:54:00:12:34:88 \</span><br><span class="line">        -netdev tap,id=vnet,ifname=tap0,script=no,downscript=no \</span><br><span class="line">        -smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>要保证IMDS webserver启动好且网络可达 user模式的<code>10.0.2.2</code> 在net模式不可用</p>
+<p>启动qemu的进程会直接打开虚拟机的shell</p>
+<p>用户名ubuntu 密码password</p>
+<p>关闭qemu后虚拟机退出，重启后数据也都在</p>
+<p>指定编译出的kernel</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64 \</span><br><span class="line">    -cpu host \</span><br><span class="line">    --enable-kvm \</span><br><span class="line">    -smp 1 \</span><br><span class="line">    -m 4G \</span><br><span class="line">    -nographic \</span><br><span class="line">    -kernel ./bzImage \</span><br><span class="line">    -append &quot;console=ttyS0 ignore_loglevel root=/dev/vda1&quot; \</span><br><span class="line">    -device virtio-blk-pci,drive=vdisk \</span><br><span class="line">    -drive if=none,id=vdisk,file=jammy-server-cloudimg-amd64.img,format=qcow2 \</span><br><span class="line">    -device virtio-net-pci,netdev=vnet,mac=52:54:00:12:34:88 \</span><br><span class="line">    -netdev tap,id=vnet,ifname=tap0,script=no,downscript=no \</span><br><span class="line">    #-smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br><span class="line">    #-snapshot \</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h3 id="User"><a href="#User" class="headerlink" title="User"></a>User</h3><p>user mode可以访问外网 但是ping被ban了</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_43406494/article/details/124827927">QEMU–用户模式网络_qemu 网络模式_play maker的博客-CSDN博客</a></p>
+<p>host不能访问guest，guest可以访问host</p>
+<h3 id="tap-0"><a href="#tap-0" class="headerlink" title="tap 0"></a>tap 0</h3><p>没有tun模块 要自己编译以后启动</p>
+<p><a target="_blank" rel="noopener" href="https://www.php1.cn/detail/YuanDaiMaGuanLiG_143ec260.html">ubuntu下安装tun模块图文详细教程 - 第一PHP社区 (php1.cn)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/larryliuqing/article/details/27127843">用TAP方式让QEMU虚拟机与host联网_qemu tap0_拉里山姆的博客-CSDN博客</a></p>
+<p>只能虚拟机和主机相互连通 虚拟机无法访问互联网</p>
+<h3 id="tap-1"><a href="#tap-1" class="headerlink" title="tap 1"></a>tap 1</h3><p><a target="_blank" rel="noopener" href="https://gist.github.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d811c">Setting up Qemu with a tap interface (github.com)</a></p>
+<p>虚拟机内部的网卡没有ip 如果输dhclient会卡死  原因是dhclient是跳板机 需要宿主机转发 出于安全考虑被宿主机拦截</p>
+<p>需要在宿主机上执行<code>sudo iptables -P FORWARD ACCEPT</code> 每次重启后需要再次执行</p>
+<p><code>tcpdump -i tap0</code> 看网络包流通情况</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">network:</span><br><span class="line">        sudo brctl addbr br0</span><br><span class="line">        sudo ip addr flush dev ens4</span><br><span class="line">        sudo brctl addif br0 ens4</span><br><span class="line">        sudo tunctl -t tap0 -u ubuntu</span><br><span class="line">        sudo brctl addif br0 tap0</span><br><span class="line">        sudo ifconfig ens4 up</span><br><span class="line">        sudo ifconfig tap0 up</span><br><span class="line">        sudo ifconfig br0 up</span><br><span class="line">        sudo dhclient br0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如果没有tunctl</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip tuntap add dev tap0 mod tap</span><br></pre></td></tr></table></figure>
+
+<p>如果看不见网卡 需要打开guest内核的config_virtio_net m变为y</p>
+<p>进入guest需要sudo dhclient xxx</p>
+<h2 id="内核信息"><a href="#内核信息" class="headerlink" title="内核信息"></a>内核信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">szy@broadwell:~$ sudo ls  /sys/kernel/debug/kvm/</span><br><span class="line">136814-12            halt_poll_success_ns  invlpg          max_mmu_page_hash_collisions  mmu_recycled            pf_guest</span><br><span class="line">exits                halt_successful_poll  io_exits        mmio_exits                    mmu_shadow_zapped       remote_tlb_flush</span><br><span class="line">fpu_reload           halt_wakeup           irq_exits       mmu_cache_miss                mmu_unsync              req_event</span><br><span class="line">halt_attempted_poll  host_state_reload     irq_injections  mmu_flooded                   nmi_injections          request_irq</span><br><span class="line">halt_exits           hypercalls            irq_window      mmu_pde_zapped                nmi_window              signal_exits</span><br><span class="line">halt_poll_fail_ns    insn_emulation        l1d_flush       mmu_pte_updated               nx_largepages_splitted  tlb_flush</span><br><span class="line">halt_poll_invalid    insn_emulation_fail   largepages      mmu_pte_write                 pf_fixed</span><br><span class="line">szy@broadwell:~$ sudo ls  /sys/kernel/debug/kvm/136814-12</span><br><span class="line">exits                 halt_successful_poll  io_exits                      mmio_exits       mmu_shadow_zapped       remote_tlb_flush</span><br><span class="line">fpu_reload            halt_wakeup           irq_exits                     mmu_cache_miss   mmu_unsync              req_event</span><br><span class="line">halt_attempted_poll   host_state_reload     irq_injections                mmu_flooded      nmi_injections          request_irq</span><br><span class="line">halt_exits            hypercalls            irq_window                    mmu_pde_zapped   nmi_window              signal_exits</span><br><span class="line">halt_poll_fail_ns     insn_emulation        l1d_flush                     mmu_pte_updated  nx_largepages_splitted  tlb_flush</span><br><span class="line">halt_poll_invalid     insn_emulation_fail   largepages                    mmu_pte_write    pf_fixed                vcpu0</span><br><span class="line">halt_poll_success_ns  invlpg                max_mmu_page_hash_collisions  mmu_recycled     pf_guest                vcpu1</span><br><span class="line">szy@broadwell:~$ sudo cat  /sys/kernel/debug/kvm/136814-12/exits</span><br><span class="line">5449424</span><br></pre></td></tr></table></figure>
+
+<p>文件夹名是qemu的pid</p>
+<h2 id="修改内核"><a href="#修改内核" class="headerlink" title="修改内核"></a>修改内核</h2><h3 id="整体编译"><a href="#整体编译" class="headerlink" title="整体编译"></a>整体编译</h3><p><a target="_blank" rel="noopener" href="https://kernelnewbies.org/KernelBuild">KernelBuild - Linux Kernel Newbies</a></p>
+<p><code>make -j8</code> 这里编译完可以拿到bzImage  给qemu的-kernel参数使用 <code>arch/x86/bzImage</code></p>
+<p><code>sudo make modules_install install</code></p>
+<p>选择kernel并重启<code>~/grublist/grub-list.py</code></p>
+<p>broadwell下tmux<code>sudo minicom -D /dev/ttyUSB0</code> 通过串口而不是ssh连bionic 即使内核或网络崩溃无法ssh也可以观察</p>
+<p>升级内核后网络设备有问题 无法访问外网且没有ip   4.15识别到enp15s0 但是需要手动dhclient拿ip 虽然拿到相同的ip，但是只有broadwell可以ping通bionic 跳板机仍然无法ping通</p>
+<p>目前成功修改的路径为<code>/usr/src/linux-source-4.15.0/linux-source-4.15.0</code> grublist显示为<code>Ubuntu, with Linux 4.15.18</code></p>
+<p>修改<code>arch/x86/kernel/paravirt.c#default_banner</code> 可以启动时看到输出 </p>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20230628204908934.png" alt="image-20230628204908934" style="zoom:50%;" />
+
+<h3 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:22:54]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">find /lib/modules/4.15.18/ -name kvm.ko</span></span><br><span class="line">/lib/modules/4.15.18/kernel/arch/x86/kvm/kvm.ko</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:31:58] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:05]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo rmmod kvm-intel</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:12]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo rmmod kvm</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:14]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm does not exist</span><br><span class="line">HINT:   sudo modprobe kvm_intel</span><br><span class="line">INFO: For more detailed results, you should run this as root</span><br><span class="line">HINT:   sudo /usr/sbin/kvm-ok</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:18] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /lib/modules/4.15.18/kernel/arch/x86/kvm/kvm.ko</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:25]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /lib/modules/4.15.18/kernel/arch/x86/kvm/kvm-intel.ko</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:31]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:33] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm/kvm-intel.ko</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:39]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">dmesg | <span class="built_in">tail</span> -10</span></span><br><span class="line">[25416.145711] kvm: loading out-of-tree module taints kernel.</span><br><span class="line">[25416.151778] kvm: module verification failed: signature and/or required key missing - tainting kernel</span><br><span class="line">[25435.886621] kvm module modified by szy</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:51] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">///usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm/Makefile</span><br><span class="line"><span class="section">update:</span></span><br><span class="line">        sudo make -C /lib/modules/4.15.18/build M=<span class="variable">$(PWD)</span> modules -j10</span><br><span class="line">        sudo rmmod kvm-intel</span><br><span class="line">        sudo rmmod kvm</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm.ko</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm-intel.ko</span><br><span class="line">        kvm-ok</span><br><span class="line"></span><br><span class="line"><span class="section">remove:</span></span><br><span class="line">        sudo rmmod kvm-intel</span><br><span class="line">        sudo rmmod kvm</span><br><span class="line"><span class="section">install:</span></span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm.ko</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm-intel.ko</span><br><span class="line">        kvm-ok</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="KVM"><a href="#KVM" class="headerlink" title="KVM"></a>KVM</h2><h3 id="调用逻辑"><a href="#调用逻辑" class="headerlink" title="调用逻辑"></a>调用逻辑</h3><p>用户态qemu通过ioctl发起一次run</p>
+<p><code>kvm_vcpu_ioctl</code>-&gt;<code>kvm_arch_vcpu_ioctl_run</code>-&gt;<code>vcpu_run</code>-&gt;<code>vcpu_enter_guest</code>-&gt;<code>vmx_vcpu_run</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">vcpu_run</span><span class="params">(<span class="keyword">struct</span> kvm_vcpu *vcpu)</span>&#123;    </span><br><span class="line">	<span class="keyword">for</span>(;;)&#123;</span><br><span class="line">        r = vcpu_enter_guest(vcpu);</span><br><span class="line">        <span class="keyword">if</span>(r&lt;=<span class="number">0</span>)<span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;	</span><br></pre></td></tr></table></figure>
+
+<p>如果KVM能处理exit就继续循环 否则回到用户态qemu 由qemu再次调用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">vcpu_enter_guest</span><span class="params">(<span class="keyword">struct</span> kvm_vcpu *vcpu)</span>&#123;</span><br><span class="line">    kvm_x86_ops-&gt;run(vcpu);</span><br><span class="line">    ++vcpu-&gt;stat.exits;</span><br><span class="line">	<span class="keyword">return</span> kvm_x86_ops-&gt;handle_exit(vcpu);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>vmx_vcpu_run</code>中由汇编<code>ASM_VMX_VMLAUNCH</code>进入VM执行，VM退出后会紧接着执行下面的几行汇编</p>
+<h3 id="exit"><a href="#exit" class="headerlink" title="exit"></a>exit</h3><p><code>x86.c&gt;vcpu_enter_guest</code>  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">++vcpu-&gt;stat.exits;</span><br><span class="line"><span class="keyword">if</span>(vcpu-&gt;stat.exits % <span class="number">1000</span>==<span class="number">0</span>)&#123;</span><br><span class="line">	printk(<span class="string">&quot;vcpu exits:%lld\n&quot;</span>,vcpu-&gt;stat.exits);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>kvm的函数是需要一个vcpu作为参数的 exit为vcpu的成员变量</p>
+<p>直接在内核改</p>
+<p>vmx.c中增加全局变量，核心函数为<code>vmx_vcpu_run</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">str_values</span> &#123;</span></span><br><span class="line">        <span class="type">int</span>             val;</span><br><span class="line">        <span class="type">const</span> <span class="type">char</span>      *str;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">str_values</span> <span class="title">vmx_exit_reasons</span>[] =</span> &#123;</span><br><span class="line">        VMX_EXIT_REASONS</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//static int exit_type_num = sizeof(vmx_exit_reasons)/sizeof(struct str_values);</span></span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_counts[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_last_time[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_total_cost_time[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> total_exit_count;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> exit_last_reason=<span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">char</span>* <span class="title function_">get_exit_reason_string</span><span class="params">(<span class="type">int</span> val)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> i;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>;i &lt;=<span class="number">64</span> ;i++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(vmx_exit_reasons[i].val == val)&#123;</span><br><span class="line">                        <span class="keyword">return</span> vmx_exit_reasons[i].str;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> u64 <span class="title function_">get_timestamp_now</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tv</span>;</span></span><br><span class="line">        u64 timestamp;</span><br><span class="line">        do_gettimeofday(&amp;tv);</span><br><span class="line">        timestamp = (u64)tv.tv_sec * <span class="number">1000000</span> + tv.tv_usec;</span><br><span class="line">        <span class="keyword">return</span> timestamp;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">show_exit_counts</span><span class="params">(<span class="type">int</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> index[n];</span><br><span class="line">        <span class="type">int</span> i,j;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ;i &lt; n ;i++)&#123; <span class="comment">// find ith biggest number</span></span><br><span class="line">                <span class="type">int</span> max = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">for</span>(j= <span class="number">0</span> ; j&lt;= <span class="number">64</span>; j++)&#123;</span><br><span class="line">                        <span class="type">int</span> k;</span><br><span class="line">                        <span class="type">int</span> duplicated = <span class="number">0</span>;</span><br><span class="line">                        <span class="keyword">for</span>(k = <span class="number">0</span>; k &lt; i ; k++)&#123; <span class="comment">//prevent duplicated</span></span><br><span class="line">                                <span class="keyword">if</span>(index[k] == j)&#123;</span><br><span class="line">                                        duplicated = <span class="number">1</span>;</span><br><span class="line">                                        <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">if</span>(duplicated)&#123;</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="type">int</span> count = exit_counts[j];</span><br><span class="line">                        <span class="keyword">if</span>(count &gt;= max)&#123;</span><br><span class="line">                                index[i] = j;</span><br><span class="line">                                max = count;</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(exit_counts[index[i]] &gt; <span class="number">0</span>)&#123;</span><br><span class="line">                        <span class="type">char</span>* reason = get_exit_reason_string(index[i]);</span><br><span class="line">                        u64 aver_cost_time = exit_total_cost_time[index[i]]/exit_counts[index[i]];</span><br><span class="line">                        printk(<span class="string">&quot;exit reason:[%d]%s,counts:%lld,average cost time:%lld\n&quot;</span>,index[i],reason?reason : <span class="string">&quot;not found&quot;</span>,exit_counts[index[i]],aver_cost_time);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">vmx-&gt;exit_reason = vmx-&gt;fail ? <span class="number">0xdead</span> : vmcs_read32(VM_EXIT_REASON);</span><br><span class="line">        <span class="keyword">if</span>(!vmx-&gt;fail)&#123;</span><br><span class="line">                total_exit_count++;</span><br><span class="line">                exit_last_reason=(u16)vmx-&gt;exit_reason;</span><br><span class="line">                exit_last_time[exit_last_reason] = now;</span><br><span class="line">                exit_counts[exit_last_reason]++;</span><br><span class="line">                <span class="keyword">if</span>(total_exit_count%<span class="number">10000</span>==<span class="number">0</span>)&#123;</span><br><span class="line">                        <span class="comment">//printk(KERN_INFO &quot;time now:%llu\n&quot;, timestamp);</span></span><br><span class="line">                        show_exit_counts(<span class="number">5</span>);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                exit_last_reason = <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>内核模块 不能include time并且用time获得时间，只能用linux&#x2F;time的do_gettimeofday</p>
+<p>或者使用rdtsc获取cycle数 rdtsc可以直接用，也可以用同名汇编</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2023/12/18/kvm-ubuntu/" data-id="clqarzxb00002o0v0fqp88s7c" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2023/12/18/nested/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2023/12/18/kvm-api/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/12/">December 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/12/18/nested/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/18/kvm-ubuntu/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/18/kvm-api/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2023/12/18/kvm%20%E5%86%85%E5%AD%98/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2023 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
