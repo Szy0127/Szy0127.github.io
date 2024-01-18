@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const input = document.querySelector('.search-input');
 
   const inputEventFunction = () => {
-	  console.log(localSearch.path);
     if (!localSearch.isfetched) return;
     const searchText = input.value.trim().toLowerCase();
     const keywords = searchText.split(/[-\s]+/);

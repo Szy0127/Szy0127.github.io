@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title></title>
-    <url>/2023/12/18/kvm%20%E5%86%85%E5%AD%98/</url>
+    <title>kvm 内存</title>
+    <url>/2024/01/18/kvm%20%E5%86%85%E5%AD%98/</url>
     <content><![CDATA[<h1 id="kvm-内存"><a href="#kvm-内存" class="headerlink" title="kvm 内存"></a>kvm 内存</h1><p><a href="https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3c-part-3-manual.pdf">intel.com&#x2F;content&#x2F;dam&#x2F;www&#x2F;public&#x2F;us&#x2F;en&#x2F;documents&#x2F;manuals&#x2F;64-ia-32-architectures-software-developer-vol-3c-part-3-manual.pdf</a></p>
 <ul>
 <li>guest自己配置的页表完成GVA-&gt;GPA翻译 kvm不管这个数据结构</li>
@@ -169,34 +169,8 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
-    <url>/2023/12/18/kvm-api/</url>
-    <content><![CDATA[<p><code>sys_fd = open(&quot;/dev/kvm&quot;)</code></p>
-<p>之后用<code>ioctl(fd,CMD,0)</code>给kvm发送指令</p>
-<p>fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd</p>
-<ul>
-<li><p><code>KVM_CREATE_VM</code>：创建VM 拿到VM对应的fd</p>
-</li>
-<li><p><code>KVM_SET_USER_MEMORY_REGION</code>：注册<code>kvm_userspace_memory_region</code>结构体，需要自己设置一个地址(可用mmap)作为VM地址空间的起始位置。这里VMM的一个char数组，对应到VM的整个地址空间</p>
-</li>
-<li><p><code>KVM_CREATE_VCPU</code>：用VM的fd创建VCPU，拿到fd，之后运行VM都是通过vcpu</p>
-<p>需要把拿到的fd通过mmap映射到<code>kvm_run</code>结构体上 方便拿到退出原因 io信息</p>
-</li>
-<li><p><code>KVM_RUN</code>：运行VM，VM发生exit时这句语句返回</p>
-</li>
-<li><p><code>KVM_GET_REGS</code>：拿寄存器到<code>kvm_regs</code>结构体，可通过<code>.rax</code>访问</p>
-</li>
-</ul>
-<p>输出用<code>outb</code></p>
-<p>配合</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">case</span> KVM_EXIT_IO:</span><br><span class="line">	<span class="keyword">if</span> (vcpu-&gt;kvm_run-&gt;io.direction == KVM_EXIT_IO_OUT</span><br><span class="line">		&amp;&amp; vcpu-&gt;kvm_run-&gt;io.port == <span class="number">0xEA</span>) &#123;</span><br><span class="line">		<span class="type">char</span> *p = (<span class="type">char</span> *)vcpu-&gt;kvm_run;</span><br><span class="line">		fwrite(p + vcpu-&gt;kvm_run-&gt;io.data_offset,</span><br><span class="line">		vcpu-&gt;kvm_run-&gt;io.size, <span class="number">1</span>, <span class="built_in">stdout</span>);</span><br><span class="line">		fflush(<span class="built_in">stdout</span>);</span><br><span class="line">	<span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如何用printf？</p>
-]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2023/12/18/kvm-ubuntu/</url>
+    <title>KVM-Ubuntu</title>
+    <url>/2024/01/18/kvm-ubuntu/</url>
     <content><![CDATA[<h1 id="KVM-Ubuntu"><a href="#KVM-Ubuntu" class="headerlink" title="KVM-Ubuntu"></a>KVM-Ubuntu</h1><h2 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h2><p><code>sys_fd = open(&quot;/dev/kvm&quot;)</code></p>
 <p>之后用<code>ioctl(fd,CMD,0)</code>给kvm发送指令</p>
 <p>fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd</p>
@@ -242,7 +216,8 @@
 
 
 
-<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h3 id="User"><a href="#User" class="headerlink" title="User"></a>User</h3><p>user mode可以访问外网 但是ping被ban了</p>
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><p>ip route add default via 192.168.12.1<br>netplan apply<br>vim &#x2F;etc&#x2F;netplan&#x2F;50-cloud-init.yaml</p>
+<h3 id="User"><a href="#User" class="headerlink" title="User"></a>User</h3><p>user mode可以访问外网 但是ping被ban了</p>
 <p><a href="https://blog.csdn.net/m0_43406494/article/details/124827927">QEMU–用户模式网络_qemu 网络模式_play maker的博客-CSDN博客</a></p>
 <p>host不能访问guest，guest可以访问host</p>
 <h3 id="tap-0"><a href="#tap-0" class="headerlink" title="tap 0"></a>tap 0</h3><p>没有tun模块 要自己编译以后启动</p>
@@ -304,10 +279,10 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
-    <url>/2023/12/18/nested/</url>
-    <content><![CDATA[<p><a href="https://www.linux-kvm.org/page/Nested_Guests">Nested Guests - KVM (linux-kvm.org)</a></p>
-<h2 id="host上开启嵌套虚拟化"><a href="#host上开启嵌套虚拟化" class="headerlink" title="host上开启嵌套虚拟化"></a>host上开启嵌套虚拟化</h2><p>看<code>/sys/module/kvm_intel/parameters/nested</code> </p>
+    <title>virtualization misc</title>
+    <url>/2024/01/18/virtualization-misc/</url>
+    <content><![CDATA[<h1 id="virtualization-misc"><a href="#virtualization-misc" class="headerlink" title="virtualization misc"></a>virtualization misc</h1><h2 id="host上开启嵌套虚拟化"><a href="#host上开启嵌套虚拟化" class="headerlink" title="host上开启嵌套虚拟化"></a>host上开启嵌套虚拟化</h2><p><a href="https://www.linux-kvm.org/page/Nested_Guests">Nested Guests - KVM (linux-kvm.org)</a></p>
+<p>看<code>/sys/module/kvm_intel/parameters/nested</code> </p>
 <p>可以修改vmx.c<code>static bool __read_mostly nested = 1;</code>然后重新编译kvm模块</p>
 <p>host VM <code>cat /proc/cpuinfo | grep vmx</code>有内容说明配置正确</p>
 <p>此时跑kvm-hello-world没问题</p>
