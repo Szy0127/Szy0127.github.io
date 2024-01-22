@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="react-native 开发记录react-native 项目配置 最新版0.68 要求jdk11 互联网课装好的是jdk8 所以使用0.66.4 用intellij自动生成是最新版的，降级：   npm install --save react-native@0.66.4  用intellij自动生成的 跑不了 会报少文件 用官网说的命令行方式新建项目npx react-native init">
+<meta property="og:type" content="article">
+<meta property="og:title" content="react-native 开发记录">
+<meta property="og:url" content="http://szy0127.github.io/2024/01/22/misc/react-native-note/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="react-native 开发记录react-native 项目配置 最新版0.68 要求jdk11 互联网课装好的是jdk8 所以使用0.66.4 用intellij自动生成是最新版的，降级：   npm install --save react-native@0.66.4  用intellij自动生成的 跑不了 会报少文件 用官网说的命令行方式新建项目npx react-native init">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-01-22T12:46:58.519Z">
+<meta property="article:modified_time" content="2024-01-22T12:49:52.899Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/01/22/misc/react-native-note/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/01/22/misc/react-native-note/","path":"2024/01/22/misc/react-native-note/","title":"react-native 开发记录"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>react-native 开发记录 | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#react-native-%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">react-native 开发记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#react-native-%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.</span> <span class="nav-text">react-native 项目配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#package"><span class="nav-number">1.2.</span> <span class="nav-text">package</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E8%88%AA"><span class="nav-number">1.2.1.</span> <span class="nav-text">导航</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%AD%98%E5%82%A8"><span class="nav-number">1.2.2.</span> <span class="nav-text">本地存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#antd"><span class="nav-number">1.2.3.</span> <span class="nav-text">antd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webrtc"><span class="nav-number">1.2.4.</span> <span class="nav-text">webrtc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#simple-peer"><span class="nav-number">1.2.5.</span> <span class="nav-text">simple peer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#crypto"><span class="nav-number">1.2.6.</span> <span class="nav-text">crypto</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E9%94%99%E8%AF%AF"><span class="nav-number">1.3.</span> <span class="nav-text">一些错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%85%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">待解决的问题</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/misc/react-native-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="react-native 开发记录 | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          react-native 开发记录
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-01-22 20:46:58 / Modified: 20:49:52" itemprop="dateCreated datePublished" datetime="2024-01-22T20:46:58+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.1k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="react-native-开发记录"><a href="#react-native-开发记录" class="headerlink" title="react-native 开发记录"></a>react-native 开发记录</h1><h2 id="react-native-项目配置"><a href="#react-native-项目配置" class="headerlink" title="react-native 项目配置"></a>react-native 项目配置</h2><ul>
+<li><p>最新版0.68 要求jdk11 互联网课装好的是jdk8 所以使用0.66.4</p>
+<p>用intellij自动生成是最新版的，降级：</p>
+</li>
+</ul>
+<p><code>npm install --save react-native@0.66.4</code></p>
+<ul>
+<li><p>用intellij自动生成的 跑不了 会报少文件 用官网说的命令行方式新建项目<code>npx react-native init Project --version 0.66.4</code></p>
+<p>然而用命令行新建的项目再用intellij打开并不能识别 所以用vscode</p>
+</li>
+<li><p>安卓模拟器配置：<a target="_blank" rel="noopener" href="https://reactnative.dev/docs/environment-setup">https://reactnative.dev/docs/environment-setup</a></p>
+</li>
+<li><p>编译运行：<code>npx react-native run-android</code> (用vscode可以终端-运行任务)</p>
+</li>
+<li><p>打包发给手机：(android目录下)<code>gradlew assembleRelease</code></p>
+<p>apk路径：Project\android\app\build\outputs\apk\release</p>
+</li>
+<li><p>ios不像安卓这么容易，必须用Xcode，而Xcode又必须是mac环境</p>
+</li>
+</ul>
+<h2 id="package"><a href="#package" class="headerlink" title="package"></a>package</h2><p>包有互相依赖关系<br><code>npm install --legacy-peer-deps</code> 避免报错</p>
+<h3 id="导航"><a href="#导航" class="headerlink" title="导航"></a>导航</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;@react-navigation/native&quot;: &quot;^6.0.10&quot;,</span><br><span class="line">&quot;@react-navigation/stack&quot;: &quot;^6.2.1&quot;,</span><br></pre></td></tr></table></figure>
+<p>有如下依赖包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;react-native-gesture-handler&quot;: &quot;^2.5.0&quot;,</span><br><span class="line">&quot;react-native-safe-area-context&quot;: &quot;^4.3.1&quot;,</span><br><span class="line">&quot;react-native-safe-area-view&quot;: &quot;^1.1.1&quot;,</span><br><span class="line">&quot;react-native-screens&quot;: &quot;3.13.1&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="本地存储"><a href="#本地存储" class="headerlink" title="本地存储"></a>本地存储</h3><p><code>&quot;@react-native-community/async-storage&quot;: &quot;^1.12.1&quot;</code></p>
+<h3 id="antd"><a href="#antd" class="headerlink" title="antd"></a>antd</h3><p>antd-mobile不支持react native 换一个支持的</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ant-design/ant-design-mobile-rn">https://github.com/ant-design/ant-design-mobile-rn</a></p>
+<p><a target="_blank" rel="noopener" href="https://rn.mobile.ant.design/">https://rn.mobile.ant.design/</a></p>
+<p><code>&quot;@ant-design/react-native&quot;: &quot;5.0.0&quot;</code></p>
+<p>依赖包(issue中发现)<br><code>npm install classnames rc-util fbjs</code></p>
+<p>但实际上移动端的antd实现的组件并不如web端那么丰富，很多时候react-native自带的组件已经挺不错了</p>
+<h3 id="webrtc"><a href="#webrtc" class="headerlink" title="webrtc"></a>webrtc</h3><p><a target="_blank" rel="noopener" href="https://github.com/react-native-webrtc/react-native-webrtc">https://github.com/react-native-webrtc/react-native-webrtc</a></p>
+<p>下这个包会很慢，需要耐心等</p>
+<p>启动有问题，不报任何错误 在issue中找到解决方法，修改安卓文件配置即可</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/react-native-webrtc/react-native-webrtc/issues/1080">https://github.com/react-native-webrtc/react-native-webrtc/issues/1080</a></p>
+<p>针对安卓的权限问题解决如下</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/react-native-webrtc/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md">https://github.com/react-native-webrtc/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md</a></p>
+<h3 id="simple-peer"><a href="#simple-peer" class="headerlink" title="simple peer"></a>simple peer</h3><p><a target="_blank" rel="noopener" href="https://github.com/feross/simple-peer">https://github.com/feross/simple-peer</a></p>
+<p>simple-peer并没有说是支持移动端的，但是可以根据如下方法直接使用<br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/66281342/simple-peer-with-react-native-webrtc">https://stackoverflow.com/questions/66281342/simple-peer-with-react-native-webrtc</a></p>
+<p>遇到的问题在于，react-native-webrtc中的RTCPeerConnection还没有实现很多API，因此在使用的时候会直接报错。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/react-native-webrtc/react-native-webrtc/pull/1160">https://github.com/react-native-webrtc/react-native-webrtc/pull/1160</a><br>此PR增加API 但仍在开发中</p>
+<p>若此后遇到问题，可尝试更换框架为peerjs</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Zemke/react-native-peerjs">https://github.com/Zemke/react-native-peerjs</a></p>
+<p><a target="_blank" rel="noopener" href="https://peerjs.com/docs/#api">https://peerjs.com/docs/#api</a></p>
+<h3 id="crypto"><a href="#crypto" class="headerlink" title="crypto"></a>crypto</h3><p><a target="_blank" rel="noopener" href="https://github.com/tradle/react-native-crypto">https://github.com/tradle/react-native-crypto</a></p>
+<p>最后一句换成<code>node_modules\.bin\rn-nodeify --hack --install --legacy-peer-deps</code><br>默认的crypto库的方法是基于浏览器内核的，在react-native项目中会报错(例如randomBytes)，使用react-native-randombytes并不能直接解决问题。</p>
+<p>安装react-native-crypto后根据教程进行配置，可以使其替代原有的crypto而不用修改其他库的源代码。(simple-peer中实例化Peer遇到此问题)</p>
+<p>之后package.json中会出现很多奇奇怪怪的包</p>
+<h2 id="一些错误"><a href="#一些错误" class="headerlink" title="一些错误"></a>一些错误</h2><p>出现任何错误 通用解决方案：</p>
+<ol>
+<li>重启metro</li>
+<li>node_modules删了再装</li>
+<li>重启电脑</li>
+</ol>
+<ul>
+<li><pre><code>npm ERR! Error: read ECONNRESET
+npm ERR!     at TLSWrap.onStreamRead (node:internal/stream_base_commons:217:20) &#123;
+npm ERR!   errno: -4077,
+npm ERR!   code: &#39;ECONNRESET&#39;,
+npm ERR!   syscall: &#39;read&#39;
+npm ERR! &#125;
+</code></pre>
+<p>这个是网络不好 可以多试几次  或者用cnpm 或者换源</p>
+</li>
+<li><p><code>could not get batchedbridge</code> 重启metro</p>
+</li>
+<li><p><code>Invariant Violation: Module AppRegistry is not a registered callable module (calling runApplication)</code>重启metro</p>
+</li>
+<li><p><code>npm ERR! could not determine executable to run</code>仔细看命令 npm莫名其妙会变成npx</p>
+</li>
+<li><p><code>module could not be found within the project or in these directories:node_modules</code> 重启metro 如果不行删了node_modules再装</p>
+</li>
+<li><p><code>warn No apps connected. Sending &quot;reload&quot; to all React Native apps failed. Make sure your app is running in the simulator or on a phone connected via USB. info Reloading app...</code><br>这个的原因是app本身有问题 导致一打开就会闪退 或者其他原因根本打不开 和模拟器的连接没有问题  但是找不到任何报错的信息 因此只能控制变量去看;<br>少装几个包就没这个问题了 因此是装了的包 即使代码里没有用 也会导致这个问题;具体是react-native-webrtc要求安卓的minSdkVersion 需要修改android目录下的配置文件</p>
+</li>
+<li><p><code>&#39;react-native&#39; 不是内部或外部命令，也不是可运行的程序 或批处理文件。</code>这个可能是uninstall的时候多删东西了 直接<code>npm install</code>就行</p>
+</li>
+<li><p><code>TypeError: undefined is not an object (evaluating &#39;process.version.split&#39;)</code>这个问题并没有解决</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/facebook/react-native/issues/30654">https://github.com/facebook/react-native/issues/30654</a></p>
+</li>
+</ul>
+<h2 id="待解决的问题"><a href="#待解决的问题" class="headerlink" title="待解决的问题"></a>待解决的问题</h2><ul>
+<li><p>使用路由后导致页面卡死</p>
+</li>
+<li><p>某些手机下载软件后网络请求错误  可能是手机版本导致禁用了http 可能https可以解决</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_32312317/article/details/80868118">React Native: TypeError: Network request failed_翻船现场的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/facebook/react-native/issues/32931">HTTP Fetch fails with “TypeError: Network request failed” &#x3D;&gt; Resolved · Issue #32931 · facebook&#x2F;react-native (github.com)</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/01/22/ctf/sc/" rel="prev" title="TreasureHunter">
+                  <i class="fa fa-angle-left"></i> TreasureHunter
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/01/22/ctf/SJTU-CTF%202023%20Writeup/" rel="next" title="SJTU-CTF 2023 Writeup">
+                  SJTU-CTF 2023 Writeup <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">34k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:04</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

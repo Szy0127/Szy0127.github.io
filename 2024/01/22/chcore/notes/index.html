@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="chcore-miscarm架构xxx_elk k&#x3D;0 1 2 3 寄存器表示这个寄存器只能在elk的特权等级访问  el0 用户进程 el1 操作系统 el2 虚拟化 el3 trustzone  call指令为bl 不使用栈 而是用寄存器x29作为link register ret时从LR中取返回地址 SP_EL0 SP_EL1 不同特权等级用不同的栈寄存器 所以不需要放到栈中进行保">
+<meta property="og:type" content="article">
+<meta property="og:title" content="chcore-misc">
+<meta property="og:url" content="http://szy0127.github.io/2024/01/22/chcore/notes/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="chcore-miscarm架构xxx_elk k&#x3D;0 1 2 3 寄存器表示这个寄存器只能在elk的特权等级访问  el0 用户进程 el1 操作系统 el2 虚拟化 el3 trustzone  call指令为bl 不使用栈 而是用寄存器x29作为link register ret时从LR中取返回地址 SP_EL0 SP_EL1 不同特权等级用不同的栈寄存器 所以不需要放到栈中进行保">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-01-22T12:26:50.459Z">
+<meta property="article:modified_time" content="2024-01-22T12:26:50.863Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/01/22/chcore/notes/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/01/22/chcore/notes/","path":"2024/01/22/chcore/notes/","title":"chcore-misc"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>chcore-misc | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#chcore-misc"><span class="nav-number">1.</span> <span class="nav-text">chcore-misc</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#arm%E6%9E%B6%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">arm架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8"><span class="nav-number">1.2.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ChCore%E5%90%AF%E5%8A%A8"><span class="nav-number">1.3.</span> <span class="nav-text">ChCore启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VA"><span class="nav-number">1.4.</span> <span class="nav-text">VA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PA"><span class="nav-number">1.5.</span> <span class="nav-text">PA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#page-table"><span class="nav-number">1.6.</span> <span class="nav-text">page table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#programe"><span class="nav-number">1.7.</span> <span class="nav-text">programe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.8.</span> <span class="nav-text">线程</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/chcore/notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="chcore-misc | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          chcore-misc
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-22 20:26:50" itemprop="dateCreated datePublished" datetime="2024-01-22T20:26:50+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>6 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="chcore-misc"><a href="#chcore-misc" class="headerlink" title="chcore-misc"></a>chcore-misc</h1><h2 id="arm架构"><a href="#arm架构" class="headerlink" title="arm架构"></a>arm架构</h2><p><code>xxx_elk</code> k&#x3D;0 1 2 3 寄存器表示这个寄存器只能在elk的特权等级访问</p>
+<ul>
+<li>el0 用户进程</li>
+<li>el1 操作系统</li>
+<li>el2 虚拟化</li>
+<li>el3 trustzone</li>
+</ul>
+<p>call指令为bl 不使用栈 而是用寄存器<code>x29</code>作为link register <code>ret</code>时从LR中取返回地址</p>
+<p><code>SP_EL0</code> <code>SP_EL1</code> 不同特权等级用不同的栈寄存器 所以不需要放到栈中进行保存和恢复</p>
+<p><code>svc</code>进入内核</p>
+<p><code>eret</code>从当前特权等级k返回 返回地址在ELR_EL3  可以从el1到el0 也可以从el3到el1</p>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><p>树莓派启动</p>
+<ol>
+<li>通过树莓派厂商写死的GPU来初始化CPU</li>
+<li>firmware</li>
+<li>运行kernel.img  cpu从0x80000处执行第一行代码</li>
+</ol>
+<p>对于笔记本 用BIOS (basic input output system)  嵌入式设备（手机）不用BIOS</p>
+<p>将可启动设备(磁盘 MBR 0柱面0磁头0扇区 主引导扇区)512字节加载到0x7c00 然后执行 即bootloader</p>
+<p>x86 cpu reset后指向0xffff0地址 即bios物理地址</p>
+<h2 id="ChCore启动"><a href="#ChCore启动" class="headerlink" title="ChCore启动"></a>ChCore启动</h2><p>编译生成elf时需要排序所有.o 并且设置第一行指令在地址0x80000</p>
+<ol>
+<li><p>从elX切换到el1</p>
+</li>
+<li><p>初始化栈  栈实际上是c编译后的elf文件一个已经分配好的空间(4k) 只要把sp设置好就行</p>
+<p>由于arm架构使用link register保存返回地址 所以之前的函数调用没有嵌套 可以不需要栈</p>
+<p>对于c函数的编译器，并不认为这段c程序是内核初始化，所以仍会一样编译。即使不需要把返回地址压栈，也需要进行传参、寄存器保护等用栈的操作，所以一定要在调用c程序之前初始化好栈。</p>
+<p>当初始化好栈之后，完全可以用c语言而非汇编来编程，除非需要用到msr等系统isa指令</p>
+</li>
+<li><p>页表初始化</p>
+<p>ttbr：x86下的cr3  translation table base register</p>
+<p>只用48bit     0000+48bit ttbr0翻译；ffff+48bit ttbr1翻译  cpu根据虚拟地址前缀判断使用哪个翻译</p>
+<p>ttbr0和ttbr1都是_el1</p>
+<p>多级页表 ttbr0_el1_l0 指向ttbr0_el1_l1 指向ttbr0_el1_l2  都是数组 共512个entry 是下一级页表地址或物理地址 用一个bit记录</p>
+<p>4级页表  并不是只能最后一级指向物理地址，可以使用大页。这里初始化使用2M大页 之后会拆成4K</p>
+<p>虚拟内存最大256T</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>PTE</th>
+<th>指向物理内存大小</th>
+<th>index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L0</td>
+<td>L1地址</td>
+<td>512G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>L2地址</td>
+<td>1G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>L3地址</td>
+<td>2M</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>物理内存地址</td>
+<td>4k</td>
+<td>9bit</td>
+</tr>
+</tbody></table>
+<p>最后12bit是页偏移 VA与PA相同</p>
+<p>0-1G是物理地址，1G-4G是设备地址，设备地址的值随时会变化 所以不允许缓存 PTE64bit 除了记录物理地址的36bit(12bit偏移不需要) 其他bit可用作记录页信息 比如不同特权等级的读写权限</p>
+<p>将ttbr1与ttbr0的最后一级页表记录的物理地址范围设置成相同（0G到4G 每个entry2M）这样低地址与高地址的虚拟地址翻译会映射到同一块物理地址，执行相同的代码</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VA</th>
+<th>PA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ttbr0</td>
+<td>0G-1G</td>
+<td>0G-1G</td>
+</tr>
+<tr>
+<td>ttbr1</td>
+<td>0xffffff0000000000 ,1G</td>
+<td>0G-1G</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>开启mmu （设置<code>sctlr_el1</code>寄存器的某些bit）从下一条指令开始cpu会自动做地址翻译</p>
+<p>应用程序跑在低地址 操作系统跑在高地址 start_kernal从0xffffff0000000000开始</p>
+<p>内核高地址 由ttbr1翻译 得到相同PA</p>
+<p>应用程序低地址 由ttbr0翻译 得到不同PA</p>
+</li>
+<li><p>初始化异常向量表 每一项对应一个函数地址(汇编)</p>
+<p>对于syscall这个同步异常，构建syscall table 每个系统调用号对应一个函数(void*)</p>
+</li>
+</ol>
+<h2 id="VA"><a href="#VA" class="headerlink" title="VA"></a>VA</h2><p>天然隔离性好</p>
+<p>每个CPU核有一个TLB 作为页表的缓存</p>
+<ul>
+<li><p>进程切换 刷TLB</p>
+<p>ASID TLB与页表同时记录 这样就不需要每次刷</p>
+</li>
+<li><p>修改页表映射 刷TLB (修改页表映射操作的内存使用的缓存并不是TLB TLB是缓存查找PA)</p>
+</li>
+<li><p>如果其他核也运行了当前进程 则其他核TLB也需要刷</p>
+</li>
+</ul>
+<h2 id="PA"><a href="#PA" class="headerlink" title="PA"></a>PA</h2><p>开启地址翻译后，物理地址实际上也不可见 不可管理了</p>
+<p>内核映射到高地址段，通过分配高地址段的虚拟空间来管理实际的物理内存</p>
+<p>buddy system存在于内核的虚拟空间中 但映射到真实的物理内存 从而进行管理</p>
+<p>用户态需要的虚拟空间经过buddy system分配 所以物理内存上的每个page可能会对应两个虚拟地址，但是内核自己只负责管理，是不会修改的，如果出bug了修改用户空间 称为踩内存</p>
+<p>buddy system实际上占用的内存只有metadata，每个物理页会对应一个page数据结构  记录物理页实际大小，需要访存修改的只有metadata 而操作的物理页地址实际上是虚拟地址，并且只需要根据虚拟地址找到metadata和buddy 并不需要访问内容，所以即使内核的start_addr指向的虚拟空间部分并没有映射到真实物理空间也没有关系。</p>
+<h2 id="page-table"><a href="#page-table" class="headerlink" title="page table"></a>page table</h2><p>所有page都是通过buddy_system拿到的，都是虚拟地址，存PTE时需要转换成物理地址</p>
+<p>PTE需要按给定格式存，最后一位是valid，硬件通过这个bit判断是否缺页(异常，给内核处理)</p>
+<p>如果需要换页，只要valid为0触发缺页，其他bit全自己定义即可，与硬件无关</p>
+<p>mmu访问时会改pte的access bit 方便换页策略</p>
+<p>换页需要有反向映射 修改所有映射到被换出的物理页的虚拟页的PTE</p>
+<h2 id="programe"><a href="#programe" class="headerlink" title="programe"></a>programe</h2><p><code>create_root_thread</code>创建进程 同时创建线程</p>
+<ul>
+<li>进程：创建pmo，加载二进制文件，地址映射</li>
+<li>线程：线程上下文，加入调度队列</li>
+</ul>
+<p>对于spawn创建线程，自己加载好二进制，通过各种系统调用拿到pmo，地址映射，创建线程</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>进程的地址空间，包含共享的堆，不同线程的内核栈和线程栈（用户态）</p>
+<p>chcore中，内核栈地址即为kmalloc拿到的thread结构体的地址，访问thread结构体的成员正好是在内存中栈的对应位置</p>
+<p>而线程栈是用户在发出创建线程时手动指定的。内核中的代码sp均为内核栈地址，用户态地址在指定后存在sp_el0中，上下文切换时保存恢复，eret后sp为此地址</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/01/22/misc/kubelet/" rel="prev" title="kubelet">
+                  <i class="fa fa-angle-left"></i> kubelet
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/01/22/chcore/chcore/" rel="next" title="chcore">
+                  chcore <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">34k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">2:04</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
