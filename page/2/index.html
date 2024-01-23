@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,440 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/chcore/notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/01/22/chcore/notes/" class="post-title-link" itemprop="url">chcore-misc</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-22 20:26:50" itemprop="dateCreated datePublished" datetime="2024-01-22T20:26:50+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="chcore-misc"><a href="#chcore-misc" class="headerlink" title="chcore-misc"></a>chcore-misc</h1><h2 id="arm架构"><a href="#arm架构" class="headerlink" title="arm架构"></a>arm架构</h2><p><code>xxx_elk</code> k&#x3D;0 1 2 3 寄存器表示这个寄存器只能在elk的特权等级访问</p>
+<ul>
+<li>el0 用户进程</li>
+<li>el1 操作系统</li>
+<li>el2 虚拟化</li>
+<li>el3 trustzone</li>
+</ul>
+<p>call指令为bl 不使用栈 而是用寄存器<code>x29</code>作为link register <code>ret</code>时从LR中取返回地址</p>
+<p><code>SP_EL0</code> <code>SP_EL1</code> 不同特权等级用不同的栈寄存器 所以不需要放到栈中进行保存和恢复</p>
+<p><code>svc</code>进入内核</p>
+<p><code>eret</code>从当前特权等级k返回 返回地址在ELR_EL3  可以从el1到el0 也可以从el3到el1</p>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><p>树莓派启动</p>
+<ol>
+<li>通过树莓派厂商写死的GPU来初始化CPU</li>
+<li>firmware</li>
+<li>运行kernel.img  cpu从0x80000处执行第一行代码</li>
+</ol>
+<p>对于笔记本 用BIOS (basic input output system)  嵌入式设备（手机）不用BIOS</p>
+<p>将可启动设备(磁盘 MBR 0柱面0磁头0扇区 主引导扇区)512字节加载到0x7c00 然后执行 即bootloader</p>
+<p>x86 cpu reset后指向0xffff0地址 即bios物理地址</p>
+<h2 id="ChCore启动"><a href="#ChCore启动" class="headerlink" title="ChCore启动"></a>ChCore启动</h2><p>编译生成elf时需要排序所有.o 并且设置第一行指令在地址0x80000</p>
+<ol>
+<li><p>从elX切换到el1</p>
+</li>
+<li><p>初始化栈  栈实际上是c编译后的elf文件一个已经分配好的空间(4k) 只要把sp设置好就行</p>
+<p>由于arm架构使用link register保存返回地址 所以之前的函数调用没有嵌套 可以不需要栈</p>
+<p>对于c函数的编译器，并不认为这段c程序是内核初始化，所以仍会一样编译。即使不需要把返回地址压栈，也需要进行传参、寄存器保护等用栈的操作，所以一定要在调用c程序之前初始化好栈。</p>
+<p>当初始化好栈之后，完全可以用c语言而非汇编来编程，除非需要用到msr等系统isa指令</p>
+</li>
+<li><p>页表初始化</p>
+<p>ttbr：x86下的cr3  translation table base register</p>
+<p>只用48bit     0000+48bit ttbr0翻译；ffff+48bit ttbr1翻译  cpu根据虚拟地址前缀判断使用哪个翻译</p>
+<p>ttbr0和ttbr1都是_el1</p>
+<p>多级页表 ttbr0_el1_l0 指向ttbr0_el1_l1 指向ttbr0_el1_l2  都是数组 共512个entry 是下一级页表地址或物理地址 用一个bit记录</p>
+<p>4级页表  并不是只能最后一级指向物理地址，可以使用大页。这里初始化使用2M大页 之后会拆成4K</p>
+<p>虚拟内存最大256T</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>PTE</th>
+<th>指向物理内存大小</th>
+<th>index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L0</td>
+<td>L1地址</td>
+<td>512G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>L2地址</td>
+<td>1G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>L3地址</td>
+<td>2M</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>物理内存地址</td>
+<td>4k</td>
+<td>9bit</td>
+</tr>
+</tbody></table>
+<p>最后12bit是页偏移 VA与PA相同</p>
+<p>0-1G是物理地址，1G-4G是设备地址，设备地址的值随时会变化 所以不允许缓存 PTE64bit 除了记录物理地址的36bit(12bit偏移不需要) 其他bit可用作记录页信息 比如不同特权等级的读写权限</p>
+<p>将ttbr1与ttbr0的最后一级页表记录的物理地址范围设置成相同（0G到4G 每个entry2M）这样低地址与高地址的虚拟地址翻译会映射到同一块物理地址，执行相同的代码</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VA</th>
+<th>PA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ttbr0</td>
+<td>0G-1G</td>
+<td>0G-1G</td>
+</tr>
+<tr>
+<td>ttbr1</td>
+<td>0xffffff0000000000 ,1G</td>
+<td>0G-1G</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>开启mmu （设置<code>sctlr_el1</code>寄存器的某些bit）从下一条指令开始cpu会自动做地址翻译</p>
+<p>应用程序跑在低地址 操作系统跑在高地址 start_kernal从0xffffff0000000000开始</p>
+<p>内核高地址 由ttbr1翻译 得到相同PA</p>
+<p>应用程序低地址 由ttbr0翻译 得到不同PA</p>
+</li>
+<li><p>初始化异常向量表 每一项对应一个函数地址(汇编)</p>
+<p>对于syscall这个同步异常，构建syscall table 每个系统调用号对应一个函数(void*)</p>
+</li>
+</ol>
+<h2 id="VA"><a href="#VA" class="headerlink" title="VA"></a>VA</h2><p>天然隔离性好</p>
+<p>每个CPU核有一个TLB 作为页表的缓存</p>
+<ul>
+<li><p>进程切换 刷TLB</p>
+<p>ASID TLB与页表同时记录 这样就不需要每次刷</p>
+</li>
+<li><p>修改页表映射 刷TLB (修改页表映射操作的内存使用的缓存并不是TLB TLB是缓存查找PA)</p>
+</li>
+<li><p>如果其他核也运行了当前进程 则其他核TLB也需要刷</p>
+</li>
+</ul>
+<h2 id="PA"><a href="#PA" class="headerlink" title="PA"></a>PA</h2><p>开启地址翻译后，物理地址实际上也不可见 不可管理了</p>
+<p>内核映射到高地址段，通过分配高地址段的虚拟空间来管理实际的物理内存</p>
+<p>buddy system存在于内核的虚拟空间中 但映射到真实的物理内存 从而进行管理</p>
+<p>用户态需要的虚拟空间经过buddy system分配 所以物理内存上的每个page可能会对应两个虚拟地址，但是内核自己只负责管理，是不会修改的，如果出bug了修改用户空间 称为踩内存</p>
+<p>buddy system实际上占用的内存只有metadata，每个物理页会对应一个page数据结构  记录物理页实际大小，需要访存修改的只有metadata 而操作的物理页地址实际上是虚拟地址，并且只需要根据虚拟地址找到metadata和buddy 并不需要访问内容，所以即使内核的start_addr指向的虚拟空间部分并没有映射到真实物理空间也没有关系。</p>
+<h2 id="page-table"><a href="#page-table" class="headerlink" title="page table"></a>page table</h2><p>所有page都是通过buddy_system拿到的，都是虚拟地址，存PTE时需要转换成物理地址</p>
+<p>PTE需要按给定格式存，最后一位是valid，硬件通过这个bit判断是否缺页(异常，给内核处理)</p>
+<p>如果需要换页，只要valid为0触发缺页，其他bit全自己定义即可，与硬件无关</p>
+<p>mmu访问时会改pte的access bit 方便换页策略</p>
+<p>换页需要有反向映射 修改所有映射到被换出的物理页的虚拟页的PTE</p>
+<h2 id="programe"><a href="#programe" class="headerlink" title="programe"></a>programe</h2><p><code>create_root_thread</code>创建进程 同时创建线程</p>
+<ul>
+<li>进程：创建pmo，加载二进制文件，地址映射</li>
+<li>线程：线程上下文，加入调度队列</li>
+</ul>
+<p>对于spawn创建线程，自己加载好二进制，通过各种系统调用拿到pmo，地址映射，创建线程</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>进程的地址空间，包含共享的堆，不同线程的内核栈和线程栈（用户态）</p>
+<p>chcore中，内核栈地址即为kmalloc拿到的thread结构体的地址，访问thread结构体的成员正好是在内存中栈的对应位置</p>
+<p>而线程栈是用户在发出创建线程时手动指定的。内核中的代码sp均为内核栈地址，用户态地址在指定后存在sp_el0中，上下文切换时保存恢复，eret后sp为此地址</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/misc/kubelet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/01/22/misc/kubelet/" class="post-title-link" itemprop="url">kubelet</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-22 20:18:03" itemprop="dateCreated datePublished" datetime="2024-01-22T20:18:03+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>6.8k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>25 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h1><h2 id="containerd"><a href="#containerd" class="headerlink" title="containerd"></a>containerd</h2><p><a target="_blank" rel="noopener" href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">containerd&#x2F;getting-started.md at main · containerd&#x2F;containerd (github.com)</a></p>
+<p>镜像自带，但需要安装cni，高版本没有自带的flannel，用0.9.1版本可以</p>
+<h3 id="management"><a href="#management" class="headerlink" title="management"></a>management</h3><p>管理容器，考虑以下三种方法：</p>
+<ol>
+<li><p>containerd启动时会作为grpc server，监听在<code>unix:///run/containerd/containerd.sock</code> 可以像k8s一样作为grpc client调定义好的CRI接口。但是我们不需要考虑项目不同模块解耦，也不需要考虑支持其他的容器运行时，对于grpc的调用需要自己构造参数，太复杂，并且试了一下很难跑起来。</p>
+</li>
+<li><p>用exec+ctl</p>
+<p>这里可以使用containerd写的nerdctl 兼容docker的命令行格式</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/containerd/nerdctl">containerd&#x2F;nerdctl: contaiNERD CTL - Docker-compatible CLI for containerd, with support for Compose, Rootless, eStargz, OCIcrypt, IPFS, … (github.com)</a></p>
+<p>完全用cli工具技术含量不高，且需要经过nerdctl这个大框架的解析，效率不高。</p>
+<p>可以做一些辅助用途，比如测试、启动pause等。核心的查看容器状态和启动容器还是用containerd的go api</p>
+</li>
+<li><p>containerd api</p>
+<p>实在难用，官方文档一共就readme的几句话，剩下的全靠看源码+猜+看nerdctl源码如何使用</p>
+</li>
+</ol>
+<p>这里研究出的api如下</p>
+<ul>
+<li>创建容器 包括配置</li>
+<li>销毁容器</li>
+<li>获取容器状态</li>
+<li>获取容器资源信息</li>
+</ul>
+<h3 id="configuration"><a href="#configuration" class="headerlink" title="configuration"></a>configuration</h3><ul>
+<li><p><code>WithMounts</code> 挂载 需要将type和options同时设为bind，否则会报<code>no such device</code>的错</p>
+</li>
+<li><p><code>WithDomainname</code> <code>WithHostname</code></p>
+</li>
+<li><p><code>WithLinuxNamespace</code>可以加入其他进程的namespace 但是需要先起task 拿到pid<code>proc/pid/ns/uts</code></p>
+<p>启动pause容器后，将此pod内的所有其他容器加入到pause容器的namespace<br>观察containerd的源码可知，就算什么都不配置，默认也是使用了ipc、uts、network、mount、pid这五个命名空间隔离的<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_40579389/article/details/125941366">k8s之pause容器</a>按这篇文章的意思 除了mount其他都不需要和pause隔离<br>需要修改的话 一种是自己写配置函数，另一种是使用这个api但只能一个个单独设 </p>
+</li>
+<li><p><code>WithProcessArgs</code> 启动命令 只有windows支持<code>ProcessCmdLine</code> 不过简单的命令使用起来效果差不多，具体可能涉及到entrypoint 和cmd的区别</p>
+</li>
+<li><p><code>Withenv</code>  环境变量 <code>&quot;a=c&quot;</code> </p>
+</li>
+<li><p><code>WithMemoryLimit</code> 单位是字节，如果容器使用内存超过这个数 会被直接kill。</p>
+<p>莫名其妙会有bug，报cgroup的错，全网查不到信息，使用“30Mi” 没问题</p>
+</li>
+<li><p>CPU：</p>
+<ul>
+<li><code>WithCPUs</code> 将容器进程绑定到指定cpu执行，比如<code>0-3</code>绑定到0 1 2 3  ，<code>1</code>绑定到1</li>
+<li><code>WithCPUCFS</code> 调度器，对应到nerdctl 是<code>--cpus</code> 会使用这个api，但是网上说这个参数指定cpu核，这个说法不准确，实际上如果这个值为1，会发生cpu0 和cpu1占用率都在50%的情况，即总使用量为1</li>
+<li><code>WithCPUShares</code> 份额</li>
+</ul>
+</li>
+<li><p>port: 仅作标识用，没有意义，所以没有对应api</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/4b16c995990b">k8s四种port解析：nodePort、port、targetPort、containerPort - 简书 (jianshu.com)</a> </p>
+</li>
+<li><p><code>WithContainerLabels</code>这个功能为container提供label</p>
+<p>配合<code>client.Containers(ctx,fmt.Sprintf(&quot;labels.%q==%s&quot;, &quot;pod&quot;, pod.Data.Name))</code>一起使用</p>
+<p>对于apiserver维护的信息，只是自定义的container apiobject，并不是containerd的可以用来获取真实容器信息的对象，使用containerd的添加label并使用filter的方法可以很方便地拿到一个pod对应的所有containers，否则需要通过遍历容器并比较ID来判断。</p>
+</li>
+</ul>
+<h3 id="task"><a href="#task" class="headerlink" title="task"></a>task</h3><p>containerd的api有一个docker没有的概念task</p>
+<p>每个容器创建后，可以开启task，每个task对应一个进程，有对应的api，这时候才会产生新的命名空间</p>
+<p>删除容器，先要killtask 然后delete task 最后delete容器</p>
+<h3 id="image"><a href="#image" class="headerlink" title="image"></a>image</h3><p>containerd本身管理容器运行时，对于其他功能的提供非常少，包括拉取镜像。使用containerd提供的api只能做到从某个registry拉取，本地image是不行的，不带registry的image也是不行的。</p>
+<p>通过观察nerdctl的源码可以得到以下两个扩展：</p>
+<ol>
+<li><code>pkg/imgutil/dockerconfigresolver/dockerconfigresolver.go/New</code>可知使用docker的resolver可以做到从不同registry(包括自己部署的)拉取镜像</li>
+<li><code>pkg/imgutil/imgutil.go/GetExistingImage</code>可知containerd提供<code>NewImage</code>方法，供<code>image.Image</code>对象到<code>containerd.Image</code>的转换，这里<code>image.Image</code>可以通过<code>client.ImageService().Get(imageName)</code>来获取。虽然这里在字符串解析上也必须出现registry的部分，但是实际上不会真的pull，而是从本地获取(<code>nerdctl image list</code>可见即可)</li>
+</ol>
+<p>如果image在自己部署的registry中但还未被pull，这两种方法都是行不通的，需要自己创建docker resolver然后用WithResolver的配置去pull。这里图方便，解决方案为先用cli工具提前pull，随后紧接着用方法2获取到image对象</p>
+<h3 id="pause"><a href="#pause" class="headerlink" title="pause"></a>pause</h3><p>用containerd api设置网络特别麻烦，因此直接用nerdctl跑pause容器，并inspect拿到pid</p>
+<p>因此这里直接使用podname+”-pause”为每个pause容器命名</p>
+<p>虽然containerd的container对象只能访问.ID，而nerdctl 的 <code>--name</code> 设置的是name并不是id 但还是可以通过containerd的filter+label拿到container对象</p>
+<p>然而由于一开始pause容器利用nerdctl实现网络配置，nerdctl本身除了调用containerd的api外，自己有维护一个namestore，在创建容器时会 <code>aquire</code> 需要在销毁时 <code>release</code></p>
+<p>所以销毁容器只调containerd的api是不够的，会导致containerd的容器已经被删掉了，但是nerdctl维护的信息还没删，导致下一次创建同名pause容器会有问题</p>
+<p>解决方案可以是照nerdctl的代码找到对应的文件路径 然后照抄 <code>release</code>的代码，但这导致minik8s存在与nerdctl耦合的路径配置，较复杂 所以不如销毁pause仍用nerdctl直接实现</p>
+<h2 id="network"><a href="#network" class="headerlink" title="network"></a>network</h2><p>containerd相较于docker并没有提供任何网络相关帮助，所以完全依赖CNI插件</p>
+<p><code>nerdctl network ls</code> <code>nerdctl run -net host/none</code></p>
+<p>CNI插件完成两个目标</p>
+<ol>
+<li>让每个容器(实际上就是一个pod)拥有一个虚拟网卡，使其拥有访问外网的能力</li>
+<li>支持跨node(物理主机)的pod间通信</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_41033724/article/details/124976813">Kubernetes容器网络及Flannel插件详解_边缘计算社区的博客-CSDN博客</a></p>
+<p>思路：</p>
+<ol>
+<li>使用flannel插件创建网络 此时每个node都会出现<code>flannel.1</code>的虚拟网卡，可以互相通信</li>
+<li>使用<code>nerdctl run -net flannel pause</code> 创建pause容器，此时ip在不同node上会在不同子网中进行分配，不会重复</li>
+<li>其他容器加入pause容器的network namespace</li>
+</ol>
+<h3 id="flannel"><a href="#flannel" class="headerlink" title="flannel"></a>flannel</h3><p><a target="_blank" rel="noopener" href="https://github.com/flannel-io/flannel/blob/master/Documentation/running.md">flannel&#x2F;running.md at master · flannel-io&#x2F;flannel · GitHub</a></p>
+<p>flannel目前已经支持了etcd v3版本，不需要切换v2。</p>
+<p>etcd v3 v2的数据是不互通的，flanneld启动时默认会在v3里找数据</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lhang/p/17306765.html">Docker容器使用Flannel通信 - L_Hang - 博客园 (cnblogs.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_30641567/article/details/123917486">Containerd网络管理_containerd 端口映射_班婕妤的博客-CSDN博客</a></p>
+<p>只有master节点通过apiserver使用etcd，kubelet部署在node上 不需要也不能管理etcd</p>
+<p>只需要一个etcd 不需要集群 (flannel如果使用etcd集群会出找不到lease的bug)</p>
+<p>master <code>etcd --listen-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --listen-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot; --initial-advertise-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --advertise-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot;</code></p>
+<p>master <code>etcdctl --endpoints &quot;http://192.168.1.12:2379&quot; put /coreos.com/network/config &#39;&#123;&quot;NetWork&quot;:&quot;10.2.0.0/16&quot;,&quot;SubnetMin&quot;:&quot;10.2.1.0&quot;,&quot;SubnetMax&quot;: &quot;10.2.20.0&quot;,&quot;Backend&quot;: &#123;&quot;Type&quot;: &quot;vxlan&quot;&#125;&#125;&#39;</code></p>
+<p>node启动<code>./flanneld-amd64 -etcd-endpoints=http://192.168.1.12:2379 -iface=ens3</code></p>
+<p>这里ens3是主机上能和外界通信的网卡，如果不设置flannel也会自动找</p>
+<p>出现<code>flannel.1</code>的网卡。如果修改配置后第一次的flannel1无法消失 出现cni0 重启可以解决</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vim /etc/cni/net.d/10-flannel.conflist</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">  <span class="string">&quot;cniVersion&quot;</span>: <span class="string">&quot;0.3.1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;plugins&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">      <span class="string">&quot;delegate&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;isDefaultGateway&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;portmap&quot;</span>,</span><br><span class="line">      <span class="string">&quot;capabilities&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;portMappings&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>nerdctl run -d -v /home/test_mount:/root/test_mount --net flannel -e port=12345 mcastelino/nettools /root/test_mount/test_network</code> 测试网络可行<br>nerdctl对于网络的解析太复杂了，对于pause并没有很多额外的配置，所以直接用ctl启动pause<br>在加入pause的namespace后发现，虽然其他容器有通过虚拟网卡向外找到合适的转发接口的能力，但是并没有DNS server。这里解决方法是使用外部的<code>nerdctl cp</code>命令将首个容器(pause)的<code>/etc/resolv.conf</code> <code>/etc/hosts</code>文件复制给每个该pod下的容器<br>容器内部部署的服务 可在主机上通过容器ip+容器内端口的方式直接访问到，至此实现pod间通信、主机与pod通信，后续交给kube-proxy</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43266367/article/details/127836595">k8s网络插件之Flannel_林凡修的博客-CSDN博客</a></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>由于需要给pod增加dns服务，在master上使用coredns作为dns server，解决方法是在resolve.conf中第一条加入master节点的ip（必须53端口）</p>
+<p>resolv.conf的逻辑是 如果前一个nameserver连接不上，才会继续向下一个nameserver查找。</p>
+<p>如果前一个nameserver连接上了但是没有记录，则会直接报无记录，不会向下一个nameserver查找。</p>
+<p>因此必须保证在集群网络通常的情况下，master节点必须启用coredns并且coredns除了minik8s需要的dns服务，必须包括其他通用的dns服务。</p>
+<h2 id="资源监控"><a href="#资源监控" class="headerlink" title="资源监控"></a>资源监控</h2><p>参考<code>cmd/nerdctl/container_stats_linux.go</code></p>
+<p>可以通过containerd的api拿到metrics对象,不过需要Unmarshal，并且对应的接口离其报错，找不到type，只能照着containerd的源码手动用反射</p>
+<h3 id="memory"><a href="#memory" class="headerlink" title="memory"></a>memory</h3><p>是一个定值，表示占用内存大小，单位byte</p>
+<h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><p>进程创建开始之后累计执行的时间，如果跑在2个核上，过了1s，则记为2s<br>通过与上一次获取的cpu执行时间的delta和时间delta可以计算出CPUPercent，和top展示的cpu%是一模一样的<br>CPUPercent和容器创建指定的cpu参数可对应，例如指定cpu&#x3D;1，则cpu%&#x3D;100%;cpu&#x3D;2,cpu%&#x3D;200%（两核跑满）;cpu&#x3D;500m,cpu%&#x3D;50%</p>
+<h2 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h2><p>kubelet主要做三件事</p>
+<ol>
+<li>websocket与apiserver保持长连接，监听到pod的创建、销毁状态时进行对应的容器操作。</li>
+<li>作为http server接收对于容器资源的请求，获取并计算容器资源后返回。</li>
+<li>每隔一段时间检查所有容器的状态，将存在停止容器的pod的状态通过短链接更新给apiserver</li>
+</ol>
+<p>针对container，1是写，23是读，可能会发生冲突。例如操作2正在统计某容器资源的时候，该容器被操作1删除。</p>
+<p>使用读写锁为每个pod上锁，即<code>map[string]sync.RWMutex</code> 其中key为<code>namespace-podname</code> 锁必须细粒度，因为2操作非常慢。</p>
+<p>go的map本身是线程不安全的，在对于同一个pod同时拿锁时可能创建两个不同的锁，严重时可能导致对于map的修改崩溃，因此将map替换为<code>sync.Map</code>。虽然同时写map没问题，但是很可能出现t1创建完并拿完锁之后return t2再次创建并拿锁，原因是并没有另一把锁来让对于map中某个key的访问设为临界区。使用<code>sync.Map</code>提供的<code>LoadOrStore(key,value)</code>方法，它会先判断是否存在某个key，如果存在返回<code>map[key]</code>，否则设置<code>map[key]=value</code>后返回value，最后用value.lock。这个方法只是压缩代码行数到了两行，但仍然不是原子的。最好是有类似<code>tbb::concurrent_hash_map::accessor</code>之类的东西。</p>
+<p>解决方法是使用一把大锁保护<code>sync.Map</code>，每次写map都需要拿锁，虽然粒度从pod变大到了整个空间，但是这里锁保护的临界区非常小，之后对于map数据结构的写，很快。</p>
+<p>在和apiserver连接中断后，任务2会继续做，任务1会每5s再发起一次连接请求，任务3会按之前的频率继续做(由于get请求会失败所以拿不到pod信息)</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -233,7 +667,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -357,7 +791,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>12 mins.</span>
+      <span>50 mins.</span>
     </span>
 </div>
 
@@ -529,7 +963,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>26 mins.</span>
+      <span>1:43</span>
     </span>
 </div>
 
@@ -791,7 +1225,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>29 mins.</span>
     </span>
 </div>
 
@@ -994,7 +1428,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
+      <span>35 mins.</span>
     </span>
 </div>
 
@@ -1151,13 +1585,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">181k</span>
+    <span title="Word count total">184k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">2:44</span>
+    <span title="Reading time total">11:08</span>
   </span>
 </div>
 <div class="busuanzi-count">
