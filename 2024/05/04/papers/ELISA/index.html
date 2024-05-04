@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="yasukata&#x2F;ELISA: ELISA: Exit-Less, Isolated, and Shared Access for Virtual Machines (github.com) 主要是elisa的设计实现了带隔离的共享内存 network的use case可以做到比vhost-net更好 背景虚拟机间需要共享数据  共享内存 效率高 隔离性低 guest代码不可信 host">
+<meta property="og:type" content="article">
+<meta property="og:title" content="S blog">
+<meta property="og:url" content="http://szy0127.github.io/2024/05/04/papers/ELISA/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="yasukata&#x2F;ELISA: ELISA: Exit-Less, Isolated, and Shared Access for Virtual Machines (github.com) 主要是elisa的设计实现了带隔离的共享内存 network的use case可以做到比vhost-net更好 背景虚拟机间需要共享数据  共享内存 效率高 隔离性低 guest代码不可信 host">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135854799.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221140438142.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221151320704.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135313661.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135431450.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135535967.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221141207415.png">
+<meta property="og:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221141230092.png">
+<meta property="article:published_time" content="2024-05-04T07:40:31.335Z">
+<meta property="article:modified_time" content="2024-03-01T11:59:59.150Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135854799.png">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/05/04/papers/ELISA/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/05/04/papers/ELISA/","path":"2024/05/04/papers/ELISA/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EPTP"><span class="nav-number">2.</span> <span class="nav-text">EPTP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#challange"><span class="nav-number">3.</span> <span class="nav-text">challange</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#design"><span class="nav-number">4.</span> <span class="nav-text">design</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#APT"><span class="nav-number">4.1.</span> <span class="nav-text">APT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gate"><span class="nav-number">4.2.</span> <span class="nav-text">gate</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#network"><span class="nav-number">5.</span> <span class="nav-text">network</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VALE"><span class="nav-number">5.1.</span> <span class="nav-text">VALE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hyperNF"><span class="nav-number">5.2.</span> <span class="nav-text">hyperNF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libelisa"><span class="nav-number">6.</span> <span class="nav-text">libelisa</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#elisa-server-%E8%BF%90%E8%A1%8C%E5%9C%A8managerVM-%E6%AD%BB%E5%BE%AA%E7%8E%AF"><span class="nav-number">6.0.1.</span> <span class="nav-text">elisa_server  运行在managerVM 死循环</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#elisa-client-%E8%BF%90%E8%A1%8C%E5%9C%A8guestVM%E4%B8%AD-%E9%85%8D%E7%BD%AE%E5%AE%8Cgate-sub-EPT-%E4%B9%8B%E5%90%8E%E9%80%80%E5%87%BA"><span class="nav-number">6.0.2.</span> <span class="nav-text">elisa_client 运行在guestVM中 配置完gate&#x2F;sub EPT 之后退出</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/05/04/papers/ELISA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-05-04 15:40:31" itemprop="dateCreated datePublished" datetime="2024-05-04T15:40:31+08:00">2024-05-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2024-03-01 19:59:59" itemprop="dateModified" datetime="2024-03-01T19:59:59+08:00">2024-03-01</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>10 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://github.com/yasukata/ELISA?tab=readme-ov-file#section-41--anywhere-page-table-apt">yasukata&#x2F;ELISA: ELISA: Exit-Less, Isolated, and Shared Access for Virtual Machines (github.com)</a></p>
+<p>主要是elisa的设计实现了带隔离的共享内存 network的use case可以做到比vhost-net更好</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>虚拟机间需要共享数据</p>
+<ul>
+<li>共享内存 效率高 隔离性低 guest代码不可信</li>
+<li>host介入 例如hypercall 隔离性好 效率低</li>
+</ul>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135854799.png" alt="image-20240221135854799" style="zoom:50%;" />
+
+<ul>
+<li>share一块设备的DMA区域</li>
+<li>trafficDB</li>
+</ul>
+<p>ELISA通过vmfunc切换EPT页表实现安全高效的资源共享</p>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221140438142.png" alt="image-20240221140438142" style="zoom:50%;" />
+
+<h2 id="EPTP"><a href="#EPTP" class="headerlink" title="EPTP"></a>EPTP</h2><img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221151320704.png" alt="image-20240221151320704" style="zoom:50%;" />
+
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Rev-omi/p/14063037.html">第10章：VT 技术（简单了解+EPT 机制） - Rev_omi - 博客园 (cnblogs.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.usenix.org/sites/default/files/conference/protected-files/atc18_slides_hua.pdf">atc18_slides_hua.pdf (usenix.org)</a></p>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135313661.png" alt="image-20240221135313661" style="zoom:50%;" />
+
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135431450.png" alt="image-20240221135431450" style="zoom:50%;" />
+
+<p>EPTP: EPT四级页表的root</p>
+<p>传统hypervisor只需要为每个guest配置一套EPT就可以 intel允许配置512个</p>
+<p>改完EPT以后 GPA-&gt;HPA映射改变 所有数据都变了 包括代码和页表</p>
+<p>所以大部分都是不改的 只改需要改的部分 例如代码</p>
+<ul>
+<li>原本不能访问的 现在可以访问</li>
+<li>代码段4k页结束以后 变到了新的代码段上了</li>
+</ul>
+<h2 id="challange"><a href="#challange" class="headerlink" title="challange"></a>challange</h2><p>EPT context 指每个EPTP对应的四级页表</p>
+<p>需要保证guest 页表数据不变(否则会crash) 所以guest 页表GPA-&gt;HPA不能变</p>
+<p> 所以guest改cr3必须下陷同步修改EPT？</p>
+<p>修改EPT以后代码在哪？  理论：通过固定GVA去call vmfunc 实际：恶意guest可以控制页表和cr3 导致可以任意GVAcall 绕过判断</p>
+<h2 id="design"><a href="#design" class="headerlink" title="design"></a>design</h2><p>三种EPT context</p>
+<ul>
+<li>default 不可信</li>
+<li>gate 可信</li>
+<li>sub 可信</li>
+</ul>
+<p>Manager VM：可信部分 方便用user-space的tool 代替了kernel的hypervisor 去配置EPT</p>
+<h3 id="APT"><a href="#APT" class="headerlink" title="APT"></a>APT</h3><p>APT是为了消除CR3的trap和update开销</p>
+<p>vmfunc之后 GPA-&gt;HPA映射改变 还是在guest内 因此想要执行目标代码 绕不开地址翻译</p>
+<p>让所有的GPA都指向提前配置好的guest页表基地址 这样不论cr3的值是什么 都可以正确翻译</p>
+<p>因此其他用到的内存 例如栈 共享变量 代码都必须在guest合法GPA之外 例如256G</p>
+<h3 id="gate"><a href="#gate" class="headerlink" title="gate"></a>gate</h3><img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221135535967.png" alt="image-20240221135535967" style="zoom:50%;" />
+
+<p><a target="_blank" rel="noopener" href="https://www.usenix.org/conference/usenixsecurity20/presentation/mi">(Mostly) Exitless VM Protection from Untrusted Hypervisor through Disaggregated Nested Virtualization | USENIX</a></p>
+<p>防止VM 随意切换EPTP bypass掉可信部分 用动态修改EPTP list的技术 </p>
+<p>初始化情况下 EPTP list 只有default 和gate 两个entry</p>
+<p>切换到gate的时候动态加入sub到EPTP list</p>
+<p>sub回到default之前再把sub从EPTP list里面删了</p>
+<p>dlopen加载可信代码 映射到sub EPT</p>
+<p>gate隔离开def和sub 加简单的check就可以</p>
+<h2 id="network"><a href="#network" class="headerlink" title="network"></a>network</h2><p>VM-&gt;虚拟网卡-&gt;qemu&#x2F;kvm-&gt;内核网桥-&gt;物理网卡</p>
+<p>[KVM 介绍（4）：I&#x2F;O 设备直接分配和 SR-IOV <a target="_blank" rel="noopener" href="https://www.cnblogs.com/sammyliu/p/4548194.html">KVM PCI&#x2F;PCIe Pass-Through SR-IOV] - SammyLiu - 博客园 (cnblogs.com)</a></p>
+<p>PCI passthrough 设备直通 一个网卡给一个虚拟机用</p>
+<p>SRIOV也是设备直通 但是有一个网卡给多个虚拟机用的能力</p>
+<p>virtual switch是sub context共享的 物理NIC的IO buffer和DMA是sub context共享的</p>
+<p>vNIC的io buffer是def和sub共享的</p>
+<p>virtual switch用了VALE&#x2F;mswitch netmap</p>
+<p>VNIC driver是DPDK写的  user application也要用DPDK去通信</p>
+<p>发包</p>
+<ol>
+<li>vNIC把数据放到IObuffer def和sub shared</li>
+<li>vmfunc</li>
+<li>virtual switch拷贝到目标NIC</li>
+<li>virtual switch trigger sub中的physical NIC driver</li>
+</ol>
+<p>收包</p>
+<ol>
+<li>vNIC</li>
+<li>vmfunc 进入sub</li>
+<li>virtual switch拷贝到vNIC</li>
+</ol>
+<p>PCI passthrough不能被多个VM共用</p>
+<p>转发逻辑完全可编程 和SRIOV不同 后者是硬件代码</p>
+<p>测试用的benchmark都需要基于DPDK的用户进程</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/fengfengdiandia/article/details/52869290">netmap 介绍-CSDN博客</a></p>
+<p>网络包首发框架 映射网卡packet buffer到用户态</p>
+<p><a target="_blank" rel="noopener" href="https://conferences.sigcomm.org/sigcomm/2017/files/tutorial-netmap/03-vale.pdf">03-vale.pdf (sigcomm.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://manpages.org/vale/4">man vale (4): a very fast Virtual Local Ethernet using the netmap API (manpages.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/ELISA?tab=readme-ov-file#section-71--vm-networking-system">yasukata&#x2F;ELISA: ELISA: Exit-Less, Isolated, and Shared Access for Virtual Machines (github.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-app-vmnet/blob/master/client/main.c">elisa-app-vmnet&#x2F;client&#x2F;main.c at master · yasukata&#x2F;elisa-app-vmnet (github.com)</a></p>
+<ol>
+<li><p>guestVM网络请求 被DPDK driver处理<a target="_blank" rel="noopener" href="https://github.com/yasukata/librte_pmd_rvif/blob/9fbd375484cef415ea61bb6b436d509dca707c87/main.c#L276-L278">librte_pmd_rvif&#x2F;main.c at 9fbd375484cef415ea61bb6b436d509dca707c87 · yasukata&#x2F;librte_pmd_rvif (github.com)</a></p>
+</li>
+<li><p>先拷贝数据到vNIC iobuf上 这个是def sub共享的</p>
+</li>
+<li><p>然后调用dpdk_rvif_io_hook<a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-app-vmnet/blob/4a9800ea488aa4ac9b057c3d98f04da35faefab1/client/main.c">elisa-app-vmnet&#x2F;client&#x2F;main.c at 4a9800ea488aa4ac9b057c3d98f04da35faefab1 · yasukata&#x2F;elisa-app-vmnet (github.com)</a> 其中do_io会调用elisa_gate_entry</p>
+</li>
+<li><p>触发vmfunc</p>
+</li>
+<li><p>进入sub的entry point 这里entry_function是rvs_fwd</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-app-vmnet/blob/4a9800ea488aa4ac9b057c3d98f04da35faefab1/server/lib/libelisa-applib-vmnet/main.c#L68">elisa-app-vmnet&#x2F;server&#x2F;lib&#x2F;libelisa-applib-vmnet&#x2F;main.c at 4a9800ea488aa4ac9b057c3d98f04da35faefab1 · yasukata&#x2F;elisa-app-vmnet (github.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/rvs/blob/master/rvs.c">rvs&#x2F;rvs.c at master · yasukata&#x2F;rvs (github.com)</a></p>
+<p>rvs是单独实现的一个virtual switch</p>
+</li>
+<li><p>virtual switch主要做两件事</p>
+<ul>
+<li>找destination</li>
+<li>拷贝数据到destination NIC的IO buffer</li>
+</ul>
+<p>这部分参考VALE&#x2F;mswitch实现</p>
+</li>
+</ol>
+<h3 id="VALE"><a href="#VALE" class="headerlink" title="VALE"></a>VALE</h3><p>就是一个高性能的virtual switch</p>
+<h3 id="hyperNF"><a href="#hyperNF" class="headerlink" title="hyperNF"></a>hyperNF</h3><ul>
+<li>为了不增加hypervisor的TCB 把基于VALE的vswitch放在一个privilege VM中 实现转发逻辑</li>
+<li>数据和代码export到hypervisor中</li>
+<li>map一些数据结构给VM</li>
+<li>NIC直接连接switch</li>
+</ul>
+<p>transmit</p>
+<ol>
+<li>VM 放数据到packet buffer</li>
+<li>hypercall</li>
+<li>VALE转发逻辑（查询dest地址 拷贝数据）</li>
+<li>hypercall return</li>
+</ol>
+<ul>
+<li>virtio&#x2F;vhost-net是通过hypervisor处理 物理NIC连的是hypervisor上的tap设备</li>
+<li>elisa通过hyperNF的架构 多个VM共享物理NIC的DMA区域 例如加锁使用</li>
+</ul>
+<p>VALE本身就比tap快10-20倍 12年</p>
+<p>hyperNF用了VALE 15年</p>
+<p>发网络包的过程</p>
+<ol>
+<li>guest host通信</li>
+<li>switch转发</li>
+</ol>
+<p>elisa做到的是把通信部分从vm exit变为开销更小的vmfunc 并且用自己实现的高效转发逻辑用sub EPT保护起来 同时实现了隔离性</p>
+<p>baseline：</p>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221141207415.png" alt="image-20240221141207415" style="zoom:50%;" />
+
+
+
+<p>elisa</p>
+<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20240221141230092.png" alt="image-20240221141230092" style="zoom:50%;" />
+
+
+
+<h2 id="libelisa"><a href="#libelisa" class="headerlink" title="libelisa"></a>libelisa</h2><p>最终执行流也是通过EPT映射决定的 所以如何构造EPT很关键</p>
+<p>managerVM配置好EPT以后写到eptp_list 通过hypercall告诉kvm  kvm通过写vmcs配置eptp_list 然后vmfunc就可以直接用</p>
+<p>elisa-util-exec会直接执行elisa__exec_init managerVM和guestVM都需要执行elisa-util-exec 这样都执行了shared的mmap</p>
+<p>每个需要共享内存的guest VM作为elisa_client</p>
+<ul>
+<li><h4 id="elisa-server-运行在managerVM-死循环"><a href="#elisa-server-运行在managerVM-死循环" class="headerlink" title="elisa_server  运行在managerVM 死循环"></a><a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-util-exec/blob/eb8a14a132fe7f9b0e7980c7a4ab3a30ef8a465f/main.c#L67"><code>elisa_server</code></a>  运行在managerVM 死循环</h4><p>由elisa-util-exec调用到elisa_server 传入elisa__server_cb  elisa__server_exit_cb</p>
+<p>fork后执行server_work</p>
+<p>ELISA_APPLIB_FILE&#x3D;.&#x2F;lib&#x2F;libelisa-applib-nop&#x2F;lib.so 这个文件里面只有一个entry_function</p>
+<p>server_cb(elisa__server_cb)调用elisa_create_program_map_req 解析ELF把entry_function的代码段都放到base_gpa后的一页一页</p>
+<p>shared_memory的指针会被放到代码段页之后的一页</p>
+<p>BASE_GPA是1&lt;&lt;37 即128G</p>
+<p>正常来说8G内存范围就是0-8G 超了访问硬件就会报错<br>但是对于虚拟化 有GPA-&gt;HPA翻译 超出的部分也可以被映射到合法的HPA<br>default EPT不映射超出的部分 non-default EPT映射超出的GPA到HPA</p>
+<p>src_gxa表示可能是gva也可能是gpa 实际上都是gva</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(*map_req)[*map_req_cnt].dst_gpa = <span class="number">0x1000</span> * *map_req_cnt + base_gpa;</span><br><span class="line">(*map_req)[*map_req_cnt].dst_gva = (phdr.p_vaddr &amp; (~((<span class="number">1UL</span> &lt;&lt; <span class="number">12</span>) - <span class="number">1</span>))) + <span class="number">0x1000</span> * j;</span><br><span class="line">(*map_req)[*map_req_cnt].src_gxa = (phdr.p_vaddr &amp; (~((<span class="number">1UL</span> &lt;&lt; <span class="number">12</span>) - <span class="number">1</span>))) + <span class="number">0x1000</span> * j;</span><br></pre></td></tr></table></figure>
+
+<p>server libelisa这边的BASE_GPA是256G</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__map_req[i].dst_gva = requested_gva + 0x1000 * i;</span><br><span class="line">__map_req[i].dst_gpa = BASE_GPA + 0x1000 * i;</span><br></pre></td></tr></table></figure>
+
+<p><code>embed_addr_to_code((void *)((uintptr_t) __RUNTIME_VALUE_2 + 2), entry_function);</code></p>
+<p>把entry_function的地址写到sub_context的code中</p>
+<p>setup_vcpu_ept_ctx</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">assert(!gva2hpa(req[i].src_gxa, &amp;hpa));</span><br><span class="line">pt_map(&amp;ctx-&gt;pt, req[i].dst_gva, req[i].dst_gpa, req[i].pt_flags, req[i].level);</span><br><span class="line">pt_map(&amp;ctx-&gt;ept, req[i].dst_gpa, hpa, req[i].ept_flags, req[i].level);</span><br></pre></td></tr></table></figure>
+
+<p>原先src_gva-&gt;hpa 是src_gva是已经存在的一块内存区域</p>
+<p>之后dst_gva-&gt;dst_gpa-&gt;hpa 即用新的guest page table和ept 可以用dst_gva访问到这块数据</p>
+<p>pt_map补全页表 建立映射 pgtbl-&gt;cnt表示四级页表中所有页表的个数 pg[0]表示root页表</p>
+<p>把pt页表的映射再加到EPT中</p>
+<p>只是配好了一个pt和一个ept 包括gate sub用到的代码和stack</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">memcpy</span>((<span class="type">void</span> *) ctx-&gt;apt_mem, (<span class="type">void</span> *) ctx-&gt;pt.pg[<span class="number">0</span>].va, <span class="number">0x1000</span>);</span><br><span class="line">assert(!gva2hpa((<span class="type">uint64_t</span>) ctx-&gt;apt_mem, &amp;hpa));</span><br><span class="line">pt_map(&amp;ctx-&gt;ept, ((<span class="type">uint64_t</span>) <span class="number">-1</span>) &amp; EPT_ADDR_MASK, hpa, EPT_R | EPT_W | <span class="comment">/*EPT_X | EPT_U |*/</span> EPT_MT, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>ept把0xfffffffff映射到apt_mem的hpa 这样ept四级页表都会有最后一项</p>
+<p>ae是所有页表的最后一个位置</p>
+<p>遍历ept 把512项的每一项都指向ae 即下一级页表的最后一个位置 这样最终会指向apt_mem的hpa 如果已经有指向了 则递归把下一级的指向apt_mem</p>
+<p>改变整个地址空间的映射 不是遍历整个地址空间为每个va创建映射 而是直接修改page table entry即可</p>
+<p>最终配置完的EPT guest自己所有的GPA都会被映射到apt_mem的HPA  存储的数据是guest page table的root page table</p>
+<p>超出范围的GPA被映射到指定的位置  </p>
+<p>gate EPT会被放到eptp_list的最后一个位置</p>
+<p>set_rendezvous_point_eptp_list_hpa 把eptp_list记录到host</p>
+<p>read等待client结束</p>
+<p>配置完成后 多了两个ept  并且ept的合法GPA范围都指向了一起配置好的pt</p>
+</li>
+<li><h4 id="elisa-client-运行在guestVM中-配置完gate-sub-EPT-之后退出"><a href="#elisa-client-运行在guestVM中-配置完gate-sub-EPT-之后退出" class="headerlink" title="elisa_client 运行在guestVM中 配置完gate&#x2F;sub EPT 之后退出"></a><a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-util-exec/blob/eb8a14a132fe7f9b0e7980c7a4ab3a30ef8a465f/main.c#L72"><code>elisa_client</code></a> 运行在guestVM中 配置完gate&#x2F;sub EPT 之后退出</h4><p> 由elisa-util-exec调用到elisa_client 传入client_cb </p>
+<p>拿到vcpuid</p>
+<p>client_cb 啥也不干</p>
+<p><code>request_gva = (uint64_t) gate_entry_page + 0x1000;</code></p>
+<p>elisa_guest_activate 写入eptp_list</p>
+<p>elisa__client_work 禁止中断 elisa_gate_entry</p>
+<p>____asm_impl_client 定义了elisa_gate_entry  执行vmfunc(511) 切换到gate ept</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.src_gxa = (<span class="type">uint64_t</span>) gate_ctx_page,</span><br><span class="line">.dst_gva = requested_gva + <span class="number">0x1000</span> * <span class="number">0</span>,</span><br><span class="line">.dst_gpa = BASE_GPA + <span class="number">0x1000</span> * <span class="number">0</span>,</span><br></pre></td></tr></table></figure>
+
+<p>此使pc正好指向下一个page 这个page通过之前配置好的pt和ept 会被映射到gate_ctx_page</p>
+<p>立即切换之后 并不会马上用到stack 因此可以先写一些不需要stack的汇编 然后配置rsp到事先用mmap准备好的栈位置</p>
+<p>gate执行完(code page上半部分) vmfunc 切换视角 继续执行的是sub page的下半部分 </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&quot;.globl __RUNTIME_VALUE_2 \n\t&quot;</span><br><span class="line">&quot;__RUNTIME_VALUE_2: \n\t&quot;</span><br><span class="line">&quot;movabs $0x123456789abcdef0, %rax \n\t&quot; // 0x123456789abcdef0 (pointer to entry point function) is replaced at initialization</span><br><span class="line">&quot;call *%rax \n\t&quot;</span><br><span class="line">&quot;movq %rax, %rbx \n\t&quot; // save return value on rbx</span><br></pre></td></tr></table></figure>
+
+<p>entry_function中的gva是事先准备好映射的 在shared memory例子中 shm_memory_ptr的gva和src_gva相同 gva不变 通过修改映射访问到host物理内存上的事先用mmap shared准备好的共享内存</p>
+<p>entry_function的映射在<a target="_blank" rel="noopener" href="https://github.com/yasukata/libelisa-extra/blob/master/include/libelisa_extra/map.h">libelisa-extra&#x2F;include&#x2F;libelisa_extra&#x2F;map.h at master · yasukata&#x2F;libelisa-extra (github.com)</a>中建立 与shared_memory相同 src_gva&#x3D;dst_gva 不变 dst_gpa一个个往后放</p>
+</li>
+</ul>
+<p>def和sub共享 修改def EPT？ 在启动的时候先让manager VM和guest VM通过qemu提供的共享内存</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/stray2b/article/details/128896078">qemu-kvm Hypervisor：ivshmem-CSDN博客</a></p>
+<p>managerVM可以知道共享内存的地址  然后建立和guest sub的共享 达到guest def&lt;&#x3D;&gt;manager def&lt;&#x3D;&gt;guest sub共享的效果</p>
+<p>gate_entry_page有三个连续的page</p>
+<p>gate_ctx_page和sub_ctx_page共4个连续的page</p>
+<p>这些page代码通过VM kernel加载以后 放到host真实的物理内存中</p>
+<p>随后通过修改EPT 改变了guest眼中的内存布局(例如物理内存中gate_ctx_page-&gt;eptp_list-&gt;sub_ctx_pape但是GPA视角gate_ctx_page-&gt;eptp_list-&gt;stack)</p>
+<p>guest vm 用户态代码<a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-app-nop/blob/master/main.c">elisa-app-nop&#x2F;main.c at master · yasukata&#x2F;elisa-app-nop (github.com)</a> 其中elisa__client_work调用elisa_gate_entry</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/elisa-util-exec/blob/master/main.c">elisa-util-exec&#x2F;main.c at master · yasukata&#x2F;elisa-util-exec (github.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/libelisa/blob/master/client.c">libelisa&#x2F;client.c at master · yasukata&#x2F;libelisa (github.com)</a> ____asm_impl_client 定义了elisa_gate_entry 用到vmfunc 执行这行以后去哪了？</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yasukata/libelisa/blob/master/server.c#L43">libelisa&#x2F;server.c at master · yasukata&#x2F;libelisa (github.com)</a>对应了论文中gate entry的header</p>
+<p>vmfunc理论上是某个page的最后一个指令 因此non-default EPT不会再映射开始的vmfunc这个page</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/01/23/papers/forward/" rel="prev" title="Operation Forwarding">
+                  <i class="fa fa-angle-left"></i> Operation Forwarding
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/05/04/papers/CacheWarp/" rel="next" title="CacheWarp">
+                  CacheWarp <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">189k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">11:27</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
