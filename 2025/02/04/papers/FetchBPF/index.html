@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="FetchBPF: Customizable Prefetching Policies in Linux with eBPFATC’24  基于eBPF设计了一个框架，使得用户可以定制自己的memory prefetch策略 背景linux的某些策略平均表现很好，但是很难在特定的情况下取得最好的性能。 Memory prefetching内存压力大时，内存页会被swap out，之后需要用时，sw">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FetchBPF: Customizable Prefetching Policies in Linux with eBPF">
+<meta property="og:url" content="http://szy0127.github.io/2025/02/04/papers/FetchBPF/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="FetchBPF: Customizable Prefetching Policies in Linux with eBPFATC’24  基于eBPF设计了一个框架，使得用户可以定制自己的memory prefetch策略 背景linux的某些策略平均表现很好，但是很难在特定的情况下取得最好的性能。 Memory prefetching内存压力大时，内存页会被swap out，之后需要用时，sw">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Mjg4YWYzNDI2Y2E2ZGNjZDliMDRhNTgwNTU1ZmZlMDJfWDFTczE1UVBzYkswT2dlQ3Y4ekdHUlhPUmp1MVpzNXJfVG9rZW46SFJSbGJyeEpBb2F1aVR4YzlEcWMzOHhabnJnXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjZmOWIyOWFhNDg0NTRhMDhlNTZhZGRlMTIyM2M5N2RfODdJWE95ZW02M0dDaGdEREJSTzg5TzhYSHBicTFzRHJfVG9rZW46UXA2R2JhdzVEb2VjYkx4cTMzdWNvc0ZBblFoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjJkNGY3OGUzZDMyNDY4NDVlYTE4ZTc4OGE5MTIxNjhfZERmWmI3S001RXpLem5QdGFPVXRaUmtvU0NkMXNKckFfVG9rZW46R3RYcGJxNXFub2N2MGZ4alNxY2NJYlhKbnJmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWQ4M2EzZGE2MjU0Njc5NWY0MDRhOGFkMWVhNDg1NTJfRTVNY2dFZ241M3Z0Q2FIWmlIY2ljNWpaZlM3UDhVaDBfVG9rZW46T2lLbWJwa2VOb2FXQWR4Y0VmTWNxZkZSbnZiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2Y4NDdlZmJlMjI5Y2E0NzY4ZGZlOTJjMDU5ZmQ1NWFfZGl5cGF1MXB2WmVqbUdNcElWTjVQUGJNeEJub290N3BfVG9rZW46QXVlM2JDdnZZbzNHSzB4NlVOOWNZSllLblFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmI4MjIyYjk4ZjI5Yjc5YTRkMTE1NzJiY2JiOGFiYTJfUklQWFZpUkFJVjZmOXNNOVVrdWFDV3dkcEViQXhzdUhfVG9rZW46QWo3QmJaZGQ2b0hVZTl4YXVJS2N6Ykg0bkpoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MzdhY2I4MzY3NTUwZGM1YjI1MDNjYjBlOTk3MjRmOTNfUlhRWnNGMnQyWGNnOFVPMWZ1a3hnY1EyMEplSWZLMFpfVG9rZW46VTU1Y2IzQVpHb0lTaUR4QlFMT2NDVXR0bjJjXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjFmMTBhNDY2NWIxOGUyNGQ3MjUxMmMwM2ZlOWI2YjNfU3NrQ3ptdTI5MjhoQW96RVBtWXZkNVBmY3h3dTZmVXVfVG9rZW46U3BmTmJzRjFXb2N5cDF4MkNPZmNBWFpmbkplXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTc4MDBhYTVlODYyZGE3N2ZkYzVmZjkyYjljNDNlYmRfN0xlQ3pFZE1JTWo2Mk9kZ1RGTnJhcmFGZTZYcE9xN1RfVG9rZW46TTA4UmJ1WlJZb2xIU0F4ZVdURmNqczRPblRmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDY1N2ExNWVmOWI1MDE3OWViZjgzZWI2YjE1MjU5ZWRfTVNNZ0Q5SHdYNlNkSGYzaldUNnpkUk9TbGRFbm5vM0ZfVG9rZW46SDFBMmJpRWREb0VCR1R4TGtsZ2Nwd1hFbnZlXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YjZkY2UzZTNiZDgzZTM0Yjg2MTIwNjA4OWM4MmVjODJfcUE2Z3NCQW5PVTBXV2t3dkY4WmFnZ1NwVVF3aTNTOWpfVG9rZW46QWRFbmJzblRib2UyTm14eUhVemNkSWVVbmFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDc4NDQzYWNhMTExYzVjN2I3NjdjYWFlNjU4ZWRhOGNfbVl2U0ZpaVpNWG9JRU52ZzNNUXhHMmF0ZThuVEo1YUtfVG9rZW46TmZkZ2JhWWg1bzBINll4UFNsaGM2YzU4bmdwXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+<meta property="article:published_time" content="2025-02-04T12:45:13.651Z">
+<meta property="article:modified_time" content="2025-02-04T12:53:17.393Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Mjg4YWYzNDI2Y2E2ZGNjZDliMDRhNTgwNTU1ZmZlMDJfWDFTczE1UVBzYkswT2dlQ3Y4ekdHUlhPUmp1MVpzNXJfVG9rZW46SFJSbGJyeEpBb2F1aVR4YzlEcWMzOHhabnJnXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2025/02/04/papers/FetchBPF/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2025/02/04/papers/FetchBPF/","path":"2025/02/04/papers/FetchBPF/","title":"FetchBPF: Customizable Prefetching Policies in Linux with eBPF"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>FetchBPF: Customizable Prefetching Policies in Linux with eBPF | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FetchBPF-Customizable-Prefetching-Policies-in-Linux-with-eBPF"><span class="nav-number">1.</span> <span class="nav-text">FetchBPF: Customizable Prefetching Policies in Linux with eBPF</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory-prefetching"><span class="nav-number">1.1.1.</span> <span class="nav-text">Memory prefetching</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-default-prefetch-policy"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">Linux default prefetch policy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SOTA-prefetch-policy"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">SOTA prefetch policy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">motivation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eBPF"><span class="nav-number">1.1.2.</span> <span class="nav-text">eBPF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Strawman-design"><span class="nav-number">1.2.</span> <span class="nav-text">Strawman design</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Design-and-implementation"><span class="nav-number">1.3.</span> <span class="nav-text">Design and implementation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#eBPF-Hook"><span class="nav-number">1.3.1.</span> <span class="nav-text">eBPF Hook</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Helper-Functions"><span class="nav-number">1.3.2.</span> <span class="nav-text">Helper Functions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Policy-example-LEAP"><span class="nav-number">1.3.3.</span> <span class="nav-text">Policy example(LEAP)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evaluation"><span class="nav-number">1.4.</span> <span class="nav-text">Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Microbenchmarks"><span class="nav-number">1.4.1.</span> <span class="nav-text">Microbenchmarks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Macrobenchmarks"><span class="nav-number">1.4.2.</span> <span class="nav-text">Macrobenchmarks</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">1.5.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2025/02/04/papers/FetchBPF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="FetchBPF: Customizable Prefetching Policies in Linux with eBPF | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FetchBPF: Customizable Prefetching Policies in Linux with eBPF
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2025-02-04 20:45:13 / Modified: 20:53:17" itemprop="dateCreated datePublished" datetime="2025-02-04T20:45:13+08:00">2025-02-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>935</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="FetchBPF-Customizable-Prefetching-Policies-in-Linux-with-eBPF"><a href="#FetchBPF-Customizable-Prefetching-Policies-in-Linux-with-eBPF" class="headerlink" title="FetchBPF: Customizable Prefetching Policies in Linux with eBPF"></a>FetchBPF: Customizable Prefetching Policies in Linux with eBPF</h1><p>ATC’24</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Mjg4YWYzNDI2Y2E2ZGNjZDliMDRhNTgwNTU1ZmZlMDJfWDFTczE1UVBzYkswT2dlQ3Y4ekdHUlhPUmp1MVpzNXJfVG9rZW46SFJSbGJyeEpBb2F1aVR4YzlEcWMzOHhabnJnXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>基于eBPF设计了一个框架，使得用户可以定制自己的memory prefetch策略</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>linux的某些策略平均表现很好，但是很难在特定的情况下取得最好的性能。</p>
+<h3 id="Memory-prefetching"><a href="#Memory-prefetching" class="headerlink" title="Memory prefetching"></a>Memory prefetching</h3><p>内存压力大时，内存页会被swap out，之后需要用时，swap in会很慢</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjZmOWIyOWFhNDg0NTRhMDhlNTZhZGRlMTIyM2M5N2RfODdJWE95ZW02M0dDaGdEREJSTzg5TzhYSHBicTFzRHJfVG9rZW46UXA2R2JhdzVEb2VjYkx4cTMzdWNvc0ZBblFoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>为了提高性能，操作系统会预测哪些swapped out的pages可能会被用到，prefetch这些pages</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjJkNGY3OGUzZDMyNDY4NDVlYTE4ZTc4OGE5MTIxNjhfZERmWmI3S001RXpLem5QdGFPVXRaUmtvU0NkMXNKckFfVG9rZW46R3RYcGJxNXFub2N2MGZ4alNxY2NJYlhKbnJmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>一个好的prefetch策略需要兼顾Accuracy与Coverage：</p>
+<ul>
+<li>Coverage：cache hits &#x2F; (cache hits + cache misses) 尽可能让之后可能发生的page fault的pages都被prefetch到</li>
+<li>Accuracy：cache hits &#x2F; prefetch pages 需要保证不能prefetch太多没用的page 反而拖慢了性能</li>
+</ul>
+<h4 id="Linux-default-prefetch-policy"><a href="#Linux-default-prefetch-policy" class="headerlink" title="Linux default prefetch policy"></a>Linux default prefetch policy</h4><ul>
+<li>只考虑sequantial pattern</li>
+<li>只看过去2个page fault，如果连续，则prefetch连续的后几个pages</li>
+</ul>
+<h4 id="SOTA-prefetch-policy"><a href="#SOTA-prefetch-policy" class="headerlink" title="SOTA prefetch policy"></a>SOTA prefetch policy</h4><ul>
+<li>LEAP：ATC‘20</li>
+<li>HoPP：HPCA‘23</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWQ4M2EzZGE2MjU0Njc5NWY0MDRhOGFkMWVhNDg1NTJfRTVNY2dFZ241M3Z0Q2FIWmlIY2ljNWpaZlM3UDhVaDBfVG9rZW46T2lLbWJwa2VOb2FXQWR4Y0VmTWNxZkZSbnZiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2Y4NDdlZmJlMjI5Y2E0NzY4ZGZlOTJjMDU5ZmQ1NWFfZGl5cGF1MXB2WmVqbUdNcElWTjVQUGJNeEJub290N3BfVG9rZW46QXVlM2JDdnZZbzNHSzB4NlVOOWNZSllLblFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>不同allocation pattern和不同access pattern下 各个memory prefetch policy的性能表现</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmI4MjIyYjk4ZjI5Yjc5YTRkMTE1NzJiY2JiOGFiYTJfUklQWFZpUkFJVjZmOXNNOVVrdWFDV3dkcEViQXhzdUhfVG9rZW46QWo3QmJaZGQ2b0hVZTl4YXVJS2N6Ykg0bkpoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>结论：没有一个policy会在任何条件下比其他的policy都好。需要最适合某个application，必须为这个application定制policy</p>
+<h3 id="eBPF"><a href="#eBPF" class="headerlink" title="eBPF"></a>eBPF</h3><blockquote>
+<p>eBPF 是一项革命性的技术，起源于 Linux 内核，它可以在特权上下文中（如操作系统内核）运行沙盒程序。它用于安全有效地扩展内核的功能，而无需通过更改内核源代码或加载内核模块的方式来实现。</p>
+</blockquote>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MzdhY2I4MzY3NTUwZGM1YjI1MDNjYjBlOTk3MjRmOTNfUlhRWnNGMnQyWGNnOFVPMWZ1a3hnY1EyMEplSWZLMFpfVG9rZW46VTU1Y2IzQVpHb0lTaUR4QlFMT2NDVXR0bjJjXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h2 id="Strawman-design"><a href="#Strawman-design" class="headerlink" title="Strawman design"></a>Strawman design</h2><p>改linux 实现多种prefetch policy ，根据历史的memory access pattern进行动态切换</p>
+<p>问题</p>
+<ol>
+<li>难以支持任意数量的policy</li>
+<li>很难存在一个特定的policy集合 可以适应所有的access pattern</li>
+<li>在linux中实现工程量大</li>
+<li>需要说服linux上游接受 需要耗费更多精力和时间</li>
+</ol>
+<h2 id="Design-and-implementation"><a href="#Design-and-implementation" class="headerlink" title="Design and implementation"></a>Design and implementation</h2><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjFmMTBhNDY2NWIxOGUyNGQ3MjUxMmMwM2ZlOWI2YjNfU3NrQ3ptdTI5MjhoQW96RVBtWXZkNVBmY3h3dTZmVXVfVG9rZW46U3BmTmJzRjFXb2N5cDF4MkNPZmNBWFpmbkplXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h3 id="eBPF-Hook"><a href="#eBPF-Hook" class="headerlink" title="eBPF Hook"></a>eBPF Hook</h3><ul>
+<li>(A)prefetch_stats：page fault时触发，用于记录fault pages的历史信息，便于policy找到access pattern</li>
+<li>(B)prefetch_policy：执行prefetch policy时触发，需要根据算法找到需要prefetch的pages并且请求prefetch 这些pages</li>
+</ul>
+<h3 id="Helper-Functions"><a href="#Helper-Functions" class="headerlink" title="Helper Functions"></a>Helper Functions</h3><ul>
+<li>(1)bpf_prefetch_physical_page：根据物理地址发出I&#x2F;O请求</li>
+<li>(2)bpf_prefetch_virtual_page：根据虚拟地址发出I&#x2F;O请求</li>
+<li>(3)bpf_&lt;start&#x2F;stop&gt;_block_plug：选择性batch上两个接口发出的I&#x2F;O请求</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTc4MDBhYTVlODYyZGE3N2ZkYzVmZjkyYjljNDNlYmRfN0xlQ3pFZE1JTWo2Mk9kZ1RGTnJhcmFGZTZYcE9xN1RfVG9rZW46TTA4UmJ1WlJZb2xIU0F4ZVdURmNqczRPblRmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h3 id="Policy-example-LEAP"><a href="#Policy-example-LEAP" class="headerlink" title="Policy example(LEAP)"></a>Policy example(LEAP)</h3><ul>
+<li>eBPF map: 存储memory access history</li>
+<li>prefetch_stats: 在map中存入page fault地址以及与前一个page fault地址的差</li>
+<li>prefetch_policy：用Boyer-Moore识别出majority stride，调用bpf_prefetch_physical_page进行prefetch</li>
+</ul>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p>分配5GB array</p>
+<p>Allocation patterns：</p>
+<ul>
+<li>Sequential allocation（sqn）</li>
+<li>Random allocation（random）：模拟多个线程同时alloc pages （这种情况使用virtual address会比physical address好）</li>
+</ul>
+<p>Access patterns：</p>
+<ul>
+<li>Sequential（sqn）</li>
+<li>stride（stride）：相隔3 pages</li>
+<li>ladder（ladder）：increasing stride</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDY1N2ExNWVmOWI1MDE3OWViZjgzZWI2YjE1MjU5ZWRfTVNNZ0Q5SHdYNlNkSGYzaldUNnpkUk9TbGRFbm5vM0ZfVG9rZW46SDFBMmJpRWREb0VCR1R4TGtsZ2Nwd1hFbnZlXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>Accuracy、Coverage： eBPF实现版本与linux kernel版本几乎完全一致</li>
+<li>Execution time：eBPF带来的overhead可以忽略不计</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YjZkY2UzZTNiZDgzZTM0Yjg2MTIwNjA4OWM4MmVjODJfcUE2Z3NCQW5PVTBXV2t3dkY4WmFnZ1NwVVF3aTNTOWpfVG9rZW46QWRFbmJzblRib2UyTm14eUhVemNkSWVVbmFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>latency大部分的开销在page retrieval （I&#x2F;O）</li>
+<li>eBPF程序被JIT编译为机器指令，性能与kernel functions差别不大</li>
+</ul>
+<h3 id="Macrobenchmarks"><a href="#Macrobenchmarks" class="headerlink" title="Macrobenchmarks"></a>Macrobenchmarks</h3><ul>
+<li>VoltDB上运行TPC-C</li>
+<li>Redis’ memtier benchmark</li>
+<li>Twitter dataset上运行PageRank与betweeness centrality</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDc4NDQzYWNhMTExYzVjN2I3NjdjYWFlNjU4ZWRhOGNfbVl2U0ZpaVpNWG9JRU52ZzNNUXhHMmF0ZThuVEo1YUtfVG9rZW46TmZkZ2JhWWg1bzBINll4UFNsaGM2YzU4bmdwXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>对比policy及与之对应的eBPF版本，仍然没有明显的性能差别</li>
+<li>好的policy在可用内存少时优势更明显</li>
+</ul>
+<p>关于VMA policy作者的解释：这些对性能要求极高的程序耗费了大量的时间为linux的prefetch policy做了优化</p>
+<p>FetchBPF希望改变这种方式，设计policy去适配application，而不是优化application的访存模式去适配policy</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>本文基于eBPF设计了框架FetchBPF，使得用户可以根据程序的访存模式自定义内存预取策略来达到最优的性能。FetchBPF框架可以在几乎没有额外性能开销的情况下达到一致的内存预取功能。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/02/04/papers/Sabre/" rel="prev" title="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs ">
+                  <i class="fa fa-angle-left"></i> Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs 
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/02/04/papers/WESEE/" rel="next" title="WESEE: Using Malicious #VC Interrupts to Break AMD SEV-SNP">
+                  WESEE: Using Malicious #VC Interrupts to Break AMD SEV-SNP <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">208k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">12:37</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

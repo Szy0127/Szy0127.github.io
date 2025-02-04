@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMsOSDI24  利用硬件加速器IAA压缩VM snapshot，优化serverless场景下microVM cold start慢的问题 背景问题：serverless场景下microVM冷启动 启动时间久  解决方案：采用VM snapshot 把gu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs ">
+<meta property="og:url" content="http://szy0127.github.io/2025/02/04/papers/Sabre/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMsOSDI24  利用硬件加速器IAA压缩VM snapshot，优化serverless场景下microVM cold start慢的问题 背景问题：serverless场景下microVM冷启动 启动时间久  解决方案：采用VM snapshot 把gu">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MTNkYmUwZDlhYjFmN2RkMWZjY2EzMThhMzRmMGM0NDNfN3RIV0RvUkZZb1JvQTJzdk1IekhNam0wOWF2N3NWTGVfVG9rZW46QWpiZ2JBaVhIb0FLQnR4T0h3UGNzN0VRbjJlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YWQwYjU3Mzk1NGM5YjFmMTg5YjkxNTkzZjgxZjUyZDRfYXd0QzNYTWlBdVRUTGVUaEEwVUV6V2wxRkxKTk1BTlNfVG9rZW46SGtnWmJLTVdDb1FrY3p4amwyd2N2eGZYbjViXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjQwYzQyNmIwYTBkNTZmMmI2OWFkZjQzM2FiMmQ3ZTBfZ0xLaHo1UXM3TUtZWlVFYlBlNU1IQzhDVUlpWW1maFFfVG9rZW46U2tyQ2JXWEMwb2Q0cTB4eWZRNWNnVnZybk5jXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDFkZDNkNTc2NDQzY2EyOWI1MTc1ZTRmMDQ4MmRjZmVfUG95aGpkdEdQMkxjMHRZODNLSTBHN0lMYmhzQVBWMEhfVG9rZW46VnUxQ2JqT3d0bzRmUml4SnpKTWNSOFRhbnZnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NGZmNjI0MGU5MDRhNzA1NmUwMzdmNTA3MGI1MjFhMTlfcnNDMDhWSVRoaERTekp0NHFTQ2F0MTM2cldHY0RaRmVfVG9rZW46THprcmJvZ0Iyb1Eyb014OWhYRGNiTXJsbktmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTQ2MDEwY2M5ZGVmY2Q1NjY0MDUwM2NjN2E2ZjMwODRfSEV1aHI4cTExazVlM2w3S1RRM2FzMjN1Q1Y0cnpBVG1fVG9rZW46SUptYmI1emtNb1lhSER4dTBsdGNIS1RqbkZkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWI1YjQxMjVkOGQ4ODI3MmQwNmM5Y2RkMjJjNDIyNzlfVFhKa0pESmFZVzgwbzVaR0ZWVkE4R0U2YlU0SnZ2ejFfVG9rZW46UFdGR2I3ZDRlb2pIT0Z4OEhhemNva0NablVnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2M1YmViNTQ0NGJmMzIyMjk0OGNkZDA0ZDE5MGFkM2NfdERBQXpqa2RMdmJlcWhVaWtKTDEzZDlQOTREeFo5N3lfVG9rZW46SU1aOGJYOEw5b20xTUl4WkFaN2NQSzBOblFkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Zjg5ZjM1NzY2NzhlNDc1YTNjM2RkYTZkNjllMDZkNzZfQ3IxVzlGMndEaW9HenRDaDlFeUdpUHNTMTBPakNSQUJfVG9rZW46SXZSWGJqMWJkb0dCaDF4bHE2TGNQWjhzbjFiXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YzQ2OWFkY2JkYjEyOTI3OTE0Y2E1Mjc4YjQzNTU1MjdfcERyOE1qTzdUcUNQbWJDb2N3VUtzRzIzMVd6OHJDb01fVG9rZW46Tkd0Z2JKTVlObzdNcEd4eFdsMmN1cVlRbjFmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NWM2MmE4YjM2NDU2Mjk5ODhhZWJjNWQzY2FlNTYwZjNfaWtvWlRhZ2lrcE01Q01JelFRMjNlemdzYjZleFVEYXRfVG9rZW46WE1GbmJoaHU2b0JJUWR4TWVvQ2NIRkVpbmhlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MDBiYzUxYWE0NTg0ZmM3YjIxNDZjM2FjYjU0ZDdiMmFfYzc0Tm1abU9LbzhUSDdJbk96MnUyMmFsdU9ET0NkeGFfVG9rZW46RWc3VmJsbXFwb1JOM0h4aUdsbmNzQnVMbkdkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+<meta property="article:published_time" content="2025-02-04T12:44:14.930Z">
+<meta property="article:modified_time" content="2025-02-04T12:53:17.393Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MTNkYmUwZDlhYjFmN2RkMWZjY2EzMThhMzRmMGM0NDNfN3RIV0RvUkZZb1JvQTJzdk1IekhNam0wOWF2N3NWTGVfVG9rZW46QWpiZ2JBaVhIb0FLQnR4T0h3UGNzN0VRbjJlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2025/02/04/papers/Sabre/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2025/02/04/papers/Sabre/","path":"2025/02/04/papers/Sabre/","title":"Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs "}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs  | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Sabre-Hardware-Accelerated-Snapshot-Compression-for-Serverless-MicroVMs"><span class="nav-number">1.</span> <span class="nav-text">Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IAA"><span class="nav-number">1.2.</span> <span class="nav-text">IAA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IAA%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.2.1.</span> <span class="nav-text">IAA介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IAA%E8%83%BD%E5%8A%9B%E6%8E%A2%E7%B4%A2"><span class="nav-number">1.2.2.</span> <span class="nav-text">IAA能力探索</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sabre-design"><span class="nav-number">1.3.</span> <span class="nav-text">sabre design</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#snapshot"><span class="nav-number">1.3.1.</span> <span class="nav-text">snapshot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prefetch"><span class="nav-number">1.3.2.</span> <span class="nav-text">prefetch</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">1.4.</span> <span class="nav-text">测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#microbenchmark"><span class="nav-number">1.4.1.</span> <span class="nav-text">microbenchmark</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#end-to-end"><span class="nav-number">1.4.2.</span> <span class="nav-text">end-to-end</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8F%91"><span class="nav-number">1.6.</span> <span class="nav-text">启发</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2025/02/04/papers/Sabre/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs  | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs 
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2025-02-04 20:44:14 / Modified: 20:53:17" itemprop="dateCreated datePublished" datetime="2025-02-04T20:44:14+08:00">2025-02-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Sabre-Hardware-Accelerated-Snapshot-Compression-for-Serverless-MicroVMs"><a href="#Sabre-Hardware-Accelerated-Snapshot-Compression-for-Serverless-MicroVMs" class="headerlink" title="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs"></a>Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs</h1><p>OSDI24</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MTNkYmUwZDlhYjFmN2RkMWZjY2EzMThhMzRmMGM0NDNfN3RIV0RvUkZZb1JvQTJzdk1IekhNam0wOWF2N3NWTGVfVG9rZW46QWpiZ2JBaVhIb0FLQnR4T0h3UGNzN0VRbjJlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>利用硬件加速器IAA压缩VM snapshot，优化serverless场景下microVM cold start慢的问题</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>问题：serverless场景下microVM冷启动 启动时间久</p>
+<ul>
+<li>解决方案：采用VM snapshot 把guest VM memory存到文件里 下次读文件恢复而不是从头启动</li>
+</ul>
+<p>问题：如果存了整个guest memory restore的时候全部load进去太大了</p>
+<ul>
+<li>解决方案: on-demand paging，触发page fault才映射 和传统进程&#x2F;VM 一样 （现有系统如firecracker采用的方式 baseline1）</li>
+</ul>
+<p>问题：page fault导致性能差</p>
+<ul>
+<li>解决方案：prefetch 预测工作集（working set）<ul>
+<li>REAP（record-and-replay）是asplops21加速snapshot的方案，提出用working set记录一次function call的pages prefetch这些page （SOTA方案 baseline2）</li>
+</ul>
+</li>
+</ul>
+<p>snapshot和WS file的大小很影响效率 越小性能越好 </p>
+<ul>
+<li>解决方案：压缩</li>
+</ul>
+<p>问题：解压缩占时间 且在cold start关键路径上</p>
+<h2 id="IAA"><a href="#IAA" class="headerlink" title="IAA"></a>IAA</h2><h3 id="IAA介绍"><a href="#IAA介绍" class="headerlink" title="IAA介绍"></a>IAA介绍</h3><p>Intel In-Memory Analytic Accelerator 集成在CPU SoC上的一个PCIe设备</p>
+<p>用户态应用向IAA工作队列提交请求</p>
+<p>目前主要用在数据库上</p>
+<p>IAA提供C接口 直接用intel提供的库</p>
+<p>相对于就是最简单的压缩的接口 源数据(uint8*)&lt;–&gt;压缩后的数据(uint8*)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">qpl_path_t</span> execution_path = qpl_path_software;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">source</span><span class="params">(source_size, <span class="number">5</span>)</span></span>;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">destination</span><span class="params">(source_size / <span class="number">2</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">reference</span><span class="params">(source_size, <span class="number">7</span>)</span></span>;</span><br><span class="line">std::unique_ptr&lt;<span class="type">uint8_t</span>[]&gt; job_buffer;</span><br><span class="line"><span class="type">uint32_t</span>                   size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Job initialization</span></span><br><span class="line">qpl_status status = <span class="built_in">qpl_get_job_size</span>(execution_path, &amp;size);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during job size getting.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">job_buffer   = std::<span class="built_in">make_unique</span>&lt;<span class="type">uint8_t</span>[]&gt;(size);</span><br><span class="line">qpl_job* job = <span class="built_in">reinterpret_cast</span>&lt;qpl_job*&gt;(job_buffer.<span class="built_in">get</span>());</span><br><span class="line"></span><br><span class="line">status = <span class="built_in">qpl_init_job</span>(execution_path, job);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during job initializing.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Performing a compression operation</span></span><br><span class="line">job-&gt;op            = qpl_op_compress;</span><br><span class="line">job-&gt;level         = qpl_default_level;</span><br><span class="line">job-&gt;next_in_ptr   = source.<span class="built_in">data</span>();</span><br><span class="line">job-&gt;next_out_ptr  = destination.<span class="built_in">data</span>();</span><br><span class="line">job-&gt;available_in  = source_size;</span><br><span class="line">job-&gt;available_out = <span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(destination.<span class="built_in">size</span>());</span><br><span class="line">job-&gt;flags         = QPL_FLAG_FIRST | QPL_FLAG_LAST | QPL_FLAG_DYNAMIC_HUFFMAN | QPL_FLAG_OMIT_VERIFY;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Compression</span></span><br><span class="line">status = <span class="built_in">qpl_execute_job</span>(job);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during compression.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">uint32_t</span> compressed_size = job-&gt;total_out;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IAA能力探索"><a href="#IAA能力探索" class="headerlink" title="IAA能力探索"></a>IAA能力探索</h3><p>对比用IAA硬件压缩与软件压缩的性能：</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YWQwYjU3Mzk1NGM5YjFmMTg5YjkxNTkzZjgxZjUyZDRfYXd0QzNYTWlBdVRUTGVUaEEwVUV6V2wxRkxKTk1BTlNfVG9rZW46SGtnWmJLTVdDb1FrY3p4amwyd2N2eGZYbjViXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjQwYzQyNmIwYTBkNTZmMmI2OWFkZjQzM2FiMmQ3ZTBfZ0xLaHo1UXM3TUtZWlVFYlBlNU1IQzhDVUlpWW1maFFfVG9rZW46U2tyQ2JXWEMwb2Q0cTB4eWZRNWNnVnZybk5jXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>用硬件压缩比软件快（可以支持异步，不占用CPU cycle， 但是这个工作没用到）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDFkZDNkNTc2NDQzY2EyOWI1MTc1ZTRmMDQ4MmRjZmVfUG95aGpkdEdQMkxjMHRZODNLSTBHN0lMYmhzQVBWMEhfVG9rZW46VnUxQ2JqT3d0bzRmUml4SnpKTWNSOFRhbnZnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>可扩展性没问题</p>
+<p>后续测试仍用single thread single job完成</p>
+<p>PRS(<em>Page Request Service</em> ) IAA集成了处理page fault的功能</p>
+<p>不需要操作系统先把文件内容读到内存里，可以用mmap 然后硬件通过PRS拿到数据</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NGZmNjI0MGU5MDRhNzA1NmUwMzdmNTA3MGI1MjFhMTlfcnNDMDhWSVRoaERTekp0NHFTQ2F0MTM2cldHY0RaRmVfVG9rZW46THprcmJvZ0Iyb1Eyb014OWhYRGNiTXJsbktmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<ul>
+<li>Decompress比Disk Read要快，不会拖慢整体时间</li>
+<li>O_DIRECT是为了绕过page cache提高性能（REAP使用的优化方式之一）</li>
+<li>Disk Read与Disk Read+Decompress重合 -&gt; decompress和disk read overlap 是streaming的操作</li>
+</ul>
+<p>这里对IAA的测试和分析理论上提出了应用于microVM snapshot性能提升的可行性</p>
+<h2 id="sabre-design"><a href="#sabre-design" class="headerlink" title="sabre design"></a>sabre design</h2><p>扩展压缩&#x2F;解压一段数据的功能至：</p>
+<ol>
+<li>压缩&#x2F;解压多块内存区域</li>
+<li>压缩的数据存到文件，恢复时读取再解压</li>
+</ol>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTQ2MDEwY2M5ZGVmY2Q1NjY0MDUwM2NjN2E2ZjMwODRfSEV1aHI4cTExazVlM2w3S1RRM2FzMjN1Q1Y0cnpBVG1fVG9rZW46SUptYmI1emtNb1lhSER4dTBsdGNIS1RqbkZkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>snapshot保存memory之外还会保存memory partition压缩前后的位置信息</p>
+<p>snapshot和prefetch各提出了两种方案</p>
+<h3 id="snapshot"><a href="#snapshot" class="headerlink" title="snapshot"></a>snapshot</h3><ol>
+<li>每块不连续的内存先复制到一块连续的buffer上，然后压缩一次</li>
+<li>每块不连续的内存独立压缩，压缩后的数据连续存到磁盘里</li>
+</ol>
+<h3 id="prefetch"><a href="#prefetch" class="headerlink" title="prefetch"></a>prefetch</h3><ol>
+<li>解压一次，根据记录的信息恢复到不同的内存区域（通过userfaultfd，多一次memory copy 但是因为DMA连续 所以性能好）</li>
+<li>根据记录的信息解压多次</li>
+</ol>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p>先和不压缩比，然后和软件压缩比</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWI1YjQxMjVkOGQ4ODI3MmQwNmM5Y2RkMjJjNDIyNzlfVFhKa0pESmFZVzgwbzVaR0ZWVkE4R0U2YlU0SnZ2ejFfVG9rZW46UFdGR2I3ZDRlb2pIT0Z4OEhhemNva0NablVnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>passthrough表示读不压缩的snapshot(174.5MB)</p>
+<p>sparsity表示连续page大小 1表示每个page都被一个empty page隔开</p>
+<p>压缩率是2.2x 所以考虑到磁盘读，最大的加速比就是2.2 sabre是1.9</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2M1YmViNTQ0NGJmMzIyMjk0OGNkZDA0ZDE5MGFkM2NfdERBQXpqa2RMdmJlcWhVaWtKTDEzZDlQOTREeFo5N3lfVG9rZW46SU1aOGJYOEw5b20xTUl4WkFaN2NQSzBOblFkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>比较软件方案</p>
+<ul>
+<li>create：IAA最快</li>
+<li>restore-single：IAA最快</li>
+<li>restore-scattered: 稀疏性越弱IAA越快</li>
+</ul>
+<h3 id="end-to-end"><a href="#end-to-end" class="headerlink" title="end-to-end"></a>end-to-end</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Zjg5ZjM1NzY2NzhlNDc1YTNjM2RkYTZkNjllMDZkNzZfQ3IxVzlGMndEaW9HenRDaDlFeUdpUHNTMTBPakNSQUJfVG9rZW46SXZSWGJqMWJkb0dCaDF4bHE2TGNQWjhzbjFiXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>已经集成到firecracker中</p>
+<p>使用KVM提供的dirty pages Diff Snapshot</p>
+<p>数据大，粒度粗，选择用scattered（没有对比）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YzQ2OWFkY2JkYjEyOTI3OTE0Y2E1Mjc4YjQzNTU1MjdfcERyOE1qTzdUcUNQbWJDb2N3VUtzRzIzMVd6OHJDb01fVG9rZW46Tkd0Z2JKTVlObzdNcEd4eFdsMmN1cVlRbjFmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>baseline是snapshot 不压缩 不prefetch</p>
+<ul>
+<li>baseline使用on-demand paging VM load的时候耗时少 但是函数调用会触发一系列page fault</li>
+<li>Sabre在VM load时需要恢复guest memory 耗时多 但是prefetch了内存 函数调用快</li>
+</ul>
+<p>最高64% cold start加速</p>
+<p>和SOTA方案REAP比</p>
+<p>REAP的working set记录的page比较分散 选择用single-chunk（没有对比）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NWM2MmE4YjM2NDU2Mjk5ODhhZWJjNWQzY2FlNTYwZjNfaWtvWlRhZ2lrcE01Q01JelFRMjNlemdzYjZleFVEYXRfVG9rZW46WE1GbmJoaHU2b0JJUWR4TWVvQ2NIRkVpbmhlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>Working set对于一个固定的应用来说是不变的，sabre压缩了WS file 所以性能更好了</p>
+<p>以cnn-image-classification为例，压缩比为3.10 prefetch加速38.73% 又因为该场景中REAP prefetch耗时占比大 最终Sabre达到19.2%的优势</p>
+<p>对function invocation占比大的场景优势不明显（这个serverless函数本身启动耗时）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MDBiYzUxYWE0NTg0ZmM3YjIxNDZjM2FjYjU0ZDdiMmFfYzc0Tm1abU9LbzhUSDdJbk96MnUyMmFsdU9ET0NkeGFfVG9rZW46RWc3VmJsbXFwb1JOM0h4aUdsbmNzQnVMbkdkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>创新地提出把硬件加速器IAA应用于压缩VM snapshot，并通过合理的设计成功加速了microVM cold start</p>
+<h2 id="启发"><a href="#启发" class="headerlink" title="启发"></a>启发</h2><ol>
+<li>IAA加速压缩&#x2F;解压是否可以应用在其他场景中？ (有正在进行的VM migration的工作<a target="_blank" rel="noopener" href="https://lore.kernel.org/all/20240319164527.1873891-1-yuan1.liu@intel.com/T/%EF%BC%89">https://lore.kernel.org/all/20240319164527.1873891-1-yuan1.liu@intel.com/T/）</a></li>
+<li>探索新硬件提供的其他功能</li>
+</ol>
+<ul>
+<li>IAA：加密、CRC offload、data filtering等<a target="_blank" rel="noopener" href="https://www.intel.com/content/www/us/en/content-details/721858/intel-in-memory-analytics-accelerator-architecture-specification.html">https://www.intel.com/content/www/us/en/content-details/721858/intel-in-memory-analytics-accelerator-architecture-specification.html</a></li>
+<li>其他硬件 例如DLB<a target="_blank" rel="noopener" href="https://www.intel.cn/content/www/cn/zh/products/docs/processors/xeon-accelerated/4th-gen-xeon-scalable-processors-product-brief.html">https://www.intel.cn/content/www/cn/zh/products/docs/processors/xeon-accelerated/4th-gen-xeon-scalable-processors-product-brief.html</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/17/papers/ELISA/" rel="prev" title="ELISA">
+                  <i class="fa fa-angle-left"></i> ELISA
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/02/04/papers/FetchBPF/" rel="next" title="FetchBPF: Customizable Prefetching Policies in Linux with eBPF">
+                  FetchBPF: Customizable Prefetching Policies in Linux with eBPF <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">208k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">12:37</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
