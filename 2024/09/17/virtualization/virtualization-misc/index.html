@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="virtualization mischost上开启嵌套虚拟化Nested Guests - KVM (linux-kvm.org) 看&#x2F;sys&#x2F;module&#x2F;kvm_intel&#x2F;parameters&#x2F;nested  可以修改vmx.cstatic bool __read_mostly nested &#x3D; 1;然后重新编译kvm模块 host VM cat &#x2F;proc&#x2F;cpuinfo | grep">
+<meta property="og:type" content="article">
+<meta property="og:title" content="virtualization misc">
+<meta property="og:url" content="http://szy0127.github.io/2024/09/17/virtualization/virtualization-misc/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="virtualization mischost上开启嵌套虚拟化Nested Guests - KVM (linux-kvm.org) 看&#x2F;sys&#x2F;module&#x2F;kvm_intel&#x2F;parameters&#x2F;nested  可以修改vmx.cstatic bool __read_mostly nested &#x3D; 1;然后重新编译kvm模块 host VM cat &#x2F;proc&#x2F;cpuinfo | grep">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-17T11:48:04.032Z">
+<meta property="article:modified_time" content="2024-09-17T11:48:04.049Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/09/17/virtualization/virtualization-misc/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/09/17/virtualization/virtualization-misc/","path":"2024/09/17/virtualization/virtualization-misc/","title":"virtualization misc"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>virtualization misc | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#virtualization-misc"><span class="nav-number">1.</span> <span class="nav-text">virtualization misc</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#host%E4%B8%8A%E5%BC%80%E5%90%AF%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">host上开启嵌套虚拟化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM-%E7%BC%96%E8%AF%91%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97"><span class="nav-number">1.2.</span> <span class="nav-text">hostVM 编译内核模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E5%8A%A0%E8%BD%BD%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97"><span class="nav-number">1.3.</span> <span class="nav-text">hostVM加载内核模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E5%90%AF%E5%8A%A8guestVM"><span class="nav-number">1.4.</span> <span class="nav-text">hostVM启动guestVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E7%BC%96%E8%AF%91%E5%86%85%E6%A0%B8"><span class="nav-number">1.5.</span> <span class="nav-text">hostVM编译内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#host%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E5%86%85%E6%A0%B8%E5%90%AF%E5%8A%A8hostVM"><span class="nav-number">1.6.</span> <span class="nav-text">host用自定义内核启动hostVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E4%BD%BF%E7%94%A8kvm%E6%A8%A1%E5%9D%97"><span class="nav-number">1.7.</span> <span class="nav-text">hostVM使用kvm模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E4%BD%BF%E7%94%A8virtio-balloon%E6%A8%A1%E5%9D%97"><span class="nav-number">1.8.</span> <span class="nav-text">hostVM使用virtio-balloon模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#guestVM%E5%86%85%E5%AD%98%E8%B6%85%E8%BF%87hostVM"><span class="nav-number">1.9.</span> <span class="nav-text">guestVM内存超过hostVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM-%E7%94%A8perf"><span class="nav-number">1.10.</span> <span class="nav-text">hostVM 用perf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#perf%E7%9C%8B%E4%B8%8D%E5%88%B0kernel-symbol"><span class="nav-number">1.11.</span> <span class="nav-text">perf看不到kernel symbol</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#guest-perf"><span class="nav-number">1.12.</span> <span class="nav-text">guest perf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VM%E5%A2%9E%E5%A4%A7%E7%A3%81%E7%9B%98%E5%AE%B9%E9%87%8F"><span class="nav-number">1.13.</span> <span class="nav-text">VM增大磁盘容量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hostVM%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7"><span class="nav-number">1.14.</span> <span class="nav-text">hostVM网络工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssh%E8%BF%9E%E6%8E%A5hostVM"><span class="nav-number">1.15.</span> <span class="nav-text">ssh连接hostVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#soc-term"><span class="nav-number">1.16.</span> <span class="nav-text">soc term</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%82%E8%BD%BD%E6%96%87%E4%BB%B6"><span class="nav-number">1.17.</span> <span class="nav-text">挂载文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gdb-%E8%B0%83%E5%86%85%E6%A0%B8"><span class="nav-number">1.18.</span> <span class="nav-text">gdb 调内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#balloon"><span class="nav-number">1.19.</span> <span class="nav-text">balloon</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#final"><span class="nav-number">1.20.</span> <span class="nav-text">final</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/virtualization/virtualization-misc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="virtualization misc | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          virtualization misc
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:04" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:04+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.9k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>7 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="virtualization-misc"><a href="#virtualization-misc" class="headerlink" title="virtualization misc"></a>virtualization misc</h1><h2 id="host上开启嵌套虚拟化"><a href="#host上开启嵌套虚拟化" class="headerlink" title="host上开启嵌套虚拟化"></a>host上开启嵌套虚拟化</h2><p><a target="_blank" rel="noopener" href="https://www.linux-kvm.org/page/Nested_Guests">Nested Guests - KVM (linux-kvm.org)</a></p>
+<p>看<code>/sys/module/kvm_intel/parameters/nested</code> </p>
+<p>可以修改vmx.c<code>static bool __read_mostly nested = 1;</code>然后重新编译kvm模块</p>
+<p>host VM <code>cat /proc/cpuinfo | grep vmx</code>有内容说明配置正确</p>
+<p>此时跑kvm-hello-world没问题</p>
+<p><code>qemu-img resize xxx.img +10G</code>可以加磁盘容量；编译内核需要的内存比较大，开4G</p>
+<h2 id="hostVM-编译内核模块"><a href="#hostVM-编译内核模块" class="headerlink" title="hostVM 编译内核模块"></a>hostVM 编译内核模块</h2><p>环境变量有问题</p>
+<p>单独编译kvm</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">  CC [M]  /usr/src/linux-source-5.15.0/linux-source-5.15.0/arch/x86/kvm/mmu/mmu.o</span><br><span class="line">In file included from /usr/src/linux-source-5.15.0/linux-source-5.15.0/arch/x86/kvm/trace.h:1741,</span><br><span class="line">                 from /usr/src/linux-source-5.15.0/linux-source-5.15.0/arch/x86/kvm/x86.c:86:</span><br><span class="line">./include/trace/define_trace.h:95:42: fatal error: ../../arch/x86/kvm/trace.h: No such file or directory</span><br><span class="line">   95 | #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)</span><br><span class="line">      |                                          ^</span><br><span class="line">compilation terminated.</span><br><span class="line">make[1]: *** [scripts/Makefile.build:297: /usr/src/linux-source-5.15.0/linux-source-5.15.0/arch/x86/kvm/x86.o] Error 1</span><br><span class="line">make[1]: *** Waiting for unfinished jobs....</span><br><span class="line">make: *** [Makefile:1914: /usr/src/linux-source-5.15.0/linux-source-5.15.0/arch/x86/kvm] Error 2</span><br><span class="line">make: Leaving directory &#x27;/usr/src/linux-headers-5.15.0-75-generic&#x27;</span><br><span class="line">make: *** [Makefile:46: update] Error 2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<p>把<code>kvm/trace.h</code>的相对路径改为绝对路径</p>
+<p>不知道为什么linux会被替换为1，还得把路径的linux给去掉</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">undef</span> TRACE_INCLUDE_PATH</span></span><br><span class="line"><span class="comment">//#define TRACE_INCLUDE_PATH ../../arch/x86/kvm</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TRACE_INCLUDE_PATH /usr/src/source-5.15.0/source-5.15.0/arch/x86/kvm</span></span><br><span class="line"><span class="meta">#<span class="keyword">undef</span> TRACE_INCLUDE_FILE</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TRACE_INCLUDE_FILE trace</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="hostVM加载内核模块"><a href="#hostVM加载内核模块" class="headerlink" title="hostVM加载内核模块"></a>hostVM加载内核模块</h2><p>编译没问题，加载模块出错</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sudo insmod /usr/src/source-5.15.0/source-5.15.0/arch/x86/kvm/kvm.ko</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero for type 1, 0000000</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero              for</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonz                ero</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is non                 znsmod: ERROR: could not insert module /usr/src/source-5.15.0/source-5.15.0/arch/x86/kvm/kvm.                 [  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero for type 1, oc 00000000</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero for type 1, oc 0000000</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero for type 1, oc 00000</span><br><span class="line">[  363.602674] module: x86/modules: Skipping invalid relocation target, existing value is nonzero for type 1,</span><br><span class="line">loc 00000000392e449f, val ffffffffc0777953</span><br><span class="line">insmod: ERROR: could not insert module /usr/src/source-5.15.0/source-5.15.0/arch/x86/kvm/kvm.ko: Invalid modul</span><br><span class="line">e `n`k`j`nformat</span><br><span class="line">make: *** [Makefile:49: update] Error 1</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/71746914/linux-kernel-module-development-module-x86-modules-skipping-invalid-relocatio">c - Linux Kernel Module Development “module: x86&#x2F;modules: Skipping invalid relocation target, existing value is nonzero for type 1” - Stack Overflow</a></p>
+<p>执行第一句后系统提示换内核并重启，从75-generic换到76-generic 然后就好了</p>
+<p>目前的img</p>
+<ul>
+<li><p>内核代码</p>
+</li>
+<li><p>make bison flex等编译内核的工具</p>
+</li>
+<li><p>brctl tunctl ifconfig配网络</p>
+</li>
+<li><p>kvm-hello-world用于简单测试</p>
+<p>ubuntu.img镜像，启动脚本</p>
+</li>
+</ul>
+<h2 id="hostVM启动guestVM"><a href="#hostVM启动guestVM" class="headerlink" title="hostVM启动guestVM"></a>hostVM启动guestVM</h2><p>启动后出错</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Booting from Hard Disk...</span><br><span class="line">error: invalid arch-independent ELF magic.</span><br><span class="line">Entering rescue mode...</span><br><span class="line">grub rescue&gt;</span><br></pre></td></tr></table></figure>
+
+<p>镜像有问题，换镜像就好了</p>
+<h2 id="hostVM编译内核"><a href="#hostVM编译内核" class="headerlink" title="hostVM编译内核"></a>hostVM编译内核</h2><p>整体编译：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/objtool/include/objtool/elf.h:10:10: fatal error: gelf.h: No such fy</span><br><span class="line">   10 | #include &lt;gelf.h&gt;</span><br><span class="line">      |          ^~~~~~~~</span><br><span class="line">compilation terminated.</span><br><span class="line">compilation terminated.</span><br><span class="line">make[3]: *** [/usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/build/Makefile.build:97: /usr/src/linux-source-5.15.01</span><br><span class="line">make[2]: *** [Makefile:56: /usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/objtool/objtool-in.o] Error 2</span><br><span class="line">make[1]: *** [Makefile:69: objtool] Error 2</span><br><span class="line">make: *** [Makefile:1417: tools/objtool] Error 2</span><br><span class="line">make: *** Waiting for unfinished jobs....</span><br><span class="line">make[4]: *** [/usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/build/Makefile.build:97: /usr/src/linux-source-5.15.01</span><br><span class="line">make[4]: *** Waiting for unfinished jobs....</span><br><span class="line">  CC      /usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/bpf/resolve_btfids/libbpf/staticobjs/ringbuf.o</span><br><span class="line">libbpf.c:47:10: fatal error: libelf.h: No such file or directory</span><br><span class="line">   47 | #include &lt;libelf.h&gt;</span><br><span class="line">      |          ^~~~~~~~~~</span><br><span class="line">compilation terminated.</span><br><span class="line">make[4]: *** [/usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/build/Makefile.build:97: /usr/src/linux-source-5.15.01</span><br><span class="line">make[3]: *** [Makefile:158: /usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/bpf/resolve_btfids/libbpf/staticobjs/li2</span><br><span class="line">make[2]: *** [Makefile:48: /usr/src/linux-source-5.15.0/linux-source-5.15.0/tools/bpf/resolve_btfids//libbpf/libbpf.a] Err2</span><br><span class="line">make[1]: *** [Makefile:72: bpf/resolve_btfids] Error 2</span><br><span class="line">make: *** [Makefile:1417: tools/bpf/resolve_btfids] Error 2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42000667/article/details/125205105">fatal error: libelf.h: No such file or directory 解决方案_正义之兔的博客-CSDN博客</a></p>
+<p>之后编译会报更多的错</p>
+<p>解决方案：</p>
+<p>不在VM里面编译，在host上编译</p>
+<p>换了一台电脑 出现找不到某个.so</p>
+<p>解决方案：</p>
+<p><code>sudo ln -s /snap/core20/1974/usr/lib/x86_64-linux-gpu/libcrypto.so.1.1 /usr/lib/libcrypto.so.1.1</code></p>
+<h2 id="host用自定义内核启动hostVM"><a href="#host用自定义内核启动hostVM" class="headerlink" title="host用自定义内核启动hostVM"></a>host用自定义内核启动hostVM</h2><p>内核启动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">VFS: Cannot open root device &quot;vda1&quot; or unknown-block(0,0): error -6</span><br><span class="line">[    0.485922] Please append a correct &quot;root=&quot; boot option; here are the available partitions:</span><br><span class="line">[    0.486970] 0b00         1048575 sr0</span><br><span class="line">[    0.486971]  driver: sr</span><br><span class="line">[    0.487755] Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)</span><br><span class="line">[    0.488791] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.15.18 #3</span><br><span class="line">[    0.489541] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 044</span><br><span class="line">[    0.490981] Call Trace:</span><br><span class="line">[    0.491304]  dump_stack+0x6d/0x8b</span><br><span class="line">[    0.491730]  panic+0xf7/0x25a</span><br><span class="line">[    0.492111]  mount_block_root+0x1f6/0x2da</span><br><span class="line">[    0.492623]  ? set_debug_rodata+0x34/0x34</span><br><span class="line">[    0.493134]  mount_root+0x38/0x3a</span><br><span class="line">[    0.493560]  prepare_namespace+0x139/0x18e</span><br><span class="line">[    0.494087]  kernel_init_freeable+0x22c/0x259</span><br><span class="line">[    0.494640]  ? rest_init+0xb0/0xb0</span><br><span class="line">[    0.495075]  kernel_init+0xe/0x110</span><br><span class="line">[    0.495507]  ret_from_fork+0x35/0x40</span><br><span class="line">[    0.495981] Kernel Offset: 0x1c400000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)</span><br><span class="line">[    0.497305] ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)</span><br></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<p>不用host的config，用<code>make defconfig</code></p>
+<h2 id="hostVM使用kvm模块"><a href="#hostVM使用kvm模块" class="headerlink" title="hostVM使用kvm模块"></a>hostVM使用kvm模块</h2><p>没有内核模块kvm 手动复制进去加载会报格式错误</p>
+<p><code>/lib/modules</code>只有原来的版本 和新的内核版本对不上</p>
+<p>解决方案：</p>
+<p>config加入<code>CONFIG_KVM=y</code>及<code>CONFIG_KVM_INTEL=y</code></p>
+<h2 id="hostVM使用virtio-balloon模块"><a href="#hostVM使用virtio-balloon模块" class="headerlink" title="hostVM使用virtio-balloon模块"></a>hostVM使用virtio-balloon模块</h2><p><code>CONFIG_VIRTIO_BALLOON=m</code> 传入hostVM insmod加载 lsmod查看</p>
+<p>实际上可以用y直接编译进内核 即使lsmod看不见也是可用的</p>
+<p>qemu加入启动参数 这样qemu monitor有balloon相关命令 但是可能失效</p>
+<p>guest中balloon加载mod后会瞬间起效</p>
+<h2 id="guestVM内存超过hostVM"><a href="#guestVM内存超过hostVM" class="headerlink" title="guestVM内存超过hostVM"></a>guestVM内存超过hostVM</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ubuntu@jammy:~$ ./boot.sh</span><br><span class="line">[   37.106705] __vm_enough_memory: pid: 472, comm: qemu-system-x86, not enough memory for the allocation</span><br><span class="line">qemu-system-x86_64: cannot set up guest memory &#x27;pc.ram&#x27;: Cannot allocate memory</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ruiy/p/11607036.html">openstack kvm cannot set up guest memory ‘pc.ram’: Cannot allocate memory - 秦瑞It行程实录 - 博客园 (cnblogs.com)</a></p>
+<p><code> sudo bash -c &quot;echo 1 &gt; /proc/sys/vm/overcommit_memory&quot;</code></p>
+<h2 id="hostVM-用perf"><a href="#hostVM-用perf" class="headerlink" title="hostVM 用perf"></a>hostVM 用perf</h2><p>需要在host上编译hostVM image的source里面 编译perf</p>
+<p>如果编译报错 不是代码的问题 是依赖的问题 可能少了很多依赖没装 少哪个装哪个 最后少了pkg-config</p>
+<p>hostVM 用apt装 libbabeltrace-ctf-dev 等 也可以直接复制.so</p>
+<p>config加入<code>CONFIG_BPF_SYSCALL=y</code></p>
+<p>record后面必须加<code>-e cpu-clock</code> 否则会每次写入0.002M 无sample 和宿主机行为不一样</p>
+<p>火焰图下的FlameGraph脚本需要sudo</p>
+<h2 id="perf看不到kernel-symbol"><a href="#perf看不到kernel-symbol" class="headerlink" title="perf看不到kernel symbol"></a>perf看不到kernel symbol</h2><p>用-p pid可看到报错提示</p>
+<p>根据提示<code>sudo bash -c &quot;echo -1 &gt; /proc/sys/kernel/perf_event_paranoid&quot;</code></p>
+<p>值是2 disallow kernel profiling</p>
+<h2 id="guest-perf"><a href="#guest-perf" class="headerlink" title="guest perf"></a>guest perf</h2><p>tools目录 <code>make LDFLAGS=-static perf</code> ldd perf看到not a dynamic executable</p>
+<h2 id="VM增大磁盘容量"><a href="#VM增大磁盘容量" class="headerlink" title="VM增大磁盘容量"></a>VM增大磁盘容量</h2><p>先qemu-img resize</p>
+<p>然后进虚拟机 fdisk -l 看设备</p>
+<p>然后fdisk 设备  删分区 加分区  </p>
+<p><a target="_blank" rel="noopener" href="https://taoshu.in/unix/resize-qemu-ext4.html#google_vignette">https://taoshu.in/unix/resize-qemu-ext4.html#google_vignette</a></p>
+<h2 id="hostVM网络工具"><a href="#hostVM网络工具" class="headerlink" title="hostVM网络工具"></a>hostVM网络工具</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ubuntu@jammy:~$ make network</span><br><span class="line">sudo brctl addbr br0</span><br><span class="line">add bridge failed: Package not installed</span><br><span class="line">make: *** [Makefile:2: network] Error 1</span><br></pre></td></tr></table></figure>
+
+<p>config加入<code>CONFIG_BRIDGE=y</code> <code>CONFIG_TUN=y</code> <code>CONFIG_TAP=y</code></p>
+<p>必须是y 不能是m</p>
+<p>guestVM启动分配的mac地址必须不可以和hostVM一样</p>
+<h2 id="ssh连接hostVM"><a href="#ssh连接hostVM" class="headerlink" title="ssh连接hostVM"></a>ssh连接hostVM</h2><p>默认优先级是从外至内的</p>
+<p>guestVM ctrl a x会退出两个 用ssh不会</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/yjk13703623757/article/details/114936739">解决Permission denied (publickey)._Locutus的博客-CSDN博客</a></p>
+<h2 id="soc-term"><a href="#soc-term" class="headerlink" title="soc term"></a>soc term</h2><p>如果不能配网络的情况下 用这个</p>
+<p><a target="_blank" rel="noopener" href="https://review.trustedfirmware.org/plugins/gitiles/OP-TEE/build/+/c79ecf72671f50cf8768514245bce5e46cfe4fa5/soc_term.py">soc_term.py - OP-TEE&#x2F;build - Gitiles (trustedfirmware.org)</a></p>
+<h2 id="挂载文件"><a href="#挂载文件" class="headerlink" title="挂载文件"></a>挂载文件</h2><p>用virtfs </p>
+<p><code>sudo mount -t 9p -o trans=virtio,version=9p2000.L host0 /mnt/shared</code></p>
+<h2 id="gdb-调内核"><a href="#gdb-调内核" class="headerlink" title="gdb 调内核"></a>gdb 调内核</h2><p>内核编译打开debug info</p>
+<p>内核目录下 <code>gdb vmlinux</code> 然后<code>target remote localhost:1234</code></p>
+<p>可以用hb代替b 可以启动完成后ctrl c 然后b 然后c</p>
+<p>启动加<code>-S -gdb tcp::1234</code></p>
+<p>需要加<code>-append &quot;nokaslr&quot;</code> 否则断点打了不会停</p>
+<h2 id="balloon"><a href="#balloon" class="headerlink" title="balloon"></a>balloon</h2><p><a target="_blank" rel="noopener" href="http://ssdxiao.github.io/linux/2017/03/20/Virtio-Balloon.html">Virtio-Balloon超详细分析 (ssdxiao.github.io)</a></p>
+<h2 id="final"><a href="#final" class="headerlink" title="final"></a>final</h2><p>修改host上的<code>linux_stable</code> 使用defconfig并加入kvm的配置</p>
+<p>-kernel启动hostVM后把bzImage复制（scp）进hostVM，hostVM用同样的image启动guestVM</p>
+<p>hostVM ubuntu password 创建后先配置网络 然后host上用ssh连hostVM</p>
+<p>guestVM ubuntu 123</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">net:</span></span><br><span class="line">        sudo brctl addbr br0</span><br><span class="line">        sudo ip addr flush dev ens4</span><br><span class="line">        sudo brctl addif br0 ens4</span><br><span class="line">        sudo tunctl -t tap0 -u ubuntu</span><br><span class="line">        sudo brctl addif br0 tap0</span><br><span class="line">        sudo ifconfig ens4 up</span><br><span class="line">        sudo ifconfig tap0 up</span><br><span class="line">        sudo ifconfig br0 up</span><br><span class="line">        sudo dhclient br0</span><br><span class="line"></span><br><span class="line"><span class="section">mem:</span></span><br><span class="line">        sudo bash -c <span class="string">&quot;echo 1 &gt; /proc/sys/vm/overcommit_memory&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="section">swap:</span></span><br><span class="line">        sudo swapon test_swap</span><br><span class="line"></span><br><span class="line"><span class="section">watchmsg:</span></span><br><span class="line">        watch <span class="string">&quot;dmesg | tail -n 20&quot;</span></span><br><span class="line"><span class="section">watchfree:</span></span><br><span class="line">        watch <span class="string">&quot;free -mh&quot;</span></span><br><span class="line"><span class="section">init:</span></span><br><span class="line">        make net</span><br><span class="line">        make mem</span><br><span class="line">        make swap</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/17/virtualization/virtio%20queue/" rel="prev" title="virtio queue">
+                  <i class="fa fa-angle-left"></i> virtio queue
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/02/04/papers/Sabre/" rel="next" title="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs ">
+                  Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs  <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

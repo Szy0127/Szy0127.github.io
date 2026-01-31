@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Effective C++让自己习惯C++  c++有4个主要的次语言   C 没有模板 异常 重载 C++ 类 封装 继承 多态 虚函数 Template 泛型 STL  不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）  #define 直接被替换 报错时找不到信息 并且占用内存可能反而更大  const 取地址合法 enum 取地址不合法 inline   用cons">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective C++">
+<meta property="og:url" content="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="Effective C++让自己习惯C++  c++有4个主要的次语言   C 没有模板 异常 重载 C++ 类 封装 继承 多态 虚函数 Template 泛型 STL  不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）  #define 直接被替换 报错时找不到信息 并且占用内存可能反而更大  const 取地址合法 enum 取地址不合法 inline   用cons">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-01-31T06:01:02.000Z">
+<meta property="article:modified_time" content="2026-01-31T06:12:24.607Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/01/31/cpp/effectiveC++/","path":"2026/01/31/cpp/effectiveC++/","title":"Effective C++"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Effective C++ | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Effective-C"><span class="nav-number">1.</span> <span class="nav-text">Effective C++</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A9%E8%87%AA%E5%B7%B1%E4%B9%A0%E6%83%AFC"><span class="nav-number">1.1.</span> <span class="nav-text">让自己习惯C++</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E9%80%A0-%E6%9E%90%E6%9E%84-%E8%B5%8B%E5%80%BC%E8%BF%90%E7%AE%97"><span class="nav-number">1.2.</span> <span class="nav-text">构造&#x2F;析构&#x2F;赋值运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">资源管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%A3%B0%E6%98%8E"><span class="nav-number">1.4.</span> <span class="nav-text">设计与声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.5.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF%E4%B8%8E%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.6.</span> <span class="nav-text">继承与面向对象设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E4%B8%8E%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B"><span class="nav-number">1.7.</span> <span class="nav-text">模板与泛型编程</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Effective C++ | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective C++
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:12:24" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c++</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="Effective-C"><a href="#Effective-C" class="headerlink" title="Effective C++"></a>Effective C++</h1><h2 id="让自己习惯C"><a href="#让自己习惯C" class="headerlink" title="让自己习惯C++"></a>让自己习惯C++</h2><ol>
+<li><ol>
+<li>c++有4个主要的次语言</li>
+</ol>
+<ul>
+<li>C 没有模板 异常 重载</li>
+<li>C++ 类 封装 继承 多态 虚函数</li>
+<li>Template 泛型</li>
+<li>STL</li>
+</ul>
+<p>不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）</p>
+</li>
+<li><p>#define 直接被替换 报错时找不到信息 并且占用内存可能反而更大</p>
+<ul>
+<li>const 取地址合法</li>
+<li>enum 取地址不合法</li>
+<li>inline</li>
+</ul>
+</li>
+<li><p>用const修饰变量，函数等</p>
+<p>返回的对象可以使用const修饰 避免 <code>if(a*b=c)</code></p>
+<p>const可非const可重载</p>
+<p>非const可转型为const</p>
+</li>
+<li><p>类的成员变量的初始化发生在进入构造函数之前，且一定按声明的顺序</p>
+<p>使用初始化列表，内置类型也使用xx()的形式</p>
+</li>
+</ol>
+<h2 id="构造-析构-赋值运算"><a href="#构造-析构-赋值运算" class="headerlink" title="构造&#x2F;析构&#x2F;赋值运算"></a>构造&#x2F;析构&#x2F;赋值运算</h2><ol start="5">
+<li><p>默认构造函数会初始化基类和非静态成员变量，默认析构会自动调用析构（所以不用写），默认拷贝函数会复制每个非const对象</p>
+<p>三种情况 不会生成默认拷贝函数</p>
+<ul>
+<li>有引用成员变量</li>
+<li>有const成员变量</li>
+<li>基类的拷贝函数为private</li>
+</ul>
+</li>
+<li><p>不想使用默认的函数，可以声明为private</p>
+</li>
+<li><p>多态的基类的析构函数加virtual 避免用基类指针释放派生类对象出现内存泄漏</p>
+<p>虚函数使用虚函数指针管理，会增加内存占用</p>
+<p>如果基类的析构没有virtual 不适合派生，例如STL</p>
+</li>
+<li><p>在析构中catch异常，不向下传递</p>
+</li>
+<li><p>在派生类的构造&#x2F;析构函数调用基类的构造&#x2F;析构函数时，派生类的信息已经消失，所以在基类的构造&#x2F;析构函数中调用虚函数是无效的</p>
+</li>
+<li><p>为了实现连续赋值，让operator&#x3D;返回左值引用</p>
+</li>
+<li><p>operator&#x3D;的两个对象如果相同可能会出现删掉自己的问题 </p>
+<p>解决方法如下：</p>
+<ul>
+<li>开头判断是否相等 如果相等直接返回    增加了取址 条件跳转 影响效率</li>
+<li>调整顺序 先改再删 </li>
+<li>用swap</li>
+</ul>
+</li>
+<li><p>自定义拷贝构造函数和拷贝函数需要保证复制了每个成员变量，编译器不会提醒</p>
+<ul>
+<li>复制自己所有的成员变量</li>
+<li>调用基类的拷贝构造函数 <code>XX::operator=(rhs)</code></li>
+</ul>
+<p>拷贝构造函数和拷贝函数重复的代码可用一个private的init函数来写</p>
+</li>
+</ol>
+<h2 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h2><p>除了内存，文件描述符，锁、连接、socket都是资源</p>
+<ol start="13">
+<li><p>在一个函数中，使用指针 最后delete 可能导致由于中间部分的问题而没有delete</p>
+<p>使用智能指针管理，借助离开函数自动调用析构函数的机制 <code>std::auto_ptr&lt;A&gt; p(new A)</code></p>
+<p>智能指针默认执行delete 而不是delete[] 无法管理数组</p>
+<p>需要open close成对出现的资源 可以写在一个类中，close写在类的析构中，出现异常自动调用</p>
+</li>
+<li><p>资源管理类小心复制，可以直接禁止复制</p>
+</li>
+<li><p>虽然智能指针可以通过*或-&gt;像指针一样使用，但是<code>*A</code>与<code>std::auto_ptr&lt;A&gt;</code>类型并不相同，不能被函数接受</p>
+<p>智能指针提供get方法拿到原始指针，但是这样用户会觉得麻烦</p>
+<p>另一种方法是在类中定义隐式转换的函数 但这样会出现非预期的转换 造成bug</p>
+</li>
+<li><p>new delete ； new[]  delete[]  否则都会有bug</p>
+<ul>
+<li>多个构造函数用相同形式的new</li>
+<li>使用typedef 注意是否是数组</li>
+</ul>
+</li>
+<li><p>new得到的指针放入指针智能时使用独立语句，否则可能导致中间步骤的失败丢失new出来的指针</p>
+</li>
+</ol>
+<h2 id="设计与声明"><a href="#设计与声明" class="headerlink" title="设计与声明"></a>设计与声明</h2><ol start="18">
+<li><p>良好的接口不应该被误用，例如返回指针会导致没有delete&#x2F;delete两次&#x2F;错误方式delete等</p>
+<p>可以返回一个智能指针，同时设置好deleter 强制让用户使用智能指针来接受</p>
+<p>防止同类型的参数顺序出错，可以新声明几个类型，强制让用户使用新类型</p>
+</li>
+<li><p>设计class应该像设计type一样 考虑创建销毁 初始化赋值 传递 合法值 转换 操作符 接口等一系列问题</p>
+</li>
+<li><p>函数参数传递是按值传递，会调用构造函数，效率低，尽量使用引用传递，为了防止引用传递的后果 加const</p>
+<p>这样做可以解决对象切割的问题，即使用基类对象接受派生类，依然可以正确找到派生类声明为virtual的函数</p>
+<p>内置类型比较小 用引用涉及到指针反而慢， stl容器也尽量用值传递</p>
+</li>
+<li><p>函数的返回值也会涉及到构造与析构的浪费，但是此处并没有办法节省（除非返回值并不是函数生成的）</p>
+<p>尝试方法与问题如下：</p>
+<ul>
+<li>栈上分配 返回引用   返回时已经销毁 拿到已经销毁的变量</li>
+<li>堆上分配 返回指针   没人delete&#x2F;连续运算时丢失临时变量的指针</li>
+<li>使用static     static对象只看现值 严重bug</li>
+</ul>
+</li>
+<li><p>所有类的成员变量都应该是private 需要的话设置getter和setter通过函数访问</p>
+<p>好处如下：</p>
+<ul>
+<li>提供的接口都是函数，统一使用括号访问</li>
+<li>封装 可以随意修改实现方法</li>
+<li>取消此变量后不会让客户代码与派生类代码发生破坏</li>
+</ul>
+</li>
+<li><p>封装的内容越多，可访问内容的函数越少，改动影响的部分越少，可改动的弹性越大</p>
+<p>所以在两个函数具有相同功能的时候，尽量使用non-member&#x2F;non-friend去替代member(成员)函数</p>
+<p>可以使用namespace把工具函数和类放在同一区域中</p>
+<p>不同的源文件不能切分类，但是可以使用同一个namespace 切分工具函数</p>
+</li>
+<li><p>如果一个函数的所有参数都需要类型转换，应该成为non-member</p>
+<p>member函数一方是this 无法隐式转换</p>
+</li>
+<li><p>？ swap</p>
+</li>
+</ol>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol start="26">
+<li><p>尽量延后变量定义式出现的时间，否则可能会由于中途的异常而没有使用却承担了构造析构的成本</p>
+<p>直接给初值，而不是初始化之后再赋值</p>
+<p>循环中需要的变量放在内还是外需要对比构造析构与赋值操作的时间，放内部不影响作用域及可理解性、易维护性</p>
+</li>
+<li><p>少转型 用新式转型替代旧式转型</p>
+<p>转型不是只改变解释方式不改变数据，转型会生成代码（int和double的表示方式都不同）</p>
+<ul>
+<li>static_cast  强迫转型 但是在类的成员函数中转成基类调基类的函数会导致生成函数副本，使用错误的this</li>
+<li>dynamic_cast 向下转型，可以通过基类派生类，但是效率不高，最好用virtual实现相同的功能</li>
+</ul>
+</li>
+<li><p>避免返回handles（引用，指针，迭代器）</p>
+<p>风险如下：</p>
+<ul>
+<li>操作了private成员&#x2F;声明为const的函数&#x2F;变量实际修改了内容</li>
+<li>handles所指内容的主体已经被析构，造成空悬</li>
+</ul>
+<p>例外：string vector等容器的operator&#x3D;返回的是引用</p>
+</li>
+<li><p>函数需要异常安全</p>
+<p>三个等级：</p>
+<ul>
+<li>基本：不破坏数据结构（例如资源泄露，打乱排序数组）</li>
+<li>强烈：保证状态不变 可以通过copy-swap实现，及创建副本 修改在副本上 然后交换 但可能效率较低 复杂程度较高；并且，如果这个函数中调用了其他函数，但是其他函数并没有强烈的异常安全保证，自己也不行。</li>
+<li>不抛异常</li>
+</ul>
+</li>
+<li><p>inline 用函数本体替换每次调用的地方，编译时候完成，编译器会选择（太复杂或者virtual会拒绝）</p>
+<ul>
+<li><p>好处：减小函数调用的开销</p>
+</li>
+<li><p>坏处：可能增大字节码，修改后必须重新编译</p>
+</li>
+</ul>
+</li>
+<li><p>？传统的方式（.h&#x2F;.cpp）并没有编译依存最小化，仅仅修改一部分就需要全部编译</p>
+<p>可通过以下两种方式解耦接口与实现：</p>
+<ul>
+<li>handle classes：通过组合方式，类A使用类AImpl完全其所有的函数</li>
+<li>interface classes：通过继承方式，类A提供接口，全是纯虚函数，类B继承类A实现这些函数。</li>
+</ul>
+</li>
+</ol>
+<h2 id="继承与面向对象设计"><a href="#继承与面向对象设计" class="headerlink" title="继承与面向对象设计"></a>继承与面向对象设计</h2><ol start="32">
+<li><p>public继承必须满足is-a的关系（里氏替换原则）</p>
+</li>
+<li><p>派生类函数会遮蔽基类的函数，具体情况为基类有多个重载的函数，派生类有一个同名的函数，那么基类的多个函数全被遮蔽（与virtual无关），如果是public继承则违反了is-a的关系 </p>
+<p>解决方法是使用<code>using Base::f</code> 但这样会把所有的重载的f都拿到作用域中</p>
+<p>如果只想用某一个，可以先用private继承，然后在同名函数中直接调用<code>Base::f()</code></p>
+</li>
+<li><p>区分接口继承和实现继承</p>
+<p>用virtual 同时继承接口和实现，可以重写各自的实现，但问题是如果忘记重写了编译器并不会报错，而是会使用基类的函数</p>
+<p>用pure virtual 可以强制让派生类提供实现，但是可能会出现相同代码</p>
+<p>在基类中提供一个default版本的代码供派生类调用，但这样会多一个函数，且造成命名混乱</p>
+<p>解决方法：给纯虚函数提供实现，派生类通过<code>Base::f()</code>调用此函数</p>
+</li>
+<li><p>？设计模式   替代virtual</p>
+<p>private  virtual&#x2F;public non-virtual调用virtual</p>
+</li>
+<li><p>non-virtual函数不应该被重新定义</p>
+</li>
+<li><p>函数参数的缺省值是看静态类型的，所以virtual函数的参数缺省值只有基类起作用</p>
+</li>
+<li><p>复合  has-a</p>
+</li>
+<li><p>？private继承</p>
+<p>private继承得到的接口都是private 禁止调用</p>
+<p>在设计层面上无意义，只是方便实现</p>
+<p>尽可能用复合而不是private继承</p>
+<p>空对象也有大小</p>
+</li>
+<li><p>？多重继承</p>
+<p>菱形继承 virtual继承</p>
+</li>
+</ol>
+<h2 id="模板与泛型编程"><a href="#模板与泛型编程" class="headerlink" title="模板与泛型编程"></a>模板与泛型编程</h2><p>41. </p>
+<p>42. </p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/31/cpp/C++1114%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" rel="prev" title="C++11/14高级编程">
+                  <i class="fa fa-angle-left"></i> C++11/14高级编程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" rel="next" title="C++ Concurrency in Action">
+                  C++ Concurrency in Action <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

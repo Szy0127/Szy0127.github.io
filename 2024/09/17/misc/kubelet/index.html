@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="kubeletcontainerdcontainerd&#x2F;getting-started.md at main · containerd&#x2F;containerd (github.com) 镜像自带，但需要安装cni，高版本没有自带的flannel，用0.9.1版本可以 management管理容器，考虑以下三种方法：  containerd启动时会作为grpc server，监听在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubelet">
+<meta property="og:url" content="http://szy0127.github.io/2024/09/17/misc/kubelet/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="kubeletcontainerdcontainerd&#x2F;getting-started.md at main · containerd&#x2F;containerd (github.com) 镜像自带，但需要安装cni，高版本没有自带的flannel，用0.9.1版本可以 management管理容器，考虑以下三种方法：  containerd启动时会作为grpc server，监听在">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-17T11:48:03.442Z">
+<meta property="article:modified_time" content="2024-09-17T11:48:03.457Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/09/17/misc/kubelet/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/09/17/misc/kubelet/","path":"2024/09/17/misc/kubelet/","title":"kubelet"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>kubelet | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#kubelet"><span class="nav-number">1.</span> <span class="nav-text">kubelet</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#containerd"><span class="nav-number">1.1.</span> <span class="nav-text">containerd</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#management"><span class="nav-number">1.1.1.</span> <span class="nav-text">management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#configuration"><span class="nav-number">1.1.2.</span> <span class="nav-text">configuration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#task"><span class="nav-number">1.1.3.</span> <span class="nav-text">task</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#image"><span class="nav-number">1.1.4.</span> <span class="nav-text">image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pause"><span class="nav-number">1.1.5.</span> <span class="nav-text">pause</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#network"><span class="nav-number">1.2.</span> <span class="nav-text">network</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#flannel"><span class="nav-number">1.2.1.</span> <span class="nav-text">flannel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">1.2.3.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90%E7%9B%91%E6%8E%A7"><span class="nav-number">1.3.</span> <span class="nav-text">资源监控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#memory"><span class="nav-number">1.3.1.</span> <span class="nav-text">memory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU"><span class="nav-number">1.3.2.</span> <span class="nav-text">CPU</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-1"><span class="nav-number">1.4.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/misc/kubelet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="kubelet | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          kubelet
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>11 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h1><h2 id="containerd"><a href="#containerd" class="headerlink" title="containerd"></a>containerd</h2><p><a target="_blank" rel="noopener" href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">containerd&#x2F;getting-started.md at main · containerd&#x2F;containerd (github.com)</a></p>
+<p>镜像自带，但需要安装cni，高版本没有自带的flannel，用0.9.1版本可以</p>
+<h3 id="management"><a href="#management" class="headerlink" title="management"></a>management</h3><p>管理容器，考虑以下三种方法：</p>
+<ol>
+<li><p>containerd启动时会作为grpc server，监听在<code>unix:///run/containerd/containerd.sock</code> 可以像k8s一样作为grpc client调定义好的CRI接口。但是我们不需要考虑项目不同模块解耦，也不需要考虑支持其他的容器运行时，对于grpc的调用需要自己构造参数，太复杂，并且试了一下很难跑起来。</p>
+</li>
+<li><p>用exec+ctl</p>
+<p>这里可以使用containerd写的nerdctl 兼容docker的命令行格式</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/containerd/nerdctl">containerd&#x2F;nerdctl: contaiNERD CTL - Docker-compatible CLI for containerd, with support for Compose, Rootless, eStargz, OCIcrypt, IPFS, … (github.com)</a></p>
+<p>完全用cli工具技术含量不高，且需要经过nerdctl这个大框架的解析，效率不高。</p>
+<p>可以做一些辅助用途，比如测试、启动pause等。核心的查看容器状态和启动容器还是用containerd的go api</p>
+</li>
+<li><p>containerd api</p>
+<p>实在难用，官方文档一共就readme的几句话，剩下的全靠看源码+猜+看nerdctl源码如何使用</p>
+</li>
+</ol>
+<p>这里研究出的api如下</p>
+<ul>
+<li>创建容器 包括配置</li>
+<li>销毁容器</li>
+<li>获取容器状态</li>
+<li>获取容器资源信息</li>
+</ul>
+<h3 id="configuration"><a href="#configuration" class="headerlink" title="configuration"></a>configuration</h3><ul>
+<li><p><code>WithMounts</code> 挂载 需要将type和options同时设为bind，否则会报<code>no such device</code>的错</p>
+</li>
+<li><p><code>WithDomainname</code> <code>WithHostname</code></p>
+</li>
+<li><p><code>WithLinuxNamespace</code>可以加入其他进程的namespace 但是需要先起task 拿到pid<code>proc/pid/ns/uts</code></p>
+<p>启动pause容器后，将此pod内的所有其他容器加入到pause容器的namespace<br>观察containerd的源码可知，就算什么都不配置，默认也是使用了ipc、uts、network、mount、pid这五个命名空间隔离的<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_40579389/article/details/125941366">k8s之pause容器</a>按这篇文章的意思 除了mount其他都不需要和pause隔离<br>需要修改的话 一种是自己写配置函数，另一种是使用这个api但只能一个个单独设 </p>
+</li>
+<li><p><code>WithProcessArgs</code> 启动命令 只有windows支持<code>ProcessCmdLine</code> 不过简单的命令使用起来效果差不多，具体可能涉及到entrypoint 和cmd的区别</p>
+</li>
+<li><p><code>Withenv</code>  环境变量 <code>&quot;a=c&quot;</code> </p>
+</li>
+<li><p><code>WithMemoryLimit</code> 单位是字节，如果容器使用内存超过这个数 会被直接kill。</p>
+<p>莫名其妙会有bug，报cgroup的错，全网查不到信息，使用“30Mi” 没问题</p>
+</li>
+<li><p>CPU：</p>
+<ul>
+<li><code>WithCPUs</code> 将容器进程绑定到指定cpu执行，比如<code>0-3</code>绑定到0 1 2 3  ，<code>1</code>绑定到1</li>
+<li><code>WithCPUCFS</code> 调度器，对应到nerdctl 是<code>--cpus</code> 会使用这个api，但是网上说这个参数指定cpu核，这个说法不准确，实际上如果这个值为1，会发生cpu0 和cpu1占用率都在50%的情况，即总使用量为1</li>
+<li><code>WithCPUShares</code> 份额</li>
+</ul>
+</li>
+<li><p>port: 仅作标识用，没有意义，所以没有对应api</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/4b16c995990b">k8s四种port解析：nodePort、port、targetPort、containerPort - 简书 (jianshu.com)</a> </p>
+</li>
+<li><p><code>WithContainerLabels</code>这个功能为container提供label</p>
+<p>配合<code>client.Containers(ctx,fmt.Sprintf(&quot;labels.%q==%s&quot;, &quot;pod&quot;, pod.Data.Name))</code>一起使用</p>
+<p>对于apiserver维护的信息，只是自定义的container apiobject，并不是containerd的可以用来获取真实容器信息的对象，使用containerd的添加label并使用filter的方法可以很方便地拿到一个pod对应的所有containers，否则需要通过遍历容器并比较ID来判断。</p>
+</li>
+</ul>
+<h3 id="task"><a href="#task" class="headerlink" title="task"></a>task</h3><p>containerd的api有一个docker没有的概念task</p>
+<p>每个容器创建后，可以开启task，每个task对应一个进程，有对应的api，这时候才会产生新的命名空间</p>
+<p>删除容器，先要killtask 然后delete task 最后delete容器</p>
+<h3 id="image"><a href="#image" class="headerlink" title="image"></a>image</h3><p>containerd本身管理容器运行时，对于其他功能的提供非常少，包括拉取镜像。使用containerd提供的api只能做到从某个registry拉取，本地image是不行的，不带registry的image也是不行的。</p>
+<p>通过观察nerdctl的源码可以得到以下两个扩展：</p>
+<ol>
+<li><code>pkg/imgutil/dockerconfigresolver/dockerconfigresolver.go/New</code>可知使用docker的resolver可以做到从不同registry(包括自己部署的)拉取镜像</li>
+<li><code>pkg/imgutil/imgutil.go/GetExistingImage</code>可知containerd提供<code>NewImage</code>方法，供<code>image.Image</code>对象到<code>containerd.Image</code>的转换，这里<code>image.Image</code>可以通过<code>client.ImageService().Get(imageName)</code>来获取。虽然这里在字符串解析上也必须出现registry的部分，但是实际上不会真的pull，而是从本地获取(<code>nerdctl image list</code>可见即可)</li>
+</ol>
+<p>如果image在自己部署的registry中但还未被pull，这两种方法都是行不通的，需要自己创建docker resolver然后用WithResolver的配置去pull。这里图方便，解决方案为先用cli工具提前pull，随后紧接着用方法2获取到image对象</p>
+<h3 id="pause"><a href="#pause" class="headerlink" title="pause"></a>pause</h3><p>用containerd api设置网络特别麻烦，因此直接用nerdctl跑pause容器，并inspect拿到pid</p>
+<p>因此这里直接使用podname+”-pause”为每个pause容器命名</p>
+<p>虽然containerd的container对象只能访问.ID，而nerdctl 的 <code>--name</code> 设置的是name并不是id 但还是可以通过containerd的filter+label拿到container对象</p>
+<p>然而由于一开始pause容器利用nerdctl实现网络配置，nerdctl本身除了调用containerd的api外，自己有维护一个namestore，在创建容器时会 <code>aquire</code> 需要在销毁时 <code>release</code></p>
+<p>所以销毁容器只调containerd的api是不够的，会导致containerd的容器已经被删掉了，但是nerdctl维护的信息还没删，导致下一次创建同名pause容器会有问题</p>
+<p>解决方案可以是照nerdctl的代码找到对应的文件路径 然后照抄 <code>release</code>的代码，但这导致minik8s存在与nerdctl耦合的路径配置，较复杂 所以不如销毁pause仍用nerdctl直接实现</p>
+<h2 id="network"><a href="#network" class="headerlink" title="network"></a>network</h2><p>containerd相较于docker并没有提供任何网络相关帮助，所以完全依赖CNI插件</p>
+<p><code>nerdctl network ls</code> <code>nerdctl run -net host/none</code></p>
+<p>CNI插件完成两个目标</p>
+<ol>
+<li>让每个容器(实际上就是一个pod)拥有一个虚拟网卡，使其拥有访问外网的能力</li>
+<li>支持跨node(物理主机)的pod间通信</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_41033724/article/details/124976813">Kubernetes容器网络及Flannel插件详解_边缘计算社区的博客-CSDN博客</a></p>
+<p>思路：</p>
+<ol>
+<li>使用flannel插件创建网络 此时每个node都会出现<code>flannel.1</code>的虚拟网卡，可以互相通信</li>
+<li>使用<code>nerdctl run -net flannel pause</code> 创建pause容器，此时ip在不同node上会在不同子网中进行分配，不会重复</li>
+<li>其他容器加入pause容器的network namespace</li>
+</ol>
+<h3 id="flannel"><a href="#flannel" class="headerlink" title="flannel"></a>flannel</h3><p><a target="_blank" rel="noopener" href="https://github.com/flannel-io/flannel/blob/master/Documentation/running.md">flannel&#x2F;running.md at master · flannel-io&#x2F;flannel · GitHub</a></p>
+<p>flannel目前已经支持了etcd v3版本，不需要切换v2。</p>
+<p>etcd v3 v2的数据是不互通的，flanneld启动时默认会在v3里找数据</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lhang/p/17306765.html">Docker容器使用Flannel通信 - L_Hang - 博客园 (cnblogs.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_30641567/article/details/123917486">Containerd网络管理_containerd 端口映射_班婕妤的博客-CSDN博客</a></p>
+<p>只有master节点通过apiserver使用etcd，kubelet部署在node上 不需要也不能管理etcd</p>
+<p>只需要一个etcd 不需要集群 (flannel如果使用etcd集群会出找不到lease的bug)</p>
+<p>master <code>etcd --listen-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --listen-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot; --initial-advertise-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --advertise-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot;</code></p>
+<p>master <code>etcdctl --endpoints &quot;http://192.168.1.12:2379&quot; put /coreos.com/network/config &#39;&#123;&quot;NetWork&quot;:&quot;10.2.0.0/16&quot;,&quot;SubnetMin&quot;:&quot;10.2.1.0&quot;,&quot;SubnetMax&quot;: &quot;10.2.20.0&quot;,&quot;Backend&quot;: &#123;&quot;Type&quot;: &quot;vxlan&quot;&#125;&#125;&#39;</code></p>
+<p>node启动<code>./flanneld-amd64 -etcd-endpoints=http://192.168.1.12:2379 -iface=ens3</code></p>
+<p>这里ens3是主机上能和外界通信的网卡，如果不设置flannel也会自动找</p>
+<p>出现<code>flannel.1</code>的网卡。如果修改配置后第一次的flannel1无法消失 出现cni0 重启可以解决</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vim /etc/cni/net.d/10-flannel.conflist</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">  <span class="string">&quot;cniVersion&quot;</span>: <span class="string">&quot;0.3.1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;plugins&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">      <span class="string">&quot;delegate&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;isDefaultGateway&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;portmap&quot;</span>,</span><br><span class="line">      <span class="string">&quot;capabilities&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;portMappings&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>nerdctl run -d -v /home/test_mount:/root/test_mount --net flannel -e port=12345 mcastelino/nettools /root/test_mount/test_network</code> 测试网络可行<br>nerdctl对于网络的解析太复杂了，对于pause并没有很多额外的配置，所以直接用ctl启动pause<br>在加入pause的namespace后发现，虽然其他容器有通过虚拟网卡向外找到合适的转发接口的能力，但是并没有DNS server。这里解决方法是使用外部的<code>nerdctl cp</code>命令将首个容器(pause)的<code>/etc/resolv.conf</code> <code>/etc/hosts</code>文件复制给每个该pod下的容器<br>容器内部部署的服务 可在主机上通过容器ip+容器内端口的方式直接访问到，至此实现pod间通信、主机与pod通信，后续交给kube-proxy</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43266367/article/details/127836595">k8s网络插件之Flannel_林凡修的博客-CSDN博客</a></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>由于需要给pod增加dns服务，在master上使用coredns作为dns server，解决方法是在resolve.conf中第一条加入master节点的ip（必须53端口）</p>
+<p>resolv.conf的逻辑是 如果前一个nameserver连接不上，才会继续向下一个nameserver查找。</p>
+<p>如果前一个nameserver连接上了但是没有记录，则会直接报无记录，不会向下一个nameserver查找。</p>
+<p>因此必须保证在集群网络通常的情况下，master节点必须启用coredns并且coredns除了minik8s需要的dns服务，必须包括其他通用的dns服务。</p>
+<h2 id="资源监控"><a href="#资源监控" class="headerlink" title="资源监控"></a>资源监控</h2><p>参考<code>cmd/nerdctl/container_stats_linux.go</code></p>
+<p>可以通过containerd的api拿到metrics对象,不过需要Unmarshal，并且对应的接口离其报错，找不到type，只能照着containerd的源码手动用反射</p>
+<h3 id="memory"><a href="#memory" class="headerlink" title="memory"></a>memory</h3><p>是一个定值，表示占用内存大小，单位byte</p>
+<h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><p>进程创建开始之后累计执行的时间，如果跑在2个核上，过了1s，则记为2s<br>通过与上一次获取的cpu执行时间的delta和时间delta可以计算出CPUPercent，和top展示的cpu%是一模一样的<br>CPUPercent和容器创建指定的cpu参数可对应，例如指定cpu&#x3D;1，则cpu%&#x3D;100%;cpu&#x3D;2,cpu%&#x3D;200%（两核跑满）;cpu&#x3D;500m,cpu%&#x3D;50%</p>
+<h2 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h2><p>kubelet主要做三件事</p>
+<ol>
+<li>websocket与apiserver保持长连接，监听到pod的创建、销毁状态时进行对应的容器操作。</li>
+<li>作为http server接收对于容器资源的请求，获取并计算容器资源后返回。</li>
+<li>每隔一段时间检查所有容器的状态，将存在停止容器的pod的状态通过短链接更新给apiserver</li>
+</ol>
+<p>针对container，1是写，23是读，可能会发生冲突。例如操作2正在统计某容器资源的时候，该容器被操作1删除。</p>
+<p>使用读写锁为每个pod上锁，即<code>map[string]sync.RWMutex</code> 其中key为<code>namespace-podname</code> 锁必须细粒度，因为2操作非常慢。</p>
+<p>go的map本身是线程不安全的，在对于同一个pod同时拿锁时可能创建两个不同的锁，严重时可能导致对于map的修改崩溃，因此将map替换为<code>sync.Map</code>。虽然同时写map没问题，但是很可能出现t1创建完并拿完锁之后return t2再次创建并拿锁，原因是并没有另一把锁来让对于map中某个key的访问设为临界区。使用<code>sync.Map</code>提供的<code>LoadOrStore(key,value)</code>方法，它会先判断是否存在某个key，如果存在返回<code>map[key]</code>，否则设置<code>map[key]=value</code>后返回value，最后用value.lock。这个方法只是压缩代码行数到了两行，但仍然不是原子的。最好是有类似<code>tbb::concurrent_hash_map::accessor</code>之类的东西。</p>
+<p>解决方法是使用一把大锁保护<code>sync.Map</code>，每次写map都需要拿锁，虽然粒度从pod变大到了整个空间，但是这里锁保护的临界区非常小，之后对于map数据结构的写，很快。</p>
+<p>在和apiserver连接中断后，任务2会继续做，任务1会每5s再发起一次连接请求，任务3会按之前的频率继续做(由于get请求会失败所以拿不到pod信息)</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/17/misc/GPU/" rel="prev" title="GPU">
+                  <i class="fa fa-angle-left"></i> GPU
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/17/misc/react-native-note/" rel="next" title="react-native 开发记录">
+                  react-native 开发记录 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

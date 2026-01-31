@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="CipherHSen-Deng&#x2F;CipherH at master (github.com)  Recent works have illustrated the feasibility of launching ciphertext side-channel attacks against cryptographic libraries using the aforementioned">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CipherH">
+<meta property="og:url" content="http://szy0127.github.io/2024/09/17/papers/cipherH/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="CipherHSen-Deng&#x2F;CipherH at master (github.com)  Recent works have illustrated the feasibility of launching ciphertext side-channel attacks against cryptographic libraries using the aforementioned">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-17T11:48:03.628Z">
+<meta property="article:modified_time" content="2024-09-17T11:48:03.644Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/09/17/papers/cipherH/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/09/17/papers/cipherH/","path":"2024/09/17/papers/cipherH/","title":"CipherH"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CipherH | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CipherH"><span class="nav-number">1.</span> <span class="nav-text">CipherH</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BB"><span class="nav-number">1.1.</span> <span class="nav-text">攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">防御</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#taint-analysis"><span class="nav-number">1.2.1.</span> <span class="nav-text">taint analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E6%89%A7%E8%A1%8C"><span class="nav-number">1.2.2.</span> <span class="nav-text">符号执行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#intra"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">intra</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inter"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">inter</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/cipherH/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CipherH | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CipherH
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.8k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>6 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="CipherH"><a href="#CipherH" class="headerlink" title="CipherH"></a>CipherH</h1><p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/tree/master">Sen-Deng&#x2F;CipherH at master (github.com)</a></p>
+<blockquote>
+<p>Recent works have illustrated the feasibility of launching ciphertext side-channel attacks against cryptographic libraries using the aforementioned threat model [33]. However, they primarily target manually identified program vulnerabilities. This work presents CIPHERH, a thorough and fully automated framework for identifying such vulnerabilities in production cryptographic libraries.  </p>
+</blockquote>
+<h2 id="攻击"><a href="#攻击" class="headerlink" title="攻击"></a>攻击</h2><p><strong>CIPHERLEAKS: Breaking Constant-time Cryptography on AMD SEV via the Ciphertext Side Channel</strong></p>
+<p><strong>A Systematic Look at Ciphertext Side Channels</strong></p>
+<p>VMSA page 物理地址不变  XEX</p>
+<ol>
+<li>建立寄存器密文&lt;-&gt;明文的映射 ：控制OVMF 的一个PEIM  触发NAE VC handler 同时观察rax明文和密文   需要可读</li>
+<li>得到需要攻击的代码页地址：清空所有page 的P bit  NPF的errorcode会知道是否是代码页 再根据寄存器是否变化判断是否是目标代码页</li>
+<li>以Open SSL rsa为例，bn_get_bits5的NPF可以正好从rax读到key的5bit 循环可以得到整个key</li>
+</ol>
+<p>缓解：</p>
+<ol>
+<li>减少会触发NAE导致建立映射的函数 但是治标不治本</li>
+<li>函数返回值rax高位加随机数</li>
+<li>用栈传递返回值或者其他寄存器</li>
+<li>函数不在一个新的page开始</li>
+</ol>
+<p>光防VMSA没用 任意memory都可以观察</p>
+<p>constant time swap可以防一些microarchitecture的side channel攻击 但是防不了比较密文</p>
+<p>例如nginx  先发http请求 触发 然后清空Pbit触发NPF  然后用single-step技术</p>
+<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><p>硬件防开销大</p>
+<p>cipherH 软件框架 为了让加密库开发者写完代码以后自己检查一遍</p>
+<blockquote>
+<p>As will be introduced in §5, CIPHERH explores a hybrid approach by using dynamic taint analysis (which is scalable and rapid) to collect functions tainted on an execution trace. Then, it performs static symbolic execution toward each tainted function, covering paths that are not on the dynamic trace.  </p>
+</blockquote>
+<p><strong>设计并不是很难 主要用了两个工具  2.3k代码</strong></p>
+<p>key是taint 访问的过程中 不可以有一块内存可以推断key是否变化 因为都是bit操作 或者n-bit操作 减少了熵</p>
+<ul>
+<li>DFSan  llvm</li>
+<li>angr SSP’16 二进制文件反编译  得到更多的寄存器访存信息  <a target="_blank" rel="noopener" href="https://trevorsaudi.com/posts/symbolic_execution_angr_part1/">Symbolic Execution with Angr - part 1 · Trevor Saudi</a></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.usenix.org/system/files/conference/ase18/ase18-paper_springer.pdf">ase18-paper_springer.pdf (usenix.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/DataFlowSanitizer.html">DataFlowSanitizer — Clang 19.0.0git documentation (llvm.org)</a></p>
+<p>编译优化等级开相同  根据函数名可以方便找到对应关系</p>
+<p>但还是有些信息不匹配的  所以第二阶段用保守方法处理</p>
+<h3 id="taint-analysis"><a href="#taint-analysis" class="headerlink" title="taint analysis"></a>taint analysis</h3><p>DFSan需要用他的API加到代码里 然后编译</p>
+<p>追踪数学运算、逻辑、内存访问 包括implicit</p>
+<p>手动识别secret并调API  hook每个函数调用 内存访问</p>
+<p>实际上secret就是RSA的一个私钥  传入最外层的函数之后 之后全可以通过自动分析得到 并不需要对算法库有修改</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/apps/wolfssl_case_study/test.c">CipherH&#x2F;src&#x2F;apps&#x2F;wolfssl_case_study&#x2F;test.c at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>这个阶段输出一系列函数   </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">get_digit_count:3</span><br><span class="line">mp_rand:65</span><br><span class="line">fp_invmod:1</span><br><span class="line">fp_div_2:1</span><br><span class="line">fp_exptmod:1</span><br><span class="line">_fp_exptmod_ct:33</span><br><span class="line">fp_montgomery_reduce:33</span><br><span class="line">wc_RsaUnPad_ex:67</span><br><span class="line">RsaUnPad:67</span><br></pre></td></tr></table></figure>
+
+
+
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/tainted_func.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;tainted_func.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>猜测最后的结果记录了函数名和对应的taint位置 包括6个参数寄存器、返回值、从内存加载</p>
+<ol>
+<li>任何输入 都是taint的</li>
+<li>返回值是taint</li>
+<li>从memory load了taint data</li>
+</ol>
+<p>对密码学算法库来说不需要构造很多覆盖面广的input  很多input其实涉及到的逻辑都一样</p>
+<p>不过其实筛掉大部分的function  然后留下function name和taint symbol name就可以了</p>
+<h3 id="符号执行"><a href="#符号执行" class="headerlink" title="符号执行"></a>符号执行</h3><p>符号执行阶段 从第一阶段拿到足够的信息以后 可以对每个function单独进行符号执行 if生成约束  然后根据taint信息生成一个表达式 求解</p>
+<p>因为这边不加混淆 所以代码应该比较容易被逆向 比如$0x10(rsp) 就可以认为是同一个指针</p>
+<p>syntactical equivalence   和angr现有的一样 保证效率</p>
+<h4 id="intra"><a href="#intra" class="headerlink" title="intra"></a>intra</h4><p>遇到if 加约束</p>
+<p>遇到call 直接用symbol  根据taint analysis的结果可以知道这里的symbol用普通的s还是taint的k</p>
+<p>M 中的元组a,v 表示symbol v写到地址a</p>
+<p>W中的元组a,v,i表示指令i把数据v写到地址a</p>
+<ol>
+<li>检查v是否包含key</li>
+<li>是否存在a1&#x3D;a 且v1也包含key</li>
+<li>放入Eq4看看是否可满足 (带上之前if导致的一系列条件)</li>
+<li>SMT solver返回是否可满足 并给出例子 留给user后续手动分析</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/run.py">CipherH&#x2F;src&#x2F;run.py at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>hook了每次内存读写的操作  回调的时候有当前所有的状态 包括这句内存读写操作的AST</p>
+<p>AST中包括symbol的表达式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">initial_state.inspect.b(<span class="string">&#x27;instruction&#x27;</span>, action=track_instr)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_write&#x27;</span>, when=angr.BP_BEFORE,action=track_write_mem_before)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_read&#x27;</span>, when=angr.BP_BEFORE, action=track_read_mem_before)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> fun_name <span class="keyword">in</span> tainted_func:</span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">128</span> == <span class="number">128</span>:</span><br><span class="line">    initial_state.regs.rdi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">64</span> == <span class="number">64</span>:</span><br><span class="line">    initial_state.regs.rsi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">32</span> == <span class="number">32</span>:</span><br><span class="line">    initial_state.regs.rdx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)           </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">16</span> == <span class="number">16</span>:</span><br><span class="line"></span><br><span class="line">    initial_state.regs.rcx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">8</span> == <span class="number">8</span>:</span><br><span class="line">    initial_state.regs.r8 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">4</span> == <span class="number">4</span>:</span><br><span class="line">    initial_state.regs.r9 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">l = <span class="built_in">len</span>(state.ch.chain)//<span class="number">4</span></span><br><span class="line"><span class="keyword">while</span> l &gt;= <span class="number">1</span>:</span><br><span class="line">    l = l - <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> state.ch.chain[<span class="number">4</span>*l+<span class="number">1</span>] <span class="keyword">is</span> state.inspect.mem_write_address:</span><br></pre></td></tr></table></figure>
+
+<p>四个一组 循环找 所以chain就是论文中的W和M</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/level5uiharu/p/16932453.html">欢迎回来(。・∀・)ノ (cnblogs.com)</a></p>
+<p>这里chain和expr应该都是AST key要么在arg0要么在arg1 </p>
+<p>第一个条件是判断是否相等 第二个条件是判断换一个变量是否可以不等(把key换成另一个symbol)</p>
+<p>这里虽然名字都是sol 但实际上都是两个不同的symbol 比如sol_22 sol_23</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>  temp1 == <span class="string">&#x27;__add__&#x27;</span> <span class="keyword">and</span> temp2 ==  <span class="string">&#x27;__add__&#x27;</span> :</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>]):</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))                                       </span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.inspect.mem_write_expr.args[<span class="number">0</span>]):</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">if</span> state.solver.satisfiable(extra_constraints=[state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] == state.inspect.mem_write_expr, temp3 != temp4]):</span><br><span class="line">    	<span class="built_in">print</span>(<span class="string">&quot;bug in &#123;&#125; for &#123;:x&#125; and &#123;:x&#125;&quot;</span>.<span class="built_in">format</span>(fun_name, state.ch.chain[<span class="number">4</span>*l], state.inspect.instruction), file=f_result)                     </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里等号的含义是，是否存在某一组symbol的组合(k1 k2 k3 k4) 使得取值可以相等(64bit整数)</p>
+<p>W1 W2应该表示连续两次读 (i变i+1 或f前和f后)</p>
+<p><strong>ch.chain和inspect.mem_write_expr</strong>是什么？  好像后者就是前者的4l+2?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">state.ch.chain = state.ch.chain + [state.inspect.instruction]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_address]</span><br><span class="line">a = <span class="built_in">str</span>(state.inspect.mem_write_expr)</span><br><span class="line">b = a[<span class="number">3</span>:<span class="number">5</span>]</span><br><span class="line">state.ch.chain = state.ch.chain + [b]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_expr]</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/symbolic_exec/result.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;symbolic_exec&#x2F;result.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>这个地址应该就是二进制文件里面的地址 非常精确 供之后手动分析</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bug in fp_rshb for 41cc2a and 41cc2a</span><br><span class="line">bug in fp_rshb for 41cc63 and 41cc63</span><br><span class="line"></span><br><span class="line">bug in _fp_exptmod_ct for 41ee25 and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41ee4b and 41ee4b</span><br><span class="line">bug in _fp_exptmod_ct for 41ee5c and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41f04b and 41f04b</span><br></pre></td></tr></table></figure>
+
+<h4 id="inter"><a href="#inter" class="headerlink" title="inter"></a>inter</h4><p>同一块内存会在函数调用间被写</p>
+<ul>
+<li>频繁调用</li>
+<li>callee至少一个参数是tainted</li>
+</ul>
+<p>没有加约束求解 所以可能带来false positives</p>
+<blockquote>
+<p>In all, during our intra-procedural analysis, we use symbolic execution to traverse each path of a tainted function Fc. During the traversal, we search for every encountered callee function and decide if any callee function F meets the aforementioned patterns. If so, we will proceed further to launch intra-procedural symbolic execution toward F, and decide if F has memory write instructions whose content is derived from its tainted parameters. If so, we would conclude that F enables ciphertext side channels, assuming multiple runs of F from Fc write secrets into the same memory address.  </p>
+</blockquote>
+<p>只要callee F用taint 写了内存就认为会带来side channel</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/17/papers/CacheWarp/" rel="prev" title="CacheWarp">
+                  <i class="fa fa-angle-left"></i> CacheWarp
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/17/papers/ELISA/" rel="next" title="ELISA">
+                  ELISA <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

