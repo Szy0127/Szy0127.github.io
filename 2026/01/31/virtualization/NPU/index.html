@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="NPUrknpu工作流程：  dts kernel driver初始化 通过固定地址MMIO访问 给用户态暴露ioctl接口  sandbox使用npu： tz-llm sandbox内有一个去掉调度的的npu driver 初始化MMIO submit的时候写MMIO 前后需要hypercall进行页表配置 保护。 由于没有stage2 访问的直接就是MMIO地址。  要用之前 先一个hyper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="S blog">
+<meta property="og:url" content="http://szy0127.github.io/2026/01/31/virtualization/NPU/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="NPUrknpu工作流程：  dts kernel driver初始化 通过固定地址MMIO访问 给用户态暴露ioctl接口  sandbox使用npu： tz-llm sandbox内有一个去掉调度的的npu driver 初始化MMIO submit的时候写MMIO 前后需要hypercall进行页表配置 保护。 由于没有stage2 访问的直接就是MMIO地址。  要用之前 先一个hyper">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-01-31T06:25:54.152Z">
+<meta property="article:modified_time" content="2026-01-31T06:38:20.965Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/01/31/virtualization/NPU/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/01/31/virtualization/NPU/","path":"2026/01/31/virtualization/NPU/","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title> | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NPU"><span class="nav-number">1.</span> <span class="nav-text">NPU</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rknpu-driver"><span class="nav-number">1.1.</span> <span class="nav-text">rknpu driver</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.1.1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#job"><span class="nav-number">1.1.2.</span> <span class="nav-text">job</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TZ-LLM"><span class="nav-number">1.2.</span> <span class="nav-text">TZ-LLM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#asgard"><span class="nav-number">1.3.</span> <span class="nav-text">asgard</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/virtualization/NPU/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:25:54 / Modified: 14:38:20" itemprop="dateCreated datePublished" datetime="2026-01-31T14:25:54+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.1k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>11 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h2><p>rknpu工作流程：</p>
+<ol>
+<li>dts kernel driver初始化</li>
+<li>通过固定地址MMIO访问</li>
+<li>给用户态暴露ioctl接口</li>
+</ol>
+<p>sandbox使用npu：</p>
+<p>tz-llm sandbox内有一个去掉调度的的npu driver 初始化MMIO submit的时候写MMIO 前后需要hypercall进行页表配置 保护。 由于没有stage2 访问的直接就是MMIO地址。  要用之前 先一个hypercall交一个job到队列 然后挂起，等调度到了再回来 进行配置。更合理 调度 公平</p>
+<p>asgard sanbox内有一个完全一样的npu driver 通过vfio进行直通 前后需要hypercall进行页表配置 保护。 有stage2 需要VMM的vfio进行stage2内存配置 达到直通MMIO的效果。  sandbox内外各自调度 配置 使用 通过hypercall 在EL2建立隔离。争抢</p>
+<p>在某一时刻，NPU只能提供给Host或者Guest</p>
+<p>当提供给Guest时，也就是通过MMIO正式计算job时，一定保证</p>
+<ol>
+<li>事先配置好页表 NPU可以访问sandbox 内存</li>
+<li>MMIO不可被Host访问 否则Host MMIO偷数据</li>
+<li>结束后再次配置页表 否则host下次可以通过MMIO偷sanbox内存数据</li>
+</ol>
+<p>计算任务前后进行NPU的独占、释放 是必要的</p>
+<p>tz-llm用现有的调度队列和策略  sandbox提交任务 调度的时候进行NPU切换 合理 公平</p>
+<p>asgard sandbox用前后hypercall抢占 不公平</p>
+<p>能否在发现后面没有normal job的时候 省略context switch 一直调度sandbox的？</p>
+<p>tz-llm强调data plane control plane分离 实际上就是MMIO直通+hypercall protect</p>
+<p>asgard强调NPU driver安全 实际上就是hypercall    vfio的直通是自带的</p>
+<p>为啥非得MMIO直通？ 反正用之前都要进secure visor去配置 配置前带job 配置后直接在secure visor 进行MMIO有什么问题？</p>
+<p>数据面仍然是直通的 配置好内存 NPU可以访问内存 而不是需要多一次copy到后端 控制面还是hypercall 原来也需要</p>
+<p>但是区别在于  原来acquire release可以粒度很大 中间做很多MMIO，现在需要一次性把信息都传入EL2 EL2在里面做</p>
+<p>sandbox隔离 NPU必须做的配置</p>
+<ol>
+<li>NPU的MMIO只能sandbox访问 host不行</li>
+<li>NPU的中断必须sandbox处理</li>
+<li>NPU可以访问sandbox memory</li>
+</ol>
+<p>方法一：用官方提供的集成好的</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm">https://github.com/airockchip/rknn-llm</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm/blob/main/benchmark.md">https://github.com/airockchip/rknn-llm/blob/main/benchmark.md</a></p>
+<p>方法二：用适配了rknpu的llama.cpp 需要自己改后端</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/marty1885/llama.cpp/tree/rknpu2-backend">https://github.com/marty1885/llama.cpp/tree/rknpu2-backend</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cmake .. -DLLAMA_RKNPU2=ON</span><br><span class="line">make -j</span><br><span class="line">./bin/main .... -ngl 10</span><br></pre></td></tr></table></figure>
+
+<p>问题：编译llama.cpp没有RKNN_api.h 需要rknn的sdk</p>
+<p> git clone <a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm.git">https://github.com/airockchip/rknn-llm.git</a> </p>
+<p>有demo  sdk 和rknpu driver</p>
+<p>用demo+转换rknn模型 可以直接推理验证</p>
+<p>rknpu修改CMakeList 可以和llama.cpp一起用</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/sivon/p/19199226">https://www.cnblogs.com/sivon/p/19199226</a></p>
+<p>完全按照这个教程 可以跑起来 &#x2F;sys&#x2F;kernel&#x2F;debug&#x2F;rknpu&#x2F;load可以验证</p>
+<p>npu驱动在rknn-llm 替换kernel-5.10 并且需要改mm.h 和注释一个内容</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>使用提供的rknn</th>
+<th>自己在x86上转一个rknn</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>x86 pc上编译rkllm demo</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr>
+<td>arm开发版上编译rkllm demo</td>
+<td>x</td>
+<td>ok</td>
+</tr>
+</tbody></table>
+<p>唯一的问题是看不见TTFT和TPS</p>
+<p>参考性能</p>
+<blockquote>
+<p>模型 参数<br>大小 dtype 性能 CPU<br>负载<br>NPU<br>负载 内存占用<br>TinyLLAMA 1.1B W8a8<br>预填充： 58.6157 token&#x2F;s<br>推理： 12.7262 token&#x2F;s 15.9% 3<em>49% 1.376G<br>Qwen 1.8B W8a8<br>预填充： 168.525 token&#x2F;s<br>推理： 10.8891 token&#x2F;s 13.7% 3</em>50% 2.72G<br>Qwen2 0.5B W8a8<br>预填充： 440.511 token&#x2F;s<br>推理： 17.4542 token&#x2F;s 17.75% 3<em>34% 1.344G<br>Phi-3 3.8B W8a8<br>预填充： 22.8119 token&#x2F;s<br>推理： 4.72983 token&#x2F;s 13.13% 3</em>62% 4.288G<br>ChatGLM3 6B W8a8<br>预填充： 48.8464 token&#x2F;s<br>推理： 3.80383 token&#x2F;s 8.3% 3<em>75% 7.04G<br>Gemma 2B W8a8<br>预填充： 112.489 token&#x2F;s<br>推理： 6.41746 token&#x2F;s 8.25% 3</em>64% 4.8G<br>InternLM2 1.8B W8a8<br>预填充： 117.099 token&#x2F;s<br>推理： 9.139 token&#x2F;s 11.87% 3*57% 2.432G</p>
+</blockquote>
+<p>rknn demo 在callback里面</p>
+<p>result-&gt;perf.prefill&#x2F;generate_tokens&#x2F;time_ms</p>
+<p>可以计算速度</p>
+<p>opis上rknn-llm&#x2F;examples&#x2F;rknn_api_demo&#x2F;deploy&#x2F;src</p>
+<p>g++ llm_demo.cpp -lrkllmrt</p>
+<p>运行时LD_LIBRARY_PATH&#x3D;..&#x2F;usr&#x2F;lib .&#x2F;a.out rknn 100 100</p>
+<h3 id="rknpu-driver"><a href="#rknpu-driver" class="headerlink" title="rknpu driver"></a>rknpu driver</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1930641835128254631">https://zhuanlan.zhihu.com/p/1930641835128254631</a></p>
+<p><a target="_blank" rel="noopener" href="https://jas-hacks.blogspot.com/2024/02/rk3588-reverse-engineering-rknn.html">https://jas-hacks.blogspot.com/2024/02/rk3588-reverse-engineering-rknn.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/mtx512/rk3588-npu">https://github.com/mtx512/rk3588-npu</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/18822133">https://www.cnblogs.com/arnoldlu/p/18822133</a></p>
+<p>Rknn sdk提供rknn_matmul函数给两个矩阵乘法 这也是llama.cpp-rknpu的某个适配了的版本 但是有一个逆向的版本可以更方便控制内存 tz-llm基于逆向版本又实现了一个后端</p>
+<p>drivers&#x2F;rknpu 一共6000行</p>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><p>rknpu_drv.c</p>
+<p>late_initcall(rknpu_init)-&gt;platform_driver_register(&amp;rknpu_driver)-&gt;rknpu_probe</p>
+<ul>
+<li>devm_ioremap_resource</li>
+<li>rknpu_register_irq</li>
+<li>rknpu_power_on</li>
+</ul>
+<h4 id="job"><a href="#job" class="headerlink" title="job"></a>job</h4><p>CONFIG_ROCKCHIP_RKNPU_DRM_GEM 用的是DRM</p>
+<p>&#x2F;dev&#x2F;dri&#x2F;card0 &#x2F; card1可以提供ioctl</p>
+<p>rknpu_mem_create_ioctl 分配一个rknpu_obj 地址放到obj_addr(来自kzalloc) dma_addr(来自sg_dma_address)返回给用户 用户提供的size会调用rk_dma_heap_buffer_alloc 和dma_buf_fd</p>
+<p>rknpu_submit_ioctl-&gt;rknpu_submit 使用struct rknpu_submit 作为arg 这个arg由runtime.so准备 但是runtime.so不开源 只提供封装好的api</p>
+<p>rknpu_submit以后 调用rknpu_job_schedule  add job到todo_list 然后rknpu_job_next</p>
+<p>rknpu_job_next从rknpu_dev-&gt;subcore_datas[core_index]-&gt;todo_list拿到job</p>
+<p>rknpu_job_next-&gt;rknpu_job_commit 写MMIO 真正提交给硬件</p>
+<p>每次ioctl提交job 只会放到list上 然后调度一个进硬件跑</p>
+<p>rknpu_irq_handler-&gt;rknpu_job_done-&gt;rknpu_job_next 结束一个任务后 硬件中断 跑下一个任务</p>
+<h3 id="TZ-LLM"><a href="#TZ-LLM" class="headerlink" title="TZ-LLM"></a>TZ-LLM</h3><p><code> LD_LIBRARY_PATH=/data/local/tmp/rknpu/ /data/local/tmp/rknpu/ld-linux-aarch64.so.1 /data/local/tmp/rknpu/llama-cli --no-warmup -m $model_path -p &quot;$model#$len&quot; -n $n --cache $cache -s 1 -ngl 100 -t 4 --no-mmap -c 1124</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">+    cmake -DCMAKE_TOOLCHAIN_FILE=/home/vectorxj/android-ndk/build/cmake/android.toolchain.cmake\</span><br><span class="line">+  -DANDROID_ABI=arm64-v8a \</span><br><span class="line">+  -DANDROID_PLATFORM=android-27 \</span><br><span class="line">+  -DGGML_LLAMAFILE=OFF \</span><br><span class="line">+  -DLLAMA_CURL=OFF\</span><br><span class="line">+        -DCMAKE_BUILD_TYPE=Release\</span><br><span class="line">+        -DCMAKE_C_FLAGS=&quot;-march=armv8-a&quot; \</span><br><span class="line">+        -DCMAKE_CXX_FLAGS=&quot;-march=armv8-a&quot; \</span><br><span class="line">+        -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_CHCORE_API=OFF -DGGML_CHCORE=OFF -DGGML_CPU_AARCH64=OFF -B build-rknpure</span><br><span class="line"> fi</span><br><span class="line"></span><br><span class="line"># szy @ broadband1 in ~/tz-llm-ae/scripts/kick-the-tires on git:main x [16:17:17] C:130</span><br><span class="line">$ sudo ./build-llama.sh</span><br><span class="line"># szy @ broadband1 in ~/tz-llm-ae/scripts/kick-the-tires on git:main x [18:03:26] </span><br><span class="line">$ ls share/build-rknpure </span><br><span class="line">fake  libggml.so  libllama.so  libremoting_backend.so  llama-cli</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>ggml&#x2F;src&#x2F;ggml-rknpu-re.cpp中</p>
+<p>npu_worker有一个循环 通过lock和conditional variable 从task中拿task 然后submit  (ioctl)</p>
+<p>先ioctl 从驱动拿到一个地址 这个地址就是之后submit的时候要用到的job标识</p>
+<p>mem_allocate</p>
+<ol>
+<li>DRM_IOCTL_RKNPU_MEM_CREATE 提供size 接受一个fd 分配一个dma addr 给NPU用</li>
+<li>DRM_IOCTL_RKNPU_MEM_MAP</li>
+<li>对拿到的fd调用mmap 返回mmap后的指针 mmap在driver中就是对前面create的dma addr做了一次map</li>
+</ol>
+<p>用户通过这个指针可以访问模型参数</p>
+<p>rk_cma_heap_allocate 内核需要一个struct dma_buf scatter list  源头是cma_alloc(page count)得到的struct page*</p>
+<p>matmul_kernel对象</p>
+<ol>
+<li>事先准备A B C 三个buf 准备好各种矩阵类型的 每个类型一个 rknn_mem （并行怎么办？） rknn_mem初始化的时候通过mem_allocate也就是rknpu的ioctl 初始化这块内存</li>
+<li>rknpu2_matmul_pre0-&gt;ggml_rknpu2_matmul_kernel_create 一个matmul_kernel会根据矩阵分块的情况构造npu task 每个task给出input weight 和output的rknn_mem  npu_task记录3个buf的ioctl之后的dma_addr 填入npu_task的cna_desc.feature_base_addr 一系列够造出 112个64bit的npu_regs 复制到regcmd 来自mem_allocate 最后填入tasks[0].regcmd_addr&#x3D;regcmd_dma npu_task最终提交tasks的obj_addr 这个rknpu_task是内核驱动提供的地址</li>
+<li>rknpu2_matmul_pre1-&gt;for_all_weights 填充inputs weights 根据fp16或者int8处理 内存复制 从ggml node的src-&gt;data复制到准备好的rknn_mem-&gt;ptr中 这个ptr来自ioctl之后fd的mmap 这部分内存可以提供给npu用</li>
+</ol>
+<p>推理的时候 需要的buf都是流动的 用到的内存就放在可以复用的buf上</p>
+<p>npu task等结构体动态创建 需要把内存从CPU上copy到 cpu npu 共用的mmap之后的共享内存上               </p>
+<ol>
+<li>llama.cpp 读参数到CPU 内存中 正常过程</li>
+<li>通过ioctl向NPU driver申请一部分内存 用于NPU推理  涉及到内核的dma mmap等</li>
+<li>推理过程中 copy模型参数从CPU内存到NPU内存  之后npu直接用这里的内存计算 理论上这里可以直接改地址？</li>
+<li>通过ioctl 拿到一个npu job  填入相关信息  很复杂 需要构造112个64 bit</li>
+<li>ioctl submit这个job进行推理 job本身自己有标识  内容都在这个job里面 包括推理的内存地址</li>
+</ol>
+<p>跑rk3588-npu这个仓库的check 可以发现矩阵乘法在大部分条件下都是可以正常工作 结果正确的</p>
+<p> 部分size下 会卡死npu的核 100%一直在跑然后timeout</p>
+<p>不清楚tz-llm llama-cli 为什么，seg fault</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/TZ-LLM/tee_os_kernel/blob/eurosys-ae/user/system-services/chcore-libc/libchcore/porting/overrides/src/chcore-port/rknpu-driver.c#L730">https://github.com/TZ-LLM/tee_os_kernel/blob/eurosys-ae/user/system-services/chcore-libc/libchcore/porting/overrides/src/chcore-port/rknpu-driver.c#L730</a></p>
+<p>TZ-LLM 对tee npu对设计</p>
+<p>数据面隔离 控制面在一起</p>
+<p>REE npu driver完整</p>
+<p>TEE npu driver包含</p>
+<ul>
+<li>初始化内存 IOPT buffer register cmd</li>
+<li>MMIO 触发job</li>
+<li>处理npu中断</li>
+</ul>
+<p>NPU分为secure和non secure mode 后者没有办法访问secure memory</p>
+<p>TEE需要用NPU时 需要等待non-secure NPU job做完 然后配置TZASC TZPC GIC 修改页表 中断路由</p>
+<p>REE driver构造一个shadow job 正常调度 调度到TEE job就切换secore mode </p>
+<p>smc switch&#x2F; TZASC TZPC &#x2F; GIC配置 占用推理时间 TTFT&#x2F; decode 1.6%-5.7% 看这个job本身的计算时间</p>
+<p>用户态调用的时候 rknpu_dev_init-&gt;npu_open-&gt;rknpu_init-&gt; 注册中断 内存 都需要syscall到EL1 </p>
+<p>通过chcore api注册好内存以后 npu mmio的地址会对应到一个地址 之后npu submit的时候直接写那个地址 正常驱动是devm_ioremap_resource 也就是说TEE OS里的其实也放了一个正常的NPU driver 区别只是裁剪 降级了</p>
+<p>TEE OS并没有stage2翻译 所以这里ioremap过后 最终访问的PA 就是NPU硬件的PA 可以直接用（控制平面）</p>
+<p>对于数据平面 需要在submit前后进行相关配置 完成隔离 smc应该只是进行了特权级切换 理论上syscall也可以做到？ 因为llama.cpp已经跑在secure world了</p>
+<p>对于虚拟化场景 也是需要配置stage2内存指向MMIO区域 中断 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1976395505681601946">https://zhuanlan.zhihu.com/p/1976395505681601946</a></p>
+<p>从代码上看 tz-llm的llama.cpp仍然是用的ioctl 但是tee-os里面 放在了用户态 用户态npu_submit 全都用户态做 MMIO也可以直接用户态完成</p>
+<p>USE_CHCORE的情况下，llama.cpp应该和kernel 一起编译的？ extern调用npu_submit_multi 这是chcore用户态系统服务 rknpu driver暴露的函数 里面调用npu_enter_secure __rknpu_submit npu_exit_secure 包住的就是通过syscall配置npu的部分 </p>
+<p>smc 到tz_driver 这部分和ree kernel一起编译 调用rknpu_submit_s 这里会给ree npu driver加一个job REE NPU调度到的时候</p>
+<p>smc_resume_npu_thread  唤醒waiting_npu_thread 再次进入TEE</p>
+<p>mem_allocate直接变chcore_alloc_dma_mem了</p>
+<ol>
+<li>llama.cpp通过chcore接口进入chcore用户态系统服务</li>
+<li>chcore调用smc 进入EL3 此时记录thread context 然后调用rknpu_submit_s</li>
+<li>进入REE NPU driver 构造一个job 然后正常schedule</li>
+<li>schedule到一个 secure job的时候 smc_resume_npu_thread 唤醒之前等待的线程 再次进入TEE</li>
+<li>调页表 配置TEE独有</li>
+<li>TEE submit 直接MMIO执行</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">RKNPU_SUBMIT returned 0</span><br><span class="line">=========================================================================================================</span><br><span class="line">Performance Summary:</span><br><span class="line">  CPU computation time: 456.715 ms (2.35 GFLOPS)</span><br><span class="line">  NPU computation time: 2.869 ms (374.26 GFLOPS)</span><br><span class="line">  Speedup: 159.19x</span><br><span class="line">=========================================================================================================</span><br><span class="line">Comparing CPU (expected) vs NPU (actual) results...</span><br><span class="line">---------------------------------------------------------------------------------------------------------</span><br><span class="line">Comparison Summary:</span><br><span class="line">  Total elements: 524288</span><br><span class="line">  Matched: 524288 (100.00%)</span><br><span class="line">  Mismatched: 0 (0.00%)</span><br><span class="line">✓ Multiplication of [256,1024] x [2048,1024] successful - All results match!</span><br><span class="line">=========================================================================================================</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/rk3588-npu/build-android # ./matmul_int8 256 1024 2048</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>计算一次2.8ms</p>
+<h3 id="asgard"><a href="#asgard" class="headerlink" title="asgard"></a>asgard</h3><p>对于asgard 用了dts和vfio直通以后 给EL2增加了一个acquire 一个release device的接口</p>
+<p>同一时刻还是只有一个实体可以用NPU time-share也是需要切换npu状态 包括MMIO IOMMU配置 acuire release在0.01ms</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/stray2b/article/details/124330071">https://blog.csdn.net/stray2b/article/details/124330071</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mv /dev/vfio /dev/vfio.tmp</span><br><span class="line">mkdir /dev/vfio</span><br><span class="line">mv /dev/vfio.tmp /dev/vfio/vfio</span><br><span class="line"></span><br><span class="line">chmod 777 /sys/module/vfio_iommu_type1/parameters/allow_unsafe_interrupts</span><br><span class="line">echo Y &gt; /sys/module/vfio_iommu_type1/parameters/allow_unsafe_interrupts</span><br><span class="line">chmod 777 /sys/bus/platform/devices/fdab0000.npu-guest/driver_override</span><br><span class="line">echo vfio-platform &gt; /sys/bus/platform/devices/fdab0000.npu-guest/driver_override</span><br><span class="line">chmod 777 /sys/bus/platform/drivers/vfio-platform/bind</span><br><span class="line">echo fdab0000.npu-guest &gt; /sys/bus/platform/drivers/vfio-platform/bind</span><br><span class="line"></span><br><span class="line">ls -a /dev/vfio</span><br><span class="line">ls -a /sys/bus/platform/drivers/vfio-platform</span><br><span class="line">r</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[  455.175245] vfio-platform fdab0000.npu-guest: Adding to iommu group 0</span><br><span class="line">[  455.175295] vfio-platform fdab0000.npu-guest: VFIO: No reset function found for device fdab0000.npu-guest</span><br><span class="line">[  455.175311] vfio-platform: probe of fdab0000.npu-guest failed with error -2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<ol>
+<li><p>host kernel config</p>
+</li>
+<li><p>host dts</p>
+</li>
+<li><p>host vfio hack 三个检查</p>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1|rk3588_t:/data/data/com.termux/files/home/opi-pkvm # cat /sys/class/vfio/0/dev</span><br><span class="line">237:0</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/opi-pkvm # mknod /dev/vfio/0 c 237 0</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/opi-pkvm # ./boot-pvm.sh </span><br><span class="line">[2025-12-03T06:39:37.635020949+00:00 ERROR crosvm] exiting with error 1: failed to create vfio device</span><br><span class="line"></span><br><span class="line">Caused by:</span><br><span class="line">    failed to add guest memory map into iommu table: Invalid argument (os error 22)</span><br><span class="line">1|rk3588_t:/data/data/com.termux/files/home/opi-pkvm # </span><br></pre></td></tr></table></figure>
+
+<p>VFIO_IOMMU_MAP_DMA</p>
+<p>0-0xffffffff有效 给的va是虚拟机GPA范围 超了</p>
+<p>改小虚拟机内存可以 但是启动虚拟机直接host panic了 这是非pkvm的情况</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" rel="prev" title="C++20高级编程">
+                  <i class="fa fa-angle-left"></i> C++20高级编程
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/01/31/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/" rel="next" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs">
+                  Gramine-TDX: A Lightweight OS Kernel for Confidential VMs <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">69k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:09</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

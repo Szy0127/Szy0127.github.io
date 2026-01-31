@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -958,6 +958,292 @@
 <p>其他Application例如databse和web server，由于需要socat的转发，并且gramine-tdx的virito-vsock设计过于简单，性能会降至10%</p>
 <h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Gramine-TDX为TDX机密虚拟机定制了guest kernel，大幅减小了攻击面，提升了安全性。</p>
 <p>由于重点在安全和代码质量上，性能方面看来目前只适合不需要网络的纯计算任务（例如模型推理）</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/virtualization/NPU/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/virtualization/NPU/" class="post-title-link" itemprop="url">Untitled</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:25:54 / Modified: 14:38:20" itemprop="dateCreated datePublished" datetime="2026-01-31T14:25:54+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.1k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>11 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h2><p>rknpu工作流程：</p>
+<ol>
+<li>dts kernel driver初始化</li>
+<li>通过固定地址MMIO访问</li>
+<li>给用户态暴露ioctl接口</li>
+</ol>
+<p>sandbox使用npu：</p>
+<p>tz-llm sandbox内有一个去掉调度的的npu driver 初始化MMIO submit的时候写MMIO 前后需要hypercall进行页表配置 保护。 由于没有stage2 访问的直接就是MMIO地址。  要用之前 先一个hypercall交一个job到队列 然后挂起，等调度到了再回来 进行配置。更合理 调度 公平</p>
+<p>asgard sanbox内有一个完全一样的npu driver 通过vfio进行直通 前后需要hypercall进行页表配置 保护。 有stage2 需要VMM的vfio进行stage2内存配置 达到直通MMIO的效果。  sandbox内外各自调度 配置 使用 通过hypercall 在EL2建立隔离。争抢</p>
+<p>在某一时刻，NPU只能提供给Host或者Guest</p>
+<p>当提供给Guest时，也就是通过MMIO正式计算job时，一定保证</p>
+<ol>
+<li>事先配置好页表 NPU可以访问sandbox 内存</li>
+<li>MMIO不可被Host访问 否则Host MMIO偷数据</li>
+<li>结束后再次配置页表 否则host下次可以通过MMIO偷sanbox内存数据</li>
+</ol>
+<p>计算任务前后进行NPU的独占、释放 是必要的</p>
+<p>tz-llm用现有的调度队列和策略  sandbox提交任务 调度的时候进行NPU切换 合理 公平</p>
+<p>asgard sandbox用前后hypercall抢占 不公平</p>
+<p>能否在发现后面没有normal job的时候 省略context switch 一直调度sandbox的？</p>
+<p>tz-llm强调data plane control plane分离 实际上就是MMIO直通+hypercall protect</p>
+<p>asgard强调NPU driver安全 实际上就是hypercall    vfio的直通是自带的</p>
+<p>为啥非得MMIO直通？ 反正用之前都要进secure visor去配置 配置前带job 配置后直接在secure visor 进行MMIO有什么问题？</p>
+<p>数据面仍然是直通的 配置好内存 NPU可以访问内存 而不是需要多一次copy到后端 控制面还是hypercall 原来也需要</p>
+<p>但是区别在于  原来acquire release可以粒度很大 中间做很多MMIO，现在需要一次性把信息都传入EL2 EL2在里面做</p>
+<p>sandbox隔离 NPU必须做的配置</p>
+<ol>
+<li>NPU的MMIO只能sandbox访问 host不行</li>
+<li>NPU的中断必须sandbox处理</li>
+<li>NPU可以访问sandbox memory</li>
+</ol>
+<p>方法一：用官方提供的集成好的</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm">https://github.com/airockchip/rknn-llm</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm/blob/main/benchmark.md">https://github.com/airockchip/rknn-llm/blob/main/benchmark.md</a></p>
+<p>方法二：用适配了rknpu的llama.cpp 需要自己改后端</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/marty1885/llama.cpp/tree/rknpu2-backend">https://github.com/marty1885/llama.cpp/tree/rknpu2-backend</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cmake .. -DLLAMA_RKNPU2=ON</span><br><span class="line">make -j</span><br><span class="line">./bin/main .... -ngl 10</span><br></pre></td></tr></table></figure>
+
+<p>问题：编译llama.cpp没有RKNN_api.h 需要rknn的sdk</p>
+<p> git clone <a target="_blank" rel="noopener" href="https://github.com/airockchip/rknn-llm.git">https://github.com/airockchip/rknn-llm.git</a> </p>
+<p>有demo  sdk 和rknpu driver</p>
+<p>用demo+转换rknn模型 可以直接推理验证</p>
+<p>rknpu修改CMakeList 可以和llama.cpp一起用</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/sivon/p/19199226">https://www.cnblogs.com/sivon/p/19199226</a></p>
+<p>完全按照这个教程 可以跑起来 &#x2F;sys&#x2F;kernel&#x2F;debug&#x2F;rknpu&#x2F;load可以验证</p>
+<p>npu驱动在rknn-llm 替换kernel-5.10 并且需要改mm.h 和注释一个内容</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>使用提供的rknn</th>
+<th>自己在x86上转一个rknn</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>x86 pc上编译rkllm demo</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr>
+<td>arm开发版上编译rkllm demo</td>
+<td>x</td>
+<td>ok</td>
+</tr>
+</tbody></table>
+<p>唯一的问题是看不见TTFT和TPS</p>
+<p>参考性能</p>
+<blockquote>
+<p>模型 参数<br>大小 dtype 性能 CPU<br>负载<br>NPU<br>负载 内存占用<br>TinyLLAMA 1.1B W8a8<br>预填充： 58.6157 token&#x2F;s<br>推理： 12.7262 token&#x2F;s 15.9% 3<em>49% 1.376G<br>Qwen 1.8B W8a8<br>预填充： 168.525 token&#x2F;s<br>推理： 10.8891 token&#x2F;s 13.7% 3</em>50% 2.72G<br>Qwen2 0.5B W8a8<br>预填充： 440.511 token&#x2F;s<br>推理： 17.4542 token&#x2F;s 17.75% 3<em>34% 1.344G<br>Phi-3 3.8B W8a8<br>预填充： 22.8119 token&#x2F;s<br>推理： 4.72983 token&#x2F;s 13.13% 3</em>62% 4.288G<br>ChatGLM3 6B W8a8<br>预填充： 48.8464 token&#x2F;s<br>推理： 3.80383 token&#x2F;s 8.3% 3<em>75% 7.04G<br>Gemma 2B W8a8<br>预填充： 112.489 token&#x2F;s<br>推理： 6.41746 token&#x2F;s 8.25% 3</em>64% 4.8G<br>InternLM2 1.8B W8a8<br>预填充： 117.099 token&#x2F;s<br>推理： 9.139 token&#x2F;s 11.87% 3*57% 2.432G</p>
+</blockquote>
+<p>rknn demo 在callback里面</p>
+<p>result-&gt;perf.prefill&#x2F;generate_tokens&#x2F;time_ms</p>
+<p>可以计算速度</p>
+<p>opis上rknn-llm&#x2F;examples&#x2F;rknn_api_demo&#x2F;deploy&#x2F;src</p>
+<p>g++ llm_demo.cpp -lrkllmrt</p>
+<p>运行时LD_LIBRARY_PATH&#x3D;..&#x2F;usr&#x2F;lib .&#x2F;a.out rknn 100 100</p>
+<h3 id="rknpu-driver"><a href="#rknpu-driver" class="headerlink" title="rknpu driver"></a>rknpu driver</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1930641835128254631">https://zhuanlan.zhihu.com/p/1930641835128254631</a></p>
+<p><a target="_blank" rel="noopener" href="https://jas-hacks.blogspot.com/2024/02/rk3588-reverse-engineering-rknn.html">https://jas-hacks.blogspot.com/2024/02/rk3588-reverse-engineering-rknn.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/mtx512/rk3588-npu">https://github.com/mtx512/rk3588-npu</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/18822133">https://www.cnblogs.com/arnoldlu/p/18822133</a></p>
+<p>Rknn sdk提供rknn_matmul函数给两个矩阵乘法 这也是llama.cpp-rknpu的某个适配了的版本 但是有一个逆向的版本可以更方便控制内存 tz-llm基于逆向版本又实现了一个后端</p>
+<p>drivers&#x2F;rknpu 一共6000行</p>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><p>rknpu_drv.c</p>
+<p>late_initcall(rknpu_init)-&gt;platform_driver_register(&amp;rknpu_driver)-&gt;rknpu_probe</p>
+<ul>
+<li>devm_ioremap_resource</li>
+<li>rknpu_register_irq</li>
+<li>rknpu_power_on</li>
+</ul>
+<h4 id="job"><a href="#job" class="headerlink" title="job"></a>job</h4><p>CONFIG_ROCKCHIP_RKNPU_DRM_GEM 用的是DRM</p>
+<p>&#x2F;dev&#x2F;dri&#x2F;card0 &#x2F; card1可以提供ioctl</p>
+<p>rknpu_mem_create_ioctl 分配一个rknpu_obj 地址放到obj_addr(来自kzalloc) dma_addr(来自sg_dma_address)返回给用户 用户提供的size会调用rk_dma_heap_buffer_alloc 和dma_buf_fd</p>
+<p>rknpu_submit_ioctl-&gt;rknpu_submit 使用struct rknpu_submit 作为arg 这个arg由runtime.so准备 但是runtime.so不开源 只提供封装好的api</p>
+<p>rknpu_submit以后 调用rknpu_job_schedule  add job到todo_list 然后rknpu_job_next</p>
+<p>rknpu_job_next从rknpu_dev-&gt;subcore_datas[core_index]-&gt;todo_list拿到job</p>
+<p>rknpu_job_next-&gt;rknpu_job_commit 写MMIO 真正提交给硬件</p>
+<p>每次ioctl提交job 只会放到list上 然后调度一个进硬件跑</p>
+<p>rknpu_irq_handler-&gt;rknpu_job_done-&gt;rknpu_job_next 结束一个任务后 硬件中断 跑下一个任务</p>
+<h3 id="TZ-LLM"><a href="#TZ-LLM" class="headerlink" title="TZ-LLM"></a>TZ-LLM</h3><p><code> LD_LIBRARY_PATH=/data/local/tmp/rknpu/ /data/local/tmp/rknpu/ld-linux-aarch64.so.1 /data/local/tmp/rknpu/llama-cli --no-warmup -m $model_path -p &quot;$model#$len&quot; -n $n --cache $cache -s 1 -ngl 100 -t 4 --no-mmap -c 1124</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">+    cmake -DCMAKE_TOOLCHAIN_FILE=/home/vectorxj/android-ndk/build/cmake/android.toolchain.cmake\</span><br><span class="line">+  -DANDROID_ABI=arm64-v8a \</span><br><span class="line">+  -DANDROID_PLATFORM=android-27 \</span><br><span class="line">+  -DGGML_LLAMAFILE=OFF \</span><br><span class="line">+  -DLLAMA_CURL=OFF\</span><br><span class="line">+        -DCMAKE_BUILD_TYPE=Release\</span><br><span class="line">+        -DCMAKE_C_FLAGS=&quot;-march=armv8-a&quot; \</span><br><span class="line">+        -DCMAKE_CXX_FLAGS=&quot;-march=armv8-a&quot; \</span><br><span class="line">+        -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_CHCORE_API=OFF -DGGML_CHCORE=OFF -DGGML_CPU_AARCH64=OFF -B build-rknpure</span><br><span class="line"> fi</span><br><span class="line"></span><br><span class="line"># szy @ broadband1 in ~/tz-llm-ae/scripts/kick-the-tires on git:main x [16:17:17] C:130</span><br><span class="line">$ sudo ./build-llama.sh</span><br><span class="line"># szy @ broadband1 in ~/tz-llm-ae/scripts/kick-the-tires on git:main x [18:03:26] </span><br><span class="line">$ ls share/build-rknpure </span><br><span class="line">fake  libggml.so  libllama.so  libremoting_backend.so  llama-cli</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>ggml&#x2F;src&#x2F;ggml-rknpu-re.cpp中</p>
+<p>npu_worker有一个循环 通过lock和conditional variable 从task中拿task 然后submit  (ioctl)</p>
+<p>先ioctl 从驱动拿到一个地址 这个地址就是之后submit的时候要用到的job标识</p>
+<p>mem_allocate</p>
+<ol>
+<li>DRM_IOCTL_RKNPU_MEM_CREATE 提供size 接受一个fd 分配一个dma addr 给NPU用</li>
+<li>DRM_IOCTL_RKNPU_MEM_MAP</li>
+<li>对拿到的fd调用mmap 返回mmap后的指针 mmap在driver中就是对前面create的dma addr做了一次map</li>
+</ol>
+<p>用户通过这个指针可以访问模型参数</p>
+<p>rk_cma_heap_allocate 内核需要一个struct dma_buf scatter list  源头是cma_alloc(page count)得到的struct page*</p>
+<p>matmul_kernel对象</p>
+<ol>
+<li>事先准备A B C 三个buf 准备好各种矩阵类型的 每个类型一个 rknn_mem （并行怎么办？） rknn_mem初始化的时候通过mem_allocate也就是rknpu的ioctl 初始化这块内存</li>
+<li>rknpu2_matmul_pre0-&gt;ggml_rknpu2_matmul_kernel_create 一个matmul_kernel会根据矩阵分块的情况构造npu task 每个task给出input weight 和output的rknn_mem  npu_task记录3个buf的ioctl之后的dma_addr 填入npu_task的cna_desc.feature_base_addr 一系列够造出 112个64bit的npu_regs 复制到regcmd 来自mem_allocate 最后填入tasks[0].regcmd_addr&#x3D;regcmd_dma npu_task最终提交tasks的obj_addr 这个rknpu_task是内核驱动提供的地址</li>
+<li>rknpu2_matmul_pre1-&gt;for_all_weights 填充inputs weights 根据fp16或者int8处理 内存复制 从ggml node的src-&gt;data复制到准备好的rknn_mem-&gt;ptr中 这个ptr来自ioctl之后fd的mmap 这部分内存可以提供给npu用</li>
+</ol>
+<p>推理的时候 需要的buf都是流动的 用到的内存就放在可以复用的buf上</p>
+<p>npu task等结构体动态创建 需要把内存从CPU上copy到 cpu npu 共用的mmap之后的共享内存上               </p>
+<ol>
+<li>llama.cpp 读参数到CPU 内存中 正常过程</li>
+<li>通过ioctl向NPU driver申请一部分内存 用于NPU推理  涉及到内核的dma mmap等</li>
+<li>推理过程中 copy模型参数从CPU内存到NPU内存  之后npu直接用这里的内存计算 理论上这里可以直接改地址？</li>
+<li>通过ioctl 拿到一个npu job  填入相关信息  很复杂 需要构造112个64 bit</li>
+<li>ioctl submit这个job进行推理 job本身自己有标识  内容都在这个job里面 包括推理的内存地址</li>
+</ol>
+<p>跑rk3588-npu这个仓库的check 可以发现矩阵乘法在大部分条件下都是可以正常工作 结果正确的</p>
+<p> 部分size下 会卡死npu的核 100%一直在跑然后timeout</p>
+<p>不清楚tz-llm llama-cli 为什么，seg fault</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/TZ-LLM/tee_os_kernel/blob/eurosys-ae/user/system-services/chcore-libc/libchcore/porting/overrides/src/chcore-port/rknpu-driver.c#L730">https://github.com/TZ-LLM/tee_os_kernel/blob/eurosys-ae/user/system-services/chcore-libc/libchcore/porting/overrides/src/chcore-port/rknpu-driver.c#L730</a></p>
+<p>TZ-LLM 对tee npu对设计</p>
+<p>数据面隔离 控制面在一起</p>
+<p>REE npu driver完整</p>
+<p>TEE npu driver包含</p>
+<ul>
+<li>初始化内存 IOPT buffer register cmd</li>
+<li>MMIO 触发job</li>
+<li>处理npu中断</li>
+</ul>
+<p>NPU分为secure和non secure mode 后者没有办法访问secure memory</p>
+<p>TEE需要用NPU时 需要等待non-secure NPU job做完 然后配置TZASC TZPC GIC 修改页表 中断路由</p>
+<p>REE driver构造一个shadow job 正常调度 调度到TEE job就切换secore mode </p>
+<p>smc switch&#x2F; TZASC TZPC &#x2F; GIC配置 占用推理时间 TTFT&#x2F; decode 1.6%-5.7% 看这个job本身的计算时间</p>
+<p>用户态调用的时候 rknpu_dev_init-&gt;npu_open-&gt;rknpu_init-&gt; 注册中断 内存 都需要syscall到EL1 </p>
+<p>通过chcore api注册好内存以后 npu mmio的地址会对应到一个地址 之后npu submit的时候直接写那个地址 正常驱动是devm_ioremap_resource 也就是说TEE OS里的其实也放了一个正常的NPU driver 区别只是裁剪 降级了</p>
+<p>TEE OS并没有stage2翻译 所以这里ioremap过后 最终访问的PA 就是NPU硬件的PA 可以直接用（控制平面）</p>
+<p>对于数据平面 需要在submit前后进行相关配置 完成隔离 smc应该只是进行了特权级切换 理论上syscall也可以做到？ 因为llama.cpp已经跑在secure world了</p>
+<p>对于虚拟化场景 也是需要配置stage2内存指向MMIO区域 中断 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/1976395505681601946">https://zhuanlan.zhihu.com/p/1976395505681601946</a></p>
+<p>从代码上看 tz-llm的llama.cpp仍然是用的ioctl 但是tee-os里面 放在了用户态 用户态npu_submit 全都用户态做 MMIO也可以直接用户态完成</p>
+<p>USE_CHCORE的情况下，llama.cpp应该和kernel 一起编译的？ extern调用npu_submit_multi 这是chcore用户态系统服务 rknpu driver暴露的函数 里面调用npu_enter_secure __rknpu_submit npu_exit_secure 包住的就是通过syscall配置npu的部分 </p>
+<p>smc 到tz_driver 这部分和ree kernel一起编译 调用rknpu_submit_s 这里会给ree npu driver加一个job REE NPU调度到的时候</p>
+<p>smc_resume_npu_thread  唤醒waiting_npu_thread 再次进入TEE</p>
+<p>mem_allocate直接变chcore_alloc_dma_mem了</p>
+<ol>
+<li>llama.cpp通过chcore接口进入chcore用户态系统服务</li>
+<li>chcore调用smc 进入EL3 此时记录thread context 然后调用rknpu_submit_s</li>
+<li>进入REE NPU driver 构造一个job 然后正常schedule</li>
+<li>schedule到一个 secure job的时候 smc_resume_npu_thread 唤醒之前等待的线程 再次进入TEE</li>
+<li>调页表 配置TEE独有</li>
+<li>TEE submit 直接MMIO执行</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">RKNPU_SUBMIT returned 0</span><br><span class="line">=========================================================================================================</span><br><span class="line">Performance Summary:</span><br><span class="line">  CPU computation time: 456.715 ms (2.35 GFLOPS)</span><br><span class="line">  NPU computation time: 2.869 ms (374.26 GFLOPS)</span><br><span class="line">  Speedup: 159.19x</span><br><span class="line">=========================================================================================================</span><br><span class="line">Comparing CPU (expected) vs NPU (actual) results...</span><br><span class="line">---------------------------------------------------------------------------------------------------------</span><br><span class="line">Comparison Summary:</span><br><span class="line">  Total elements: 524288</span><br><span class="line">  Matched: 524288 (100.00%)</span><br><span class="line">  Mismatched: 0 (0.00%)</span><br><span class="line">✓ Multiplication of [256,1024] x [2048,1024] successful - All results match!</span><br><span class="line">=========================================================================================================</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/rk3588-npu/build-android # ./matmul_int8 256 1024 2048</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>计算一次2.8ms</p>
+<h3 id="asgard"><a href="#asgard" class="headerlink" title="asgard"></a>asgard</h3><p>对于asgard 用了dts和vfio直通以后 给EL2增加了一个acquire 一个release device的接口</p>
+<p>同一时刻还是只有一个实体可以用NPU time-share也是需要切换npu状态 包括MMIO IOMMU配置 acuire release在0.01ms</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/stray2b/article/details/124330071">https://blog.csdn.net/stray2b/article/details/124330071</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mv /dev/vfio /dev/vfio.tmp</span><br><span class="line">mkdir /dev/vfio</span><br><span class="line">mv /dev/vfio.tmp /dev/vfio/vfio</span><br><span class="line"></span><br><span class="line">chmod 777 /sys/module/vfio_iommu_type1/parameters/allow_unsafe_interrupts</span><br><span class="line">echo Y &gt; /sys/module/vfio_iommu_type1/parameters/allow_unsafe_interrupts</span><br><span class="line">chmod 777 /sys/bus/platform/devices/fdab0000.npu-guest/driver_override</span><br><span class="line">echo vfio-platform &gt; /sys/bus/platform/devices/fdab0000.npu-guest/driver_override</span><br><span class="line">chmod 777 /sys/bus/platform/drivers/vfio-platform/bind</span><br><span class="line">echo fdab0000.npu-guest &gt; /sys/bus/platform/drivers/vfio-platform/bind</span><br><span class="line"></span><br><span class="line">ls -a /dev/vfio</span><br><span class="line">ls -a /sys/bus/platform/drivers/vfio-platform</span><br><span class="line">r</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[  455.175245] vfio-platform fdab0000.npu-guest: Adding to iommu group 0</span><br><span class="line">[  455.175295] vfio-platform fdab0000.npu-guest: VFIO: No reset function found for device fdab0000.npu-guest</span><br><span class="line">[  455.175311] vfio-platform: probe of fdab0000.npu-guest failed with error -2</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<ol>
+<li><p>host kernel config</p>
+</li>
+<li><p>host dts</p>
+</li>
+<li><p>host vfio hack 三个检查</p>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1|rk3588_t:/data/data/com.termux/files/home/opi-pkvm # cat /sys/class/vfio/0/dev</span><br><span class="line">237:0</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/opi-pkvm # mknod /dev/vfio/0 c 237 0</span><br><span class="line">rk3588_t:/data/data/com.termux/files/home/opi-pkvm # ./boot-pvm.sh </span><br><span class="line">[2025-12-03T06:39:37.635020949+00:00 ERROR crosvm] exiting with error 1: failed to create vfio device</span><br><span class="line"></span><br><span class="line">Caused by:</span><br><span class="line">    failed to add guest memory map into iommu table: Invalid argument (os error 22)</span><br><span class="line">1|rk3588_t:/data/data/com.termux/files/home/opi-pkvm # </span><br></pre></td></tr></table></figure>
+
+<p>VFIO_IOMMU_MAP_DMA</p>
+<p>0-0xffffffff有效 给的va是虚拟机GPA范围 超了</p>
+<p>改小虚拟机内存可以 但是启动虚拟机直接host panic了 这是非pkvm的情况</p>
 
       
     </div>
@@ -1969,289 +2255,6 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveSTL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/cpp/effectiveSTL/" class="post-title-link" itemprop="url">effective STL</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.5k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="effective-STL"><a href="#effective-STL" class="headerlink" title="effective STL"></a>effective STL</h1><h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><ol>
-<li><p>选择容器</p>
-</li>
-<li><p>不同容器有不同的接口 没有办法编写独立于容器的代码</p>
-</li>
-<li><p>容器会默认拷贝，基类容器放入派生类会丢失信息（slicing） 解决方法是用指针</p>
-<p>可以用空容器加reserve方法即拿到空间又避免创建空对象</p>
-</li>
-<li><p>用<code>empty()</code>代替<code>size()==0</code> 因为empty保证了常数时间而size对于某些容器不一定</p>
-<p>对于list <code>splice</code>提供了常数时间的拼接 因此无法维护size是常数时间</p>
-</li>
-<li><p>对于区间操作，写法上避免的循环 更优雅，在效率上会优化</p>
-<p>区间构造、插入、删除、赋值</p>
-</li>
-<li><p>编译器在分析时可能会把对象实例化分析成函数声明</p>
-</li>
-<li><p>使用new创建的对象需要在容器销毁前手动delete 最好的方法是用智能指针</p>
-</li>
-<li><p>不用auto_ptr</p>
-</li>
-<li><p>删除对象</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>某个值</th>
-<th>某些条件</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>vector string deque</td>
-<td>erase-remove</td>
-<td>erase-remove_if</td>
-</tr>
-<tr>
-<td>list</td>
-<td>remove</td>
-<td>remove_if</td>
-</tr>
-<tr>
-<td>set map</td>
-<td>erase</td>
-<td>遍历删除</td>
-</tr>
-</tbody></table>
-<p>循环删除：迭代器+erase</p>
-<ul>
-<li>序列容器：用返回值更新迭代器</li>
-<li>关联容器：迭代器后缀自增</li>
-</ul>
-</li>
-<li><p>自定义allocater需要注意很多东西，例如接受的参数是T的个数，返回T*</p>
-</li>
-<li><p>自定义allocater的好处有 单线程时避免线程同步的开销、放入同一块堆等</p>
-</li>
-<li><p>STL容器并不能保证线程安全 需要自己加锁</p>
-</li>
-</ol>
-<h2 id="vector和string"><a href="#vector和string" class="headerlink" title="vector和string"></a>vector和string</h2><ol start="13">
-<li><p>用vector&#x2F;string代替动态数组 避免delete的麻烦</p>
-<p>string某些实现会使用引用计数来优化，但多线程情况下会带来同步的额外开销</p>
-</li>
-<li><p>reserve避免不必要的重新分配空间</p>
-</li>
-<li><p>string的多种实现</p>
-</li>
-<li><p>兼容C API：</p>
-<p>vector： <code>&amp;v[0]</code> 或<code>&amp;*v.begin()</code> 迭代器不是指针</p>
-<p>string： <code>s.c_str()</code></p>
-</li>
-<li><p>删除元素后容器的最大容量并不改变，可以通过swap缩小</p>
-<p><code>vector&lt;T&gt;(v).swap(v)</code></p>
-</li>
-<li><p><code>vector&lt;bool&gt;</code>每个bool占一个二进制位（位域思想）不满足STL标准  []返回代理对象</p>
-<p>用<code>deque&lt;boo&gt;``bitset</code>替代</p>
-</li>
-</ol>
-<h2 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h2><ol start="19">
-<li><p>相等是数据相等 等价是自己定义的函数 成员函数与stl非成员函数方法不同</p>
-</li>
-<li><p>存指针需要指定比较函数 否则根据十六进制比较</p>
-</li>
-<li><p>比较函数需要保证让相等的值返回false 否则</p>
-<p><code>!(a&lt;=b) &amp;&amp; !(b&lt;=a)</code> 在a&#x3D;b时会返回false</p>
-</li>
-<li><p>对于set 修改key(比较的部分)是很危险的</p>
-<p>解决方法：</p>
-<ul>
-<li>找到对应元素 复制 修改 删除旧 插入新</li>
-<li><code>const_cast&lt;T&amp;&gt;(*t).f()</code></li>
-</ul>
-</li>
-<li><p><code>vector</code>使用二分查找的复杂度与关联容器一致，而在存储上更省空间，关联容器基于二叉树，需要额外两个指针。</p>
-<p>因此vector可在每个page上放更多的对象，减少了page fault的次数 从而提高性能</p>
-</li>
-<li><p>[]会先插入（默认构造）再赋值 适合已经有元素的情况下使用</p>
-<p>insert会构造pair再析构 适合在无元素的情况下使用</p>
-</li>
-<li><p>非标准散列容器</p>
-</li>
-</ol>
-<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><ol start="26">
-<li><p>使用iterator而不是其他的 例如const_iterator</p>
-</li>
-<li><p><code>advance(v.begin(),distance&lt;constIter&gt;(v.begin(),ci))</code> const_iterator去掉const</p>
-</li>
-<li><p><code>reverse_iterator.base()</code>拿到iterator 插入删除时注意位置</p>
-</li>
-<li><pre><code class="c++">ifstream inputFile(&quot;f.txt&quot;);
-string fileData(
-    (istreambuf_iterator&lt;char&gt;(inputFile)),
-    istream_buf_iterator&lt;char&gt;()
-);
-</code></pre>
-</li>
-</ol>
-<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ol start="30">
-<li><p><code>transform</code>对容器1的每个元素进行操作 结果放到容器2中</p>
-<p><code>transform(v.begin(),v.end(),back_inserter(res),f)</code></p>
-</li>
-<li><p>完全排序：sort stable_sort</p>
-<p>部分排序：partial_sort</p>
-<p>找最前n个 不用排序：nth_element</p>
-<p>满足条件的区分：partition stable_partition</p>
-</li>
-<li><p>remove没有办法真正删掉元素 只是改变了位置 </p>
-<p>remove返回的迭代器是新的逻辑结尾 需要作为erase的第一个参数使用</p>
-</li>
-<li><p>如果管理的是指针 使用remove unique会导致资源泄露</p>
-</li>
-<li><p>有些函数只有在传入排序区间的情况下才能保证性能</p>
-</li>
-<li><p>默认字符串比较是大小写敏感的  可通过mismatch和tolower自己写一个忽略大小写的</p>
-</li>
-<li><p>copy_if</p>
-</li>
-<li><p>count count_if max_element</p>
-<p>accumulate 自定义累加函数</p>
-<p>for_each</p>
-</li>
-</ol>
-<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ol start="38">
-<li><p>STL用到的函数都是按值传递的，因此需要保证小巧和单态</p>
-</li>
-<li><p>判别式（predicate）：返回bool的函数</p>
-<p>纯函数：结果仅与参数与常数有关</p>
-<p>判别式必须是纯函数 因为判别式会在某些STL函数中被复制使用</p>
-</li>
-<li><p><code>not1``not2</code>等函数配接器可以作用在函数外，配合find_if等函数使用</p>
-<p>需要定义的函数继承<code>std::unary_function&lt;T,bool&gt;</code> 或套一层<code>ptr_fun</code></p>
-</li>
-<li><p>成员函数传给STL组件时使用<code>mem_fun</code> 可用于成员函数自测</p>
-</li>
-<li><p>让<code>less&lt;T&gt;</code>与operator&#x3D;含义相同</p>
-</li>
-</ol>
-<h2 id="在程序中使用STL"><a href="#在程序中使用STL" class="headerlink" title="在程序中使用STL"></a>在程序中使用STL</h2><ol start="43">
-<li><p>用算法避免循环 例如insert find for_each</p>
-<ul>
-<li>循环需要保证迭代器有效</li>
-<li>算法实现者可以通过容器的实现细节提高遍历效率</li>
-<li>算法名称表明意图</li>
-</ul>
-</li>
-<li><p>选择容器的成员函数而不是普通的STL算法</p>
-<p>容器的成员函数是针对容器实现的  效率和正确性都有保证</p>
-</li>
-<li><p>查找：</p>
-<p>未排序：count 遍历所有 返回个数；find 找到第一个就返回迭代器  相等性</p>
-<p>排序：lower_bound upper_bound equal_range 等价性</p>
-<p>count &#x3D; equal_range + distance</p>
-</li>
-<li><p>STL组件传入函数对象而不是函数</p>
-<p>函数对象的()方法可以内联直接被编译器使用</p>
-<p>函数只能作为指针 每次都调用</p>
-</li>
-<li><p>使用STL算法会带来很多的嵌套调用 难以阅读 最好分步 但是仍不用循环</p>
-</li>
-<li><p>不同的平台可能会自动include某些头文件 因此为了方便移植 需要自己加</p>
-</li>
-<li><p>debug时可以用软件把很长的类型进行替换 方便看到核心的错误信息</p>
-</li>
-<li><p>站点</p>
-</li>
-</ol>
-<p>​    </p>
-<p>​    </p>
-<p>​    </p>
-<p>​    </p>
-<p>​    </p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2275,13 +2278,13 @@ string fileData(
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">65k</span>
+    <span title="Word count total">69k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">3:58</span>
+    <span title="Reading time total">4:09</span>
   </span>
 </div>
 <div class="busuanzi-count">
