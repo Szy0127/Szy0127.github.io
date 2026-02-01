@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">40</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -413,6 +413,177 @@
 <h2 id="微调"><a href="#微调" class="headerlink" title="微调"></a>微调</h2><ol start="41">
 <li>按值传递后用move再传入其他函数是一种30的解决方案</li>
 <li><code>emplace</code>置入函数比<code>push</code>插入函数更高效（通常）</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" class="post-title-link" itemprop="url">C++ Concurrency in Action</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>847</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="C-Concurrency-in-Action"><a href="#C-Concurrency-in-Action" class="headerlink" title="C++ Concurrency in Action"></a>C++ Concurrency in Action</h1><h2 id="Managing-threads"><a href="#Managing-threads" class="headerlink" title="Managing threads"></a>Managing threads</h2><ol>
+<li><p><code>std::thread</code> 创建对象就会直接开始新线程。有默认构造函数 不会和任意线程绑定 需要通过move接受别的</p>
+</li>
+<li><p>必须使用join或者detach。 使用detach可成为守护线程，生命周期和程序一样长；为了避免exception导致没有join可以使用一个类，析构里join</p>
+<p><code>std::for_each(threads.begin(),threads.end(),std::mem_fn(&amp;std::thread::join))</code></p>
+</li>
+<li><p><code>std::thread</code>默认copy参数，即使函数使用引用，如果要用引用需要手动加<code>std::ref</code></p>
+</li>
+<li><p>如果给的参数是创建线程的函数的临时变量，函数结束变量销毁可能导致线程的指针问题</p>
+</li>
+<li><p>如果需要用类的函数，语法为<code>std::thread(&amp;Object::f,&amp;object,a,b,c)</code> 类似<code>std::bind</code></p>
+</li>
+<li><p><code>std::thread</code>可以move不能copy 类似<code>std::ifstream</code> <code>std::unique_ptr</code></p>
+<p>通过move转义控制权到另一个<code>std::thread</code>对象</p>
+<p>当出现临时的<code>std::thread</code>对象时会隐式move</p>
+<p>可以放在<code>std::vector</code>中</p>
+</li>
+<li><p><code>std::this_thread::get_id()</code>拿到<code>std::thread::id</code> 支持比较操作</p>
+</li>
+<li><p><code>std::this_thread::yield()</code>不同于sleep等信号打断或睡眠固定时间，此操作让出time slice 供cpu调度</p>
+</li>
+</ol>
+<h2 id="Sharing-data-between-threads"><a href="#Sharing-data-between-threads" class="headerlink" title="Sharing data between threads"></a>Sharing data between threads</h2><ol start="9">
+<li><p><code>std::mutex</code>有成员函数lock和unlock 但是不推荐使用 因为必须记得放锁</p>
+<p>最好配合lock_guard等离开作用域自动放锁的对象一起用</p>
+</li>
+<li><p><code>boost::shared_lock&lt;boost::shared_mutex&gt;</code>访问只读对象，此时互斥锁会等待</p>
+</li>
+<li><p><code>std::lock</code>同时锁多个 避免死锁</p>
+</li>
+</ol>
+<p><code>std::adopt_lock</code>作为参数不用等直接拿已经有的</p>
+<ol start="12">
+<li><p>不一定只有锁才会导致死锁，join或者wait都会，在设计时需要留意</p>
+</li>
+<li><p>一些避免死锁的guidelines  hierarchi  try_lock</p>
+</li>
+<li><p><code>std::unique_lock</code>可以用<code>std::defer_lock</code>作为第二个参数，先不拿锁，之后手动lock</p>
+</li>
+<li><p>锁的范围应该最小</p>
+</li>
+</ol>
+<p><code>std::once_flag</code>配合<code>std::call_once</code>在任意多的线程中只执行一次，进行初始化的操作</p>
+<ol start="16">
+<li>允许多个同时读，但不允许多个写或读写一起,c++不提供，可以使用boost</li>
+</ol>
+<p>   读：<code>boost::shared_lock&lt;boost::shared_mutex&gt;</code></p>
+<p>   写：<code>std::unique_lock&lt;boost::shared_mutex&gt;</code></p>
+<h2 id="Synchronizing-concurrent-operations"><a href="#Synchronizing-concurrent-operations" class="headerlink" title="Synchronizing concurrent operations"></a>Synchronizing concurrent operations</h2><ol start="17">
+<li><p><code>std::condition_variable</code> </p>
+<p>wait 接受一个锁和一个lambda表达式作为参数 防止先notify再wait</p>
+<p>notify_one&#x2F;notify_all 唤醒wait等待的线程</p>
+</li>
+<li><p><code>std::async</code>用法和<code>std::thread</code>用法一样，但不是返回线程，而是返回<code>std::future&lt;T&gt;</code></p>
+<p>可以通过get方法拿到最后的返回值</p>
+<p>可以增加参数 不立即执行 （实际上是否开线程不确定）</p>
+</li>
+<li><p><code>std::package_task&lt;&gt;</code> 接受函数作为参数，可以在适当的时候通过（）直接调用</p>
+<p>get_future可以拿到future</p>
+<p>想开线程执行一个函数 拿到返回值 可以先构造task 然后拿到future task传给thread执行，最后从future中拿出数据</p>
+<p>返回类型可用<code>std::result_of&lt;&gt;</code></p>
+</li>
+<li><p><code>std::promise&lt;T&gt;</code>get_future拿到<code>std::future&lt;T&gt;</code></p>
+<p>可以通过set_value在线程间传递数据</p>
+</li>
+<li><p>cv和future都可以wait_for&#x2F;wait_until设置timeout</p>
+<p>返回<code>std::future_status</code> 可以判断timeout ready等状态</p>
+</li>
+</ol>
+<h2 id="The-C-memory-model-and-operations-on-atomic-types"><a href="#The-C-memory-model-and-operations-on-atomic-types" class="headerlink" title="The C++ memory model and operations on atomic types"></a>The C++ memory model and operations on atomic types</h2><ol start="22">
+<li><p><code>std::atomic&lt;T&gt;</code> 原子类型 有load store exchange等原子操作</p>
+<p>is_lock_free判断是否需要锁保护</p>
+</li>
+<li><p>memory ordering 指定操作顺序 对于不同变量的操作可能是乱序的</p>
+</li>
+<li><p>通过原子操作可用不需要锁实现并发安全的数据结构</p>
+</li>
 </ol>
 
       
@@ -710,6 +881,289 @@
 </ol>
 <h2 id="模板与泛型编程"><a href="#模板与泛型编程" class="headerlink" title="模板与泛型编程"></a>模板与泛型编程</h2><p>41. </p>
 <p>42. </p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveSTL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/effectiveSTL/" class="post-title-link" itemprop="url">effective STL</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="effective-STL"><a href="#effective-STL" class="headerlink" title="effective STL"></a>effective STL</h1><h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><ol>
+<li><p>选择容器</p>
+</li>
+<li><p>不同容器有不同的接口 没有办法编写独立于容器的代码</p>
+</li>
+<li><p>容器会默认拷贝，基类容器放入派生类会丢失信息（slicing） 解决方法是用指针</p>
+<p>可以用空容器加reserve方法即拿到空间又避免创建空对象</p>
+</li>
+<li><p>用<code>empty()</code>代替<code>size()==0</code> 因为empty保证了常数时间而size对于某些容器不一定</p>
+<p>对于list <code>splice</code>提供了常数时间的拼接 因此无法维护size是常数时间</p>
+</li>
+<li><p>对于区间操作，写法上避免的循环 更优雅，在效率上会优化</p>
+<p>区间构造、插入、删除、赋值</p>
+</li>
+<li><p>编译器在分析时可能会把对象实例化分析成函数声明</p>
+</li>
+<li><p>使用new创建的对象需要在容器销毁前手动delete 最好的方法是用智能指针</p>
+</li>
+<li><p>不用auto_ptr</p>
+</li>
+<li><p>删除对象</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>某个值</th>
+<th>某些条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vector string deque</td>
+<td>erase-remove</td>
+<td>erase-remove_if</td>
+</tr>
+<tr>
+<td>list</td>
+<td>remove</td>
+<td>remove_if</td>
+</tr>
+<tr>
+<td>set map</td>
+<td>erase</td>
+<td>遍历删除</td>
+</tr>
+</tbody></table>
+<p>循环删除：迭代器+erase</p>
+<ul>
+<li>序列容器：用返回值更新迭代器</li>
+<li>关联容器：迭代器后缀自增</li>
+</ul>
+</li>
+<li><p>自定义allocater需要注意很多东西，例如接受的参数是T的个数，返回T*</p>
+</li>
+<li><p>自定义allocater的好处有 单线程时避免线程同步的开销、放入同一块堆等</p>
+</li>
+<li><p>STL容器并不能保证线程安全 需要自己加锁</p>
+</li>
+</ol>
+<h2 id="vector和string"><a href="#vector和string" class="headerlink" title="vector和string"></a>vector和string</h2><ol start="13">
+<li><p>用vector&#x2F;string代替动态数组 避免delete的麻烦</p>
+<p>string某些实现会使用引用计数来优化，但多线程情况下会带来同步的额外开销</p>
+</li>
+<li><p>reserve避免不必要的重新分配空间</p>
+</li>
+<li><p>string的多种实现</p>
+</li>
+<li><p>兼容C API：</p>
+<p>vector： <code>&amp;v[0]</code> 或<code>&amp;*v.begin()</code> 迭代器不是指针</p>
+<p>string： <code>s.c_str()</code></p>
+</li>
+<li><p>删除元素后容器的最大容量并不改变，可以通过swap缩小</p>
+<p><code>vector&lt;T&gt;(v).swap(v)</code></p>
+</li>
+<li><p><code>vector&lt;bool&gt;</code>每个bool占一个二进制位（位域思想）不满足STL标准  []返回代理对象</p>
+<p>用<code>deque&lt;boo&gt;``bitset</code>替代</p>
+</li>
+</ol>
+<h2 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h2><ol start="19">
+<li><p>相等是数据相等 等价是自己定义的函数 成员函数与stl非成员函数方法不同</p>
+</li>
+<li><p>存指针需要指定比较函数 否则根据十六进制比较</p>
+</li>
+<li><p>比较函数需要保证让相等的值返回false 否则</p>
+<p><code>!(a&lt;=b) &amp;&amp; !(b&lt;=a)</code> 在a&#x3D;b时会返回false</p>
+</li>
+<li><p>对于set 修改key(比较的部分)是很危险的</p>
+<p>解决方法：</p>
+<ul>
+<li>找到对应元素 复制 修改 删除旧 插入新</li>
+<li><code>const_cast&lt;T&amp;&gt;(*t).f()</code></li>
+</ul>
+</li>
+<li><p><code>vector</code>使用二分查找的复杂度与关联容器一致，而在存储上更省空间，关联容器基于二叉树，需要额外两个指针。</p>
+<p>因此vector可在每个page上放更多的对象，减少了page fault的次数 从而提高性能</p>
+</li>
+<li><p>[]会先插入（默认构造）再赋值 适合已经有元素的情况下使用</p>
+<p>insert会构造pair再析构 适合在无元素的情况下使用</p>
+</li>
+<li><p>非标准散列容器</p>
+</li>
+</ol>
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><ol start="26">
+<li><p>使用iterator而不是其他的 例如const_iterator</p>
+</li>
+<li><p><code>advance(v.begin(),distance&lt;constIter&gt;(v.begin(),ci))</code> const_iterator去掉const</p>
+</li>
+<li><p><code>reverse_iterator.base()</code>拿到iterator 插入删除时注意位置</p>
+</li>
+<li><pre><code class="c++">ifstream inputFile(&quot;f.txt&quot;);
+string fileData(
+    (istreambuf_iterator&lt;char&gt;(inputFile)),
+    istream_buf_iterator&lt;char&gt;()
+);
+</code></pre>
+</li>
+</ol>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ol start="30">
+<li><p><code>transform</code>对容器1的每个元素进行操作 结果放到容器2中</p>
+<p><code>transform(v.begin(),v.end(),back_inserter(res),f)</code></p>
+</li>
+<li><p>完全排序：sort stable_sort</p>
+<p>部分排序：partial_sort</p>
+<p>找最前n个 不用排序：nth_element</p>
+<p>满足条件的区分：partition stable_partition</p>
+</li>
+<li><p>remove没有办法真正删掉元素 只是改变了位置 </p>
+<p>remove返回的迭代器是新的逻辑结尾 需要作为erase的第一个参数使用</p>
+</li>
+<li><p>如果管理的是指针 使用remove unique会导致资源泄露</p>
+</li>
+<li><p>有些函数只有在传入排序区间的情况下才能保证性能</p>
+</li>
+<li><p>默认字符串比较是大小写敏感的  可通过mismatch和tolower自己写一个忽略大小写的</p>
+</li>
+<li><p>copy_if</p>
+</li>
+<li><p>count count_if max_element</p>
+<p>accumulate 自定义累加函数</p>
+<p>for_each</p>
+</li>
+</ol>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ol start="38">
+<li><p>STL用到的函数都是按值传递的，因此需要保证小巧和单态</p>
+</li>
+<li><p>判别式（predicate）：返回bool的函数</p>
+<p>纯函数：结果仅与参数与常数有关</p>
+<p>判别式必须是纯函数 因为判别式会在某些STL函数中被复制使用</p>
+</li>
+<li><p><code>not1``not2</code>等函数配接器可以作用在函数外，配合find_if等函数使用</p>
+<p>需要定义的函数继承<code>std::unary_function&lt;T,bool&gt;</code> 或套一层<code>ptr_fun</code></p>
+</li>
+<li><p>成员函数传给STL组件时使用<code>mem_fun</code> 可用于成员函数自测</p>
+</li>
+<li><p>让<code>less&lt;T&gt;</code>与operator&#x3D;含义相同</p>
+</li>
+</ol>
+<h2 id="在程序中使用STL"><a href="#在程序中使用STL" class="headerlink" title="在程序中使用STL"></a>在程序中使用STL</h2><ol start="43">
+<li><p>用算法避免循环 例如insert find for_each</p>
+<ul>
+<li>循环需要保证迭代器有效</li>
+<li>算法实现者可以通过容器的实现细节提高遍历效率</li>
+<li>算法名称表明意图</li>
+</ul>
+</li>
+<li><p>选择容器的成员函数而不是普通的STL算法</p>
+<p>容器的成员函数是针对容器实现的  效率和正确性都有保证</p>
+</li>
+<li><p>查找：</p>
+<p>未排序：count 遍历所有 返回个数；find 找到第一个就返回迭代器  相等性</p>
+<p>排序：lower_bound upper_bound equal_range 等价性</p>
+<p>count &#x3D; equal_range + distance</p>
+</li>
+<li><p>STL组件传入函数对象而不是函数</p>
+<p>函数对象的()方法可以内联直接被编译器使用</p>
+<p>函数只能作为指针 每次都调用</p>
+</li>
+<li><p>使用STL算法会带来很多的嵌套调用 难以阅读 最好分步 但是仍不用循环</p>
+</li>
+<li><p>不同的平台可能会自动include某些头文件 因此为了方便移植 需要自己加</p>
+</li>
+<li><p>debug时可以用软件把很长的类型进行替换 方便看到核心的错误信息</p>
+</li>
+<li><p>站点</p>
+</li>
+</ol>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
 
       
     </div>
@@ -1925,393 +2379,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/virtualization/virtio%20queue/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/virtualization/virtio%20queue/" class="post-title-link" itemprop="url">virtio queue</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2024-09-17 19:48:03 / Modified: 19:48:04" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.5k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="virtio-queue"><a href="#virtio-queue" class="headerlink" title="virtio queue"></a>virtio queue</h1><h2 id="消息机制"><a href="#消息机制" class="headerlink" title="消息机制"></a>消息机制</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wangquan1992/article/details/120649182">virtio-net 实现机制_sg_init_one_老王不让用的博客-CSDN博客</a></p>
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>简单设计：一个环形队列 固定大小 生产者消费者 两个指针</p>
-<p>这样所有通信固定在了这个队列里</p>
-<p>virtio可以动态申请和释放共享内存，用一块固定的共享内存队列记录通信使用的共享内存的地址</p>
-<p>这个队列为desc 默认128长度</p>
-<p>真正的共享内存是scatterlist</p>
-<p>并且 desc并不是单纯的先进先出的队列，而是一个无序的链表，所有请求不需要顺序处理 所以两个指针是不够的 必须记录哪些位置是新生产的  哪些位置被消费了</p>
-<p>实现中用数组 分别索引</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vring_create_virtqueue</span><br><span class="line">vring_create_virtqueue_split</span><br><span class="line">vring_alloc_queue_split</span><br><span class="line">	-&gt; vring_split-&gt;vring.desc = vring_alloc_queue(num)</span><br></pre></td></tr></table></figure>
-
-<p>前者是avai ring qemu把新请求的desc id放在里面  然后更新这个avai ring的index</p>
-<p>qemu会维护这个avai ring的last index 然后avai_ring[last_index]读到desc id desc[desc_id]读到真正的信息的共享内存地址 然后再读数据 </p>
-<p>同理 use ring表示另一侧</p>
-<p>实现中 desc avail used用的是一块连续的物理内存</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vstatic <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">vring_init</span><span class="params">(<span class="keyword">struct</span> vring *vr, <span class="type">unsigned</span> <span class="type">int</span> num, <span class="type">void</span> *p,</span></span><br><span class="line"><span class="params">			      <span class="type">unsigned</span> <span class="type">long</span> align)</span></span><br><span class="line">&#123;</span><br><span class="line">	vr-&gt;num = num;</span><br><span class="line">	vr-&gt;desc = p;</span><br><span class="line">	vr-&gt;avail = (<span class="keyword">struct</span> vring_avail *)((<span class="type">char</span> *)p + num * <span class="keyword">sizeof</span>(<span class="keyword">struct</span> vring_desc));</span><br><span class="line">	vr-&gt;used = (<span class="type">void</span> *)(((<span class="type">uintptr_t</span>)&amp;vr-&gt;avail-&gt;ring[num] + <span class="keyword">sizeof</span>(__virtio16)</span><br><span class="line">		+ align<span class="number">-1</span>) &amp; ~(align - <span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="guest"><a href="#guest" class="headerlink" title="guest"></a>guest</h3><p>scatterlist是内核数据结构 只是记录了page地址 并没有读数据</p>
-<p><code>sg-&gt;page_link = (unsigned long)page</code></p>
-<p>调用vring_map_one_sg-&gt;sg_phys拿到gpa记录在desc中</p>
-<p>sg-&gt;length就是buflen 即pfn个数乘长度(4字节 最多256个 共1024字节)</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">desc[i].addr = vring_map_one_sg(sg)</span><br><span class="line">desc[i].len = sg-&gt;length</span><br><span class="line"></span><br><span class="line">vring.avail-&gt;ring[avail] = i</span><br><span class="line">vring.avail-&gt;idx++</span><br></pre></td></tr></table></figure>
-
-<p>这里把地址展开 其实就是sg-&gt;page_link 也就是page的地址 GPA</p>
-<p>所以这里sg用的buf 必须也是提前制定好的共享内存 相当于绕了一圈回来了 最终还是一块固定的共享内存</p>
-<p>并且sg本身存了个地址 然后又拿了地址 跟sg没什么关系 qemu这边也并不会访问到sg 只是为了复用一些函数？</p>
-<p>是virtio_balloon结构体中的pfns数组</p>
-<p>每次balloon guest把pfn写在这块固定的共享内存上(pfns) 然后把这个地址写到一个sg中 再把这个地址写到desc中 再把desc索引写到avail中 qemu从avail拿到desc索引 再拿pfns地址  传来传去就是一个固定的地址 </p>
-<h3 id="qemu"><a href="#qemu" class="headerlink" title="qemu"></a>qemu</h3><p>从avail拿到desc索引</p>
-<p>从desc拿到GPA 转成HVA</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">i = vring_avail_ring(last_avail_idx++)</span><br><span class="line">vring_split_desc_read(&amp;desc,i)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">virtqueue_map_desc(desc.addr,desc.len)&#123;</span><br><span class="line">	iov[0].iov_base = dma_memory_map(desc.addr)</span><br><span class="line">	iov[0].iov_len = desc.len</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里dma_memory_map-&gt;address_space_map把GPA转为HVA 但是代码实现看起来非常复杂</p>
-<blockquote>
-<p>Map a physical memory region into a host virtual address</p>
-</blockquote>
-<p>用HVA copy guest的数据</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">elem = virtqueue_pop(vq,sizeof(VirtQueueElement));</span><br><span class="line">while(iov_to_buf(elem-&gt;out_sg,elem-&gt;out_num,offset,&amp;pfn,4)==4)</span><br><span class="line"></span><br><span class="line">if(offset &lt;= iov[0].iov_len)</span><br><span class="line">	memcpy(buf,iov[0].iov_base + offset,bytes)</span><br></pre></td></tr></table></figure>
-
-<h3 id="used"><a href="#used" class="headerlink" title="used"></a>used</h3><h2 id="通知机制"><a href="#通知机制" class="headerlink" title="通知机制"></a>通知机制</h2><h3 id="glib"><a href="#glib" class="headerlink" title="glib"></a>glib</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_73494896/article/details/127011228">详细介绍Glib 主事件循环轻度分析与编程应用_g_main_loop_run_极致Linux内核的博客-CSDN博客</a></p>
-<p>事件循环</p>
-<p>例如connect拿到fd  glib会包装poll 响应时dispatch调用callback</p>
-<h3 id="eventfd"><a href="#eventfd" class="headerlink" title="eventfd"></a>eventfd</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/40572954">让事件飞 ——Linux eventfd 原理与实践 - 知乎 (zhihu.com)</a></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/393748176">Linux fd 系列 — eventfd 是什么？ - 知乎 (zhihu.com)</a></p>
-<p>一个eventfd维护一个8bit的整型 write对应累加 read对应清零</p>
-<p>当值是0时read会阻塞</p>
-<p>producer用write 1 consumer用read实现阻塞</p>
-<h3 id="mmio"><a href="#mmio" class="headerlink" title="mmio"></a>mmio</h3><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/9Zv7XcsvlVwDDjTn85-SZQ">Linux虚拟化KVM-Qemu分析（十二）之ioeventfd与irqfd (qq.com)</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/huang987246510/article/details/105618557">qemu中的eventfd——ioeventfd_享乐主的博客-CSDN博客</a></p>
-<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1518217">virtIO前后端notify机制详解-腾讯云开发者社区-腾讯云 (tencent.com)</a></p>
-<ol>
-<li>mmio的地址不能提交给kvm然后让guest访问 应该qemu来模拟，这里模拟的写操作会到<code>virtio_pci_config_write</code>处理</li>
-<li>为了提高效率 mmio的地址与eventfd绑定，kvm不需要回到qemu 而是直接通过eventfd通知qemu</li>
-</ol>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">const</span> MemoryRegionOps virtio_pci_config_ops = &#123;</span><br><span class="line">    .read = virtio_pci_config_read,</span><br><span class="line">    .write = virtio_pci_config_write,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">virtio_pci_bus_class_init</span><span class="params">(ObjectClass *klass, <span class="type">void</span> *data)</span>&#123;</span><br><span class="line">	k-&gt;set_guest_notifiers = virtio_pci_set_guest_notifiers;</span><br><span class="line">    	-&gt;virtio_pci_set_guest_notifier</span><br><span class="line">            -&gt;event_notifier_init	</span><br><span class="line">            	-&gt;eventfd</span><br><span class="line">	k-&gt;device_plugged = virtio_pci_device_plugged;</span><br><span class="line">    	-&gt;memory_region_init_io(&amp;proxy-&gt;bar, OBJECT(proxy),&amp;virtio_pci_config_ops,</span><br><span class="line">			proxy, <span class="string">&quot;virtio-pci&quot;</span>, size);</span><br><span class="line">    k-&gt;ioeventfd_assign = virtio_pci_ioeventfd_assign;</span><br><span class="line">    	-&gt;memory_region_add_eventfd-&gt;memory_region_transaction_commit-&gt;address_space_update_ioeventfds-&gt;address_space_add_del_ioeventfds-&gt;MEMORY_LISTEMER_CALL(eventfd_add)</span><br><span class="line">            -&gt;kvm_set_ioeventfd_mmio</span><br><span class="line">            	-&gt;kvm_vm_ioctl(kvm_state, KVM_IOEVENTFD, &amp;iofd);</span><br><span class="line">&#125;</span><br><span class="line">kvm</span><br><span class="line">kvm_assign_ioeventfd_idx</span><br></pre></td></tr></table></figure>
-
-<p>qemu端 virt queue 注册handle_output<code>typedef void (*VirtIOHandleOutput)(VirtIODevice *, VirtQueue *);</code></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">memory_region_dispatch_write</span><br><span class="line">memory_region_write_accessor</span><br><span class="line">virtio_pci_config_write</span><br><span class="line">virtio_ioport_write&#123;</span><br><span class="line">	<span class="keyword">case</span> VIRTIO_PCI_QUEUE_NOTIFY:</span><br><span class="line">        virtio_queue_notify(vdev, val);</span><br><span class="line">        	-&gt;<span class="keyword">if</span>(vq-&gt;host_notifier_enabled)</span><br><span class="line">                event_notifier_set(&amp;vq-&gt;host_notifier);</span><br><span class="line">    		<span class="keyword">else</span>	vq-&gt;handle_output(vdev,vq)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>guest </p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">virtqueue_kick</span><br><span class="line">virtqueue_notify</span><br><span class="line"><span class="type">bool</span> <span class="title function_">vp_notify</span><span class="params">(<span class="keyword">struct</span> virtqueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">/* we write the queue&#x27;s selector into the notification register to</span></span><br><span class="line"><span class="comment">	 * signal the other end */</span></span><br><span class="line">	iowrite16(vq-&gt;index, vp_dev-&gt;ldev.ioaddr + VIRTIO_PCI_QUEUE_NOTIFY);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>kvm</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">handle_ept_misconfig</span><span class="params">(<span class="keyword">struct</span> kvm_vcpu *vcpu)</span>&#123;</span><br><span class="line">    gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);</span><br><span class="line">	<span class="keyword">if</span> (!is_guest_mode(vcpu) &amp;&amp;</span><br><span class="line">	    !kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, <span class="number">0</span>, <span class="literal">NULL</span>)) &#123;</span><br><span class="line">        	-&gt;ioeventfd_write</span><br><span class="line">                -&gt;eventfd_signal (counter增加 唤醒)</span><br><span class="line">        <span class="comment">//正常执行返回0 提前退出</span></span><br><span class="line">		<span class="keyword">return</span> kvm_skip_emulated_instruction(vcpu);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里返回0 会让kvm进入下一次vcpu_run的循环 不会退出ioctl到qemu</p>
-<p>qemu在哪里等待这个eventfd  被唤醒后如何处理 网上没有相关的介绍</p>
-<blockquote>
-<p>host通知guest当然是通过注入中断的方式，首先调用的是virtio_notify，继而调用virtio_notify_vector并把中断向量作为参数传递进去。这里就调用了设备关联的notify函数，具体实现为virtio_pci_notify函数，常规中断（非MSI）会调用qemu_set_irq，在8259a中断控制器的情况下回调用kvm_pic_set_irq，然后到了kvm_set_irq，这里就会通过kvm_vm_ioctl和KVM交互，接口为KVM_IRQ_LINE，通知KVM对guest进行中断的注入。KVm里的kvm_vm_ioctl函数会对此调用进行处理，具体就是调用kvm_vm_ioctl_irq_line，之后就调用kvm_set_irq函数进行注入了。之后的流程参看中断虚拟化部分。</p>
-</blockquote>
-<p>hw&#x2F;virtio&#x2F;virtio-pci.c</p>
-<p>virio_ioport_write</p>
-<p>virtio_pci_config_ops</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42681961/article/details/82827911">qemu-kvm 对mmio的模拟_qemu mmio-CSDN博客</a></p>
-<p>guest:</p>
-<p>drivers&#x2F;virtio&#x2F;virtio_pci_legacy.c</p>
-<p>vq-&gt;priv &#x3D; … VIRTIO_PCI_QUEUE_NOTIFY</p>
-<p>qemu:</p>
-<p>memory_region_add_eventfd(VIRTIO_PCI_QUEUE_NOTIFY)</p>
-<p><a href="read://https_blog.csdn.net/?url=https%3A%2F%2Fblog.csdn.net%2Fqq_41596356%2Farticle%2Fdetails%2F128441953">virtio前端驱动通知机制分析 (csdn.net)</a></p>
-<p>这里说</p>
-<blockquote>
-<p><code>iowrite VIRTIO_PCI_QUEUE_NOTIFY</code> 后会产生一个 <code>vm-exit</code>，<code>KVM</code> 会判断 <code>exit_reason</code>， <code>I/O</code> 操作对应的执行函数是 <code>virtio_ioport_write()</code> 。</p>
-</blockquote>
-<p>kvm使用的eventfd来自do_eventfd  在fs&#x2F;eventfd.c</p>
-<p>qemu在哪里用？</p>
-<p><a target="_blank" rel="noopener" href="https://tinylab.org/qemu-vhost/">Qemu vhost 原理分析 - 泰晓科技 (tinylab.org)</a> 3.1节 有完整的调用路径 但是是需要kvm退回到qemu的 </p>
-<p>guest中balloon直接循环virtqueue_notify</p>
-<p>qemu中accel&#x2F;kvm&#x2F;kvm-all.c kvm_cpu_exec加代码统计 是mmio</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kvm_cpu_exec</span><br><span class="line">	-&gt;address_space_rw</span><br><span class="line">		-&gt;address_space_write</span><br><span class="line">			-&gt;memory_region_dispatch_write</span><br></pre></td></tr></table></figure>
-
-
-
-<p>kvm</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">npf_interception</span><br><span class="line">	-&gt;kvm_mmu_page_fault</span><br><span class="line">    	-&gt;x86_emulate_instruction</span><br><span class="line">            -&gt;x86_emulate_insn</span><br><span class="line">                -&gt;writeback</span><br><span class="line">                    -&gt;segmented_write</span><br><span class="line">                        -&gt;emulator_write_emulated</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/virtualization/kvm-ubuntu/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/virtualization/kvm-ubuntu/" class="post-title-link" itemprop="url">KVM-Ubuntu</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.2k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>8 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="KVM-Ubuntu"><a href="#KVM-Ubuntu" class="headerlink" title="KVM-Ubuntu"></a>KVM-Ubuntu</h1><h2 id="hello-world"><a href="#hello-world" class="headerlink" title="hello world"></a>hello world</h2><p><code>sys_fd = open(&quot;/dev/kvm&quot;)</code></p>
-<p>之后用<code>ioctl(fd,CMD,0)</code>给kvm发送指令</p>
-<p>fd分为kvm的sys_fd，VM的vm_fd和VCPU的vcpu_fd</p>
-<ul>
-<li><p><code>KVM_CREATE_VM</code>：创建VM 拿到VM对应的fd</p>
-</li>
-<li><p><code>KVM_SET_USER_MEMORY_REGION</code>：注册<code>kvm_userspace_memory_region</code>结构体，需要自己设置一个地址(可用mmap)作为VM地址空间的起始位置。这里VMM的一个char数组，对应到VM的整个地址空间</p>
-</li>
-<li><p><code>KVM_CREATE_VCPU</code>：用VM的fd创建VCPU，拿到fd，之后运行VM都是通过vcpu</p>
-<p>需要把拿到的fd通过mmap映射到<code>kvm_run</code>结构体上 方便拿到退出原因 io信息</p>
-</li>
-<li><p><code>KVM_SET_SREGS</code>：设置<code>kvm_sregs</code>结构体，其中包括了cr0 cr3 cr4等系统寄存器，可以自己配置页表，地址用GPA，但是PTE用HVA</p>
-</li>
-<li><p><code>KVM_RUN</code>：运行VM，VM发生exit时这句语句返回</p>
-</li>
-<li><p><code>KVM_GET_REGS</code>：拿寄存器到<code>kvm_regs</code>结构体，可通过<code>.rax</code>访问</p>
-</li>
-</ul>
-<p>输出用<code>outb</code></p>
-<p>配合</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> KVM_EXIT_IO:</span><br><span class="line">	<span class="keyword">if</span> (vcpu-&gt;kvm_run-&gt;io.direction == KVM_EXIT_IO_OUT</span><br><span class="line">		&amp;&amp; vcpu-&gt;kvm_run-&gt;io.port == <span class="number">0xEA</span>) &#123;</span><br><span class="line">		<span class="type">char</span> *p = (<span class="type">char</span> *)vcpu-&gt;kvm_run;</span><br><span class="line">		fwrite(p + vcpu-&gt;kvm_run-&gt;io.data_offset,</span><br><span class="line">		vcpu-&gt;kvm_run-&gt;io.size, <span class="number">1</span>, <span class="built_in">stdout</span>);</span><br><span class="line">		fflush(<span class="built_in">stdout</span>);</span><br><span class="line">	<span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><h3 id="core"><a href="#core" class="headerlink" title="core"></a>core</h3><p><a target="_blank" rel="noopener" href="https://ubuntu.com/download/kvm">Install Ubuntu Core on KVM | Ubuntu</a></p>
-<p><code>sudo qemu-system-x86_64 -smp 2 -m 2048 -net nic,model=virtio -net user,hostfwd=tcp::8022-:22,hostfwd=tcp::8090-:80 -nographic -drive file=/usr/share/OVMF/OVMF_CODE.fd,if=pflash,format=raw,unit=0,readonly=on -drive file=ubuntu-core-20-amd64.img,cache=none,format=raw,id=disk1,if=none -device virtio-blk-pci,drive=disk1,bootindex=1 -machine accel=kvm</code></p>
-<p>需要设置<code>-nographic</code>这样启动界面会在执行qemu的shell中被打印 可以输入和按回车选择</p>
-<p>这个官方镜像的启动是需要输入ubuntu账号的，并且需要在ubuntu网站中上传自己的rsa key 然后ssh登录虚拟机的时候需要</p>
-<p>启动qemu的窗口会显示无用的信息 需要另开窗口<code>ssh -p 8022 szy0127@localhost</code>登录虚拟机</p>
-<p>ubuntu官方提供的img镜像apt和dpkg都没有，连安装命令都很困难</p>
-<p>关闭qemu后虚拟机退出，重启后数据都在</p>
-<h3 id="cloud"><a href="#cloud" class="headerlink" title="cloud"></a>cloud</h3><p><a target="_blank" rel="noopener" href="https://cloudinit.readthedocs.io/en/latest/tutorial/qemu.html">Core tutorial with QEMU - cloud-init 23.2 documentation (cloudinit.readthedocs.io)</a></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64                                            \</span><br><span class="line">    -net nic                                                    \</span><br><span class="line">    -net tap,ifname=tap0,script=no,downscript=no\</span><br><span class="line">    -machine accel=kvm:tcg                                      \</span><br><span class="line">    -cpu host                                                   \</span><br><span class="line">    -m 512                                                      \</span><br><span class="line">    -nographic                                                  \</span><br><span class="line">    -hda jammy-server-cloudimg-amd64.img                        \</span><br><span class="line">    -smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64 \</span><br><span class="line">        -cpu host \</span><br><span class="line">        --enable-kvm \</span><br><span class="line">        -smp 1 \</span><br><span class="line">        -m 1G \</span><br><span class="line">        -nographic \</span><br><span class="line">        -device virtio-blk-pci,drive=vdisk \</span><br><span class="line">        -drive if=none,id=vdisk,file=jammy-server-cloudimg-amd64.img,format=qcow2 \</span><br><span class="line">        -device virtio-net-pci,netdev=vnet,mac=52:54:00:12:34:88 \</span><br><span class="line">        -netdev tap,id=vnet,ifname=tap0,script=no,downscript=no \</span><br><span class="line">        -smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>要保证IMDS webserver启动好且网络可达 user模式的<code>10.0.2.2</code> 在net模式不可用</p>
-<p>启动qemu的进程会直接打开虚拟机的shell</p>
-<p>用户名ubuntu 密码password</p>
-<p>关闭qemu后虚拟机退出，重启后数据也都在</p>
-<p>指定编译出的kernel</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sudo qemu-system-x86_64 \</span><br><span class="line">    -cpu host \</span><br><span class="line">    --enable-kvm \</span><br><span class="line">    -smp 1 \</span><br><span class="line">    -m 4G \</span><br><span class="line">    -nographic \</span><br><span class="line">    -kernel ./bzImage \</span><br><span class="line">    -append &quot;console=ttyS0 ignore_loglevel root=/dev/vda1&quot; \</span><br><span class="line">    -device virtio-blk-pci,drive=vdisk \</span><br><span class="line">    -drive if=none,id=vdisk,file=jammy-server-cloudimg-amd64.img,format=qcow2 \</span><br><span class="line">    -device virtio-net-pci,netdev=vnet,mac=52:54:00:12:34:88 \</span><br><span class="line">    -netdev tap,id=vnet,ifname=tap0,script=no,downscript=no \</span><br><span class="line">    #-smbios type=1,serial=ds=&#x27;nocloud-net;s=http://192.168.21.220:8000/&#x27;</span><br><span class="line">    #-snapshot \</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><p>ip route add default via 192.168.12.1<br>netplan apply<br>vim &#x2F;etc&#x2F;netplan&#x2F;50-cloud-init.yaml</p>
-<h3 id="User"><a href="#User" class="headerlink" title="User"></a>User</h3><p>user mode可以访问外网 但是ping被ban了</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_43406494/article/details/124827927">QEMU–用户模式网络_qemu 网络模式_play maker的博客-CSDN博客</a></p>
-<p>host不能访问guest，guest可以访问host</p>
-<h3 id="tap-0"><a href="#tap-0" class="headerlink" title="tap 0"></a>tap 0</h3><p>没有tun模块 要自己编译以后启动</p>
-<p><a target="_blank" rel="noopener" href="https://www.php1.cn/detail/YuanDaiMaGuanLiG_143ec260.html">ubuntu下安装tun模块图文详细教程 - 第一PHP社区 (php1.cn)</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/larryliuqing/article/details/27127843">用TAP方式让QEMU虚拟机与host联网_qemu tap0_拉里山姆的博客-CSDN博客</a></p>
-<p>只能虚拟机和主机相互连通 虚拟机无法访问互联网</p>
-<h3 id="tap-1"><a href="#tap-1" class="headerlink" title="tap 1"></a>tap 1</h3><p><a target="_blank" rel="noopener" href="https://gist.github.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d811c">Setting up Qemu with a tap interface (github.com)</a></p>
-<p>虚拟机内部的网卡没有ip 如果输dhclient会卡死  原因是dhclient是跳板机 需要宿主机转发 出于安全考虑被宿主机拦截</p>
-<p>需要在宿主机上执行<code>sudo iptables -P FORWARD ACCEPT</code> 每次重启后需要再次执行</p>
-<p><code>tcpdump -i tap0</code> 看网络包流通情况</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">network:</span><br><span class="line">        sudo brctl addbr br0</span><br><span class="line">        sudo ip addr flush dev ens4</span><br><span class="line">        sudo brctl addif br0 ens4</span><br><span class="line">        sudo tunctl -t tap0 -u ubuntu</span><br><span class="line">        sudo brctl addif br0 tap0</span><br><span class="line">        sudo ifconfig ens4 up</span><br><span class="line">        sudo ifconfig tap0 up</span><br><span class="line">        sudo ifconfig br0 up</span><br><span class="line">        sudo dhclient br0</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>如果没有tunctl</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip tuntap add dev tap0 mod tap</span><br></pre></td></tr></table></figure>
-
-<p>如果看不见网卡 需要打开guest内核的config_virtio_net m变为y</p>
-<p>进入guest需要sudo dhclient xxx</p>
-<h2 id="内核信息"><a href="#内核信息" class="headerlink" title="内核信息"></a>内核信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">szy@broadwell:~$ sudo ls  /sys/kernel/debug/kvm/</span><br><span class="line">136814-12            halt_poll_success_ns  invlpg          max_mmu_page_hash_collisions  mmu_recycled            pf_guest</span><br><span class="line">exits                halt_successful_poll  io_exits        mmio_exits                    mmu_shadow_zapped       remote_tlb_flush</span><br><span class="line">fpu_reload           halt_wakeup           irq_exits       mmu_cache_miss                mmu_unsync              req_event</span><br><span class="line">halt_attempted_poll  host_state_reload     irq_injections  mmu_flooded                   nmi_injections          request_irq</span><br><span class="line">halt_exits           hypercalls            irq_window      mmu_pde_zapped                nmi_window              signal_exits</span><br><span class="line">halt_poll_fail_ns    insn_emulation        l1d_flush       mmu_pte_updated               nx_largepages_splitted  tlb_flush</span><br><span class="line">halt_poll_invalid    insn_emulation_fail   largepages      mmu_pte_write                 pf_fixed</span><br><span class="line">szy@broadwell:~$ sudo ls  /sys/kernel/debug/kvm/136814-12</span><br><span class="line">exits                 halt_successful_poll  io_exits                      mmio_exits       mmu_shadow_zapped       remote_tlb_flush</span><br><span class="line">fpu_reload            halt_wakeup           irq_exits                     mmu_cache_miss   mmu_unsync              req_event</span><br><span class="line">halt_attempted_poll   host_state_reload     irq_injections                mmu_flooded      nmi_injections          request_irq</span><br><span class="line">halt_exits            hypercalls            irq_window                    mmu_pde_zapped   nmi_window              signal_exits</span><br><span class="line">halt_poll_fail_ns     insn_emulation        l1d_flush                     mmu_pte_updated  nx_largepages_splitted  tlb_flush</span><br><span class="line">halt_poll_invalid     insn_emulation_fail   largepages                    mmu_pte_write    pf_fixed                vcpu0</span><br><span class="line">halt_poll_success_ns  invlpg                max_mmu_page_hash_collisions  mmu_recycled     pf_guest                vcpu1</span><br><span class="line">szy@broadwell:~$ sudo cat  /sys/kernel/debug/kvm/136814-12/exits</span><br><span class="line">5449424</span><br></pre></td></tr></table></figure>
-
-<p>文件夹名是qemu的pid</p>
-<h2 id="修改内核"><a href="#修改内核" class="headerlink" title="修改内核"></a>修改内核</h2><h3 id="整体编译"><a href="#整体编译" class="headerlink" title="整体编译"></a>整体编译</h3><p><a target="_blank" rel="noopener" href="https://kernelnewbies.org/KernelBuild">KernelBuild - Linux Kernel Newbies</a></p>
-<p><code>make -j8</code> 这里编译完可以拿到bzImage  给qemu的-kernel参数使用 <code>arch/x86/bzImage</code></p>
-<p><code>sudo make modules_install install</code></p>
-<p>选择kernel并重启<code>~/grublist/grub-list.py</code></p>
-<p>broadwell下tmux<code>sudo minicom -D /dev/ttyUSB0</code> 通过串口而不是ssh连bionic 即使内核或网络崩溃无法ssh也可以观察</p>
-<p>升级内核后网络设备有问题 无法访问外网且没有ip   4.15识别到enp15s0 但是需要手动dhclient拿ip 虽然拿到相同的ip，但是只有broadwell可以ping通bionic 跳板机仍然无法ping通</p>
-<p>目前成功修改的路径为<code>/usr/src/linux-source-4.15.0/linux-source-4.15.0</code> grublist显示为<code>Ubuntu, with Linux 4.15.18</code></p>
-<p>修改<code>arch/x86/kernel/paravirt.c#default_banner</code> 可以启动时看到输出 </p>
-<img src="C:\Users\Shen\AppData\Roaming\Typora\typora-user-images\image-20230628204908934.png" alt="image-20230628204908934" style="zoom:50%;" />
-
-<h3 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:22:54]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">find /lib/modules/4.15.18/ -name kvm.ko</span></span><br><span class="line">/lib/modules/4.15.18/kernel/arch/x86/kvm/kvm.ko</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:31:58] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:05]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo rmmod kvm-intel</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:12]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo rmmod kvm</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:14]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm does not exist</span><br><span class="line">HINT:   sudo modprobe kvm_intel</span><br><span class="line">INFO: For more detailed results, you should run this as root</span><br><span class="line">HINT:   sudo /usr/sbin/kvm-ok</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:18] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /lib/modules/4.15.18/kernel/arch/x86/kvm/kvm.ko</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:25]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /lib/modules/4.15.18/kernel/arch/x86/kvm/kvm-intel.ko</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> ~ [20:32:31]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:33] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo insmod /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm/kvm-intel.ko</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:39]</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">dmesg | <span class="built_in">tail</span> -10</span></span><br><span class="line">[25416.145711] kvm: loading out-of-tree module taints kernel.</span><br><span class="line">[25416.151778] kvm: module verification failed: signature and/or required key missing - tainting kernel</span><br><span class="line">[25435.886621] kvm module modified by szy</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">szy @ bionic-x99 <span class="keyword">in</span> /usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm [21:00:51] C:1</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">kvm-ok</span></span><br><span class="line">INFO: /dev/kvm exists</span><br><span class="line">KVM acceleration can be used</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">///usr/src/linux-source-4.15.0/linux-source-4.15.0/arch/x86/kvm/Makefile</span><br><span class="line"><span class="section">update:</span></span><br><span class="line">        sudo make -C /lib/modules/4.15.18/build M=<span class="variable">$(PWD)</span> modules -j10</span><br><span class="line">        sudo rmmod kvm-intel</span><br><span class="line">        sudo rmmod kvm</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm.ko</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm-intel.ko</span><br><span class="line">        kvm-ok</span><br><span class="line"></span><br><span class="line"><span class="section">remove:</span></span><br><span class="line">        sudo rmmod kvm-intel</span><br><span class="line">        sudo rmmod kvm</span><br><span class="line"><span class="section">install:</span></span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm.ko</span><br><span class="line">        sudo insmod <span class="variable">$(PWD)</span>/kvm-intel.ko</span><br><span class="line">        kvm-ok</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="KVM"><a href="#KVM" class="headerlink" title="KVM"></a>KVM</h2><h3 id="调用逻辑"><a href="#调用逻辑" class="headerlink" title="调用逻辑"></a>调用逻辑</h3><p>用户态qemu通过ioctl发起一次run</p>
-<p><code>kvm_vcpu_ioctl</code>-&gt;<code>kvm_arch_vcpu_ioctl_run</code>-&gt;<code>vcpu_run</code>-&gt;<code>vcpu_enter_guest</code>-&gt;<code>vmx_vcpu_run</code></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">vcpu_run</span><span class="params">(<span class="keyword">struct</span> kvm_vcpu *vcpu)</span>&#123;    </span><br><span class="line">	<span class="keyword">for</span>(;;)&#123;</span><br><span class="line">        r = vcpu_enter_guest(vcpu);</span><br><span class="line">        <span class="keyword">if</span>(r&lt;=<span class="number">0</span>)<span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;	</span><br></pre></td></tr></table></figure>
-
-<p>如果KVM能处理exit就继续循环 否则回到用户态qemu 由qemu再次调用</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">vcpu_enter_guest</span><span class="params">(<span class="keyword">struct</span> kvm_vcpu *vcpu)</span>&#123;</span><br><span class="line">    kvm_x86_ops-&gt;run(vcpu);</span><br><span class="line">    ++vcpu-&gt;stat.exits;</span><br><span class="line">	<span class="keyword">return</span> kvm_x86_ops-&gt;handle_exit(vcpu);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在<code>vmx_vcpu_run</code>中由汇编<code>ASM_VMX_VMLAUNCH</code>进入VM执行，VM退出后会紧接着执行下面的几行汇编</p>
-<h3 id="exit"><a href="#exit" class="headerlink" title="exit"></a>exit</h3><p><code>x86.c&gt;vcpu_enter_guest</code>  </p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">++vcpu-&gt;stat.exits;</span><br><span class="line"><span class="keyword">if</span>(vcpu-&gt;stat.exits % <span class="number">1000</span>==<span class="number">0</span>)&#123;</span><br><span class="line">	printk(<span class="string">&quot;vcpu exits:%lld\n&quot;</span>,vcpu-&gt;stat.exits);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>kvm的函数是需要一个vcpu作为参数的 exit为vcpu的成员变量</p>
-<p>直接在内核改</p>
-<p>vmx.c中增加全局变量，核心函数为<code>vmx_vcpu_run</code></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">str_values</span> &#123;</span></span><br><span class="line">        <span class="type">int</span>             val;</span><br><span class="line">        <span class="type">const</span> <span class="type">char</span>      *str;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">str_values</span> <span class="title">vmx_exit_reasons</span>[] =</span> &#123;</span><br><span class="line">        VMX_EXIT_REASONS</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//static int exit_type_num = sizeof(vmx_exit_reasons)/sizeof(struct str_values);</span></span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_counts[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_last_time[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> exit_total_cost_time[<span class="number">65</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> total_exit_count;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> exit_last_reason=<span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">char</span>* <span class="title function_">get_exit_reason_string</span><span class="params">(<span class="type">int</span> val)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> i;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>;i &lt;=<span class="number">64</span> ;i++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(vmx_exit_reasons[i].val == val)&#123;</span><br><span class="line">                        <span class="keyword">return</span> vmx_exit_reasons[i].str;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> u64 <span class="title function_">get_timestamp_now</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">tv</span>;</span></span><br><span class="line">        u64 timestamp;</span><br><span class="line">        do_gettimeofday(&amp;tv);</span><br><span class="line">        timestamp = (u64)tv.tv_sec * <span class="number">1000000</span> + tv.tv_usec;</span><br><span class="line">        <span class="keyword">return</span> timestamp;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">show_exit_counts</span><span class="params">(<span class="type">int</span> n)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> index[n];</span><br><span class="line">        <span class="type">int</span> i,j;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span> ;i &lt; n ;i++)&#123; <span class="comment">// find ith biggest number</span></span><br><span class="line">                <span class="type">int</span> max = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">for</span>(j= <span class="number">0</span> ; j&lt;= <span class="number">64</span>; j++)&#123;</span><br><span class="line">                        <span class="type">int</span> k;</span><br><span class="line">                        <span class="type">int</span> duplicated = <span class="number">0</span>;</span><br><span class="line">                        <span class="keyword">for</span>(k = <span class="number">0</span>; k &lt; i ; k++)&#123; <span class="comment">//prevent duplicated</span></span><br><span class="line">                                <span class="keyword">if</span>(index[k] == j)&#123;</span><br><span class="line">                                        duplicated = <span class="number">1</span>;</span><br><span class="line">                                        <span class="keyword">break</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">if</span>(duplicated)&#123;</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="type">int</span> count = exit_counts[j];</span><br><span class="line">                        <span class="keyword">if</span>(count &gt;= max)&#123;</span><br><span class="line">                                index[i] = j;</span><br><span class="line">                                max = count;</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(exit_counts[index[i]] &gt; <span class="number">0</span>)&#123;</span><br><span class="line">                        <span class="type">char</span>* reason = get_exit_reason_string(index[i]);</span><br><span class="line">                        u64 aver_cost_time = exit_total_cost_time[index[i]]/exit_counts[index[i]];</span><br><span class="line">                        printk(<span class="string">&quot;exit reason:[%d]%s,counts:%lld,average cost time:%lld\n&quot;</span>,index[i],reason?reason : <span class="string">&quot;not found&quot;</span>,exit_counts[index[i]],aver_cost_time);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">vmx-&gt;exit_reason = vmx-&gt;fail ? <span class="number">0xdead</span> : vmcs_read32(VM_EXIT_REASON);</span><br><span class="line">        <span class="keyword">if</span>(!vmx-&gt;fail)&#123;</span><br><span class="line">                total_exit_count++;</span><br><span class="line">                exit_last_reason=(u16)vmx-&gt;exit_reason;</span><br><span class="line">                exit_last_time[exit_last_reason] = now;</span><br><span class="line">                exit_counts[exit_last_reason]++;</span><br><span class="line">                <span class="keyword">if</span>(total_exit_count%<span class="number">10000</span>==<span class="number">0</span>)&#123;</span><br><span class="line">                        <span class="comment">//printk(KERN_INFO &quot;time now:%llu\n&quot;, timestamp);</span></span><br><span class="line">                        show_exit_counts(<span class="number">5</span>);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                exit_last_reason = <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>内核模块 不能include time并且用time获得时间，只能用linux&#x2F;time的do_gettimeofday</p>
-<p>或者使用rdtsc获取cycle数 rdtsc可以直接用，也可以用同名汇编</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2335,13 +2402,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">69k</span>
+    <span title="Word count total">71k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:12</span>
+    <span title="Reading time total">4:19</span>
   </span>
 </div>
 <div class="busuanzi-count">

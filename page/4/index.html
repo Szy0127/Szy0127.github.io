@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">40</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,381 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/misc/kubelet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/misc/kubelet/" class="post-title-link" itemprop="url">kubelet</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>11 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h1><h2 id="containerd"><a href="#containerd" class="headerlink" title="containerd"></a>containerd</h2><p><a target="_blank" rel="noopener" href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">containerd&#x2F;getting-started.md at main · containerd&#x2F;containerd (github.com)</a></p>
+<p>镜像自带，但需要安装cni，高版本没有自带的flannel，用0.9.1版本可以</p>
+<h3 id="management"><a href="#management" class="headerlink" title="management"></a>management</h3><p>管理容器，考虑以下三种方法：</p>
+<ol>
+<li><p>containerd启动时会作为grpc server，监听在<code>unix:///run/containerd/containerd.sock</code> 可以像k8s一样作为grpc client调定义好的CRI接口。但是我们不需要考虑项目不同模块解耦，也不需要考虑支持其他的容器运行时，对于grpc的调用需要自己构造参数，太复杂，并且试了一下很难跑起来。</p>
+</li>
+<li><p>用exec+ctl</p>
+<p>这里可以使用containerd写的nerdctl 兼容docker的命令行格式</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/containerd/nerdctl">containerd&#x2F;nerdctl: contaiNERD CTL - Docker-compatible CLI for containerd, with support for Compose, Rootless, eStargz, OCIcrypt, IPFS, … (github.com)</a></p>
+<p>完全用cli工具技术含量不高，且需要经过nerdctl这个大框架的解析，效率不高。</p>
+<p>可以做一些辅助用途，比如测试、启动pause等。核心的查看容器状态和启动容器还是用containerd的go api</p>
+</li>
+<li><p>containerd api</p>
+<p>实在难用，官方文档一共就readme的几句话，剩下的全靠看源码+猜+看nerdctl源码如何使用</p>
+</li>
+</ol>
+<p>这里研究出的api如下</p>
+<ul>
+<li>创建容器 包括配置</li>
+<li>销毁容器</li>
+<li>获取容器状态</li>
+<li>获取容器资源信息</li>
+</ul>
+<h3 id="configuration"><a href="#configuration" class="headerlink" title="configuration"></a>configuration</h3><ul>
+<li><p><code>WithMounts</code> 挂载 需要将type和options同时设为bind，否则会报<code>no such device</code>的错</p>
+</li>
+<li><p><code>WithDomainname</code> <code>WithHostname</code></p>
+</li>
+<li><p><code>WithLinuxNamespace</code>可以加入其他进程的namespace 但是需要先起task 拿到pid<code>proc/pid/ns/uts</code></p>
+<p>启动pause容器后，将此pod内的所有其他容器加入到pause容器的namespace<br>观察containerd的源码可知，就算什么都不配置，默认也是使用了ipc、uts、network、mount、pid这五个命名空间隔离的<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_40579389/article/details/125941366">k8s之pause容器</a>按这篇文章的意思 除了mount其他都不需要和pause隔离<br>需要修改的话 一种是自己写配置函数，另一种是使用这个api但只能一个个单独设 </p>
+</li>
+<li><p><code>WithProcessArgs</code> 启动命令 只有windows支持<code>ProcessCmdLine</code> 不过简单的命令使用起来效果差不多，具体可能涉及到entrypoint 和cmd的区别</p>
+</li>
+<li><p><code>Withenv</code>  环境变量 <code>&quot;a=c&quot;</code> </p>
+</li>
+<li><p><code>WithMemoryLimit</code> 单位是字节，如果容器使用内存超过这个数 会被直接kill。</p>
+<p>莫名其妙会有bug，报cgroup的错，全网查不到信息，使用“30Mi” 没问题</p>
+</li>
+<li><p>CPU：</p>
+<ul>
+<li><code>WithCPUs</code> 将容器进程绑定到指定cpu执行，比如<code>0-3</code>绑定到0 1 2 3  ，<code>1</code>绑定到1</li>
+<li><code>WithCPUCFS</code> 调度器，对应到nerdctl 是<code>--cpus</code> 会使用这个api，但是网上说这个参数指定cpu核，这个说法不准确，实际上如果这个值为1，会发生cpu0 和cpu1占用率都在50%的情况，即总使用量为1</li>
+<li><code>WithCPUShares</code> 份额</li>
+</ul>
+</li>
+<li><p>port: 仅作标识用，没有意义，所以没有对应api</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/4b16c995990b">k8s四种port解析：nodePort、port、targetPort、containerPort - 简书 (jianshu.com)</a> </p>
+</li>
+<li><p><code>WithContainerLabels</code>这个功能为container提供label</p>
+<p>配合<code>client.Containers(ctx,fmt.Sprintf(&quot;labels.%q==%s&quot;, &quot;pod&quot;, pod.Data.Name))</code>一起使用</p>
+<p>对于apiserver维护的信息，只是自定义的container apiobject，并不是containerd的可以用来获取真实容器信息的对象，使用containerd的添加label并使用filter的方法可以很方便地拿到一个pod对应的所有containers，否则需要通过遍历容器并比较ID来判断。</p>
+</li>
+</ul>
+<h3 id="task"><a href="#task" class="headerlink" title="task"></a>task</h3><p>containerd的api有一个docker没有的概念task</p>
+<p>每个容器创建后，可以开启task，每个task对应一个进程，有对应的api，这时候才会产生新的命名空间</p>
+<p>删除容器，先要killtask 然后delete task 最后delete容器</p>
+<h3 id="image"><a href="#image" class="headerlink" title="image"></a>image</h3><p>containerd本身管理容器运行时，对于其他功能的提供非常少，包括拉取镜像。使用containerd提供的api只能做到从某个registry拉取，本地image是不行的，不带registry的image也是不行的。</p>
+<p>通过观察nerdctl的源码可以得到以下两个扩展：</p>
+<ol>
+<li><code>pkg/imgutil/dockerconfigresolver/dockerconfigresolver.go/New</code>可知使用docker的resolver可以做到从不同registry(包括自己部署的)拉取镜像</li>
+<li><code>pkg/imgutil/imgutil.go/GetExistingImage</code>可知containerd提供<code>NewImage</code>方法，供<code>image.Image</code>对象到<code>containerd.Image</code>的转换，这里<code>image.Image</code>可以通过<code>client.ImageService().Get(imageName)</code>来获取。虽然这里在字符串解析上也必须出现registry的部分，但是实际上不会真的pull，而是从本地获取(<code>nerdctl image list</code>可见即可)</li>
+</ol>
+<p>如果image在自己部署的registry中但还未被pull，这两种方法都是行不通的，需要自己创建docker resolver然后用WithResolver的配置去pull。这里图方便，解决方案为先用cli工具提前pull，随后紧接着用方法2获取到image对象</p>
+<h3 id="pause"><a href="#pause" class="headerlink" title="pause"></a>pause</h3><p>用containerd api设置网络特别麻烦，因此直接用nerdctl跑pause容器，并inspect拿到pid</p>
+<p>因此这里直接使用podname+”-pause”为每个pause容器命名</p>
+<p>虽然containerd的container对象只能访问.ID，而nerdctl 的 <code>--name</code> 设置的是name并不是id 但还是可以通过containerd的filter+label拿到container对象</p>
+<p>然而由于一开始pause容器利用nerdctl实现网络配置，nerdctl本身除了调用containerd的api外，自己有维护一个namestore，在创建容器时会 <code>aquire</code> 需要在销毁时 <code>release</code></p>
+<p>所以销毁容器只调containerd的api是不够的，会导致containerd的容器已经被删掉了，但是nerdctl维护的信息还没删，导致下一次创建同名pause容器会有问题</p>
+<p>解决方案可以是照nerdctl的代码找到对应的文件路径 然后照抄 <code>release</code>的代码，但这导致minik8s存在与nerdctl耦合的路径配置，较复杂 所以不如销毁pause仍用nerdctl直接实现</p>
+<h2 id="network"><a href="#network" class="headerlink" title="network"></a>network</h2><p>containerd相较于docker并没有提供任何网络相关帮助，所以完全依赖CNI插件</p>
+<p><code>nerdctl network ls</code> <code>nerdctl run -net host/none</code></p>
+<p>CNI插件完成两个目标</p>
+<ol>
+<li>让每个容器(实际上就是一个pod)拥有一个虚拟网卡，使其拥有访问外网的能力</li>
+<li>支持跨node(物理主机)的pod间通信</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_41033724/article/details/124976813">Kubernetes容器网络及Flannel插件详解_边缘计算社区的博客-CSDN博客</a></p>
+<p>思路：</p>
+<ol>
+<li>使用flannel插件创建网络 此时每个node都会出现<code>flannel.1</code>的虚拟网卡，可以互相通信</li>
+<li>使用<code>nerdctl run -net flannel pause</code> 创建pause容器，此时ip在不同node上会在不同子网中进行分配，不会重复</li>
+<li>其他容器加入pause容器的network namespace</li>
+</ol>
+<h3 id="flannel"><a href="#flannel" class="headerlink" title="flannel"></a>flannel</h3><p><a target="_blank" rel="noopener" href="https://github.com/flannel-io/flannel/blob/master/Documentation/running.md">flannel&#x2F;running.md at master · flannel-io&#x2F;flannel · GitHub</a></p>
+<p>flannel目前已经支持了etcd v3版本，不需要切换v2。</p>
+<p>etcd v3 v2的数据是不互通的，flanneld启动时默认会在v3里找数据</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lhang/p/17306765.html">Docker容器使用Flannel通信 - L_Hang - 博客园 (cnblogs.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_30641567/article/details/123917486">Containerd网络管理_containerd 端口映射_班婕妤的博客-CSDN博客</a></p>
+<p>只有master节点通过apiserver使用etcd，kubelet部署在node上 不需要也不能管理etcd</p>
+<p>只需要一个etcd 不需要集群 (flannel如果使用etcd集群会出找不到lease的bug)</p>
+<p>master <code>etcd --listen-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --listen-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot; --initial-advertise-peer-urls=&quot;http://192.168.1.12:2380,http://localhost:2380&quot; --advertise-client-urls=&quot;http://192.168.1.12:2379,http://localhost:2379&quot;</code></p>
+<p>master <code>etcdctl --endpoints &quot;http://192.168.1.12:2379&quot; put /coreos.com/network/config &#39;&#123;&quot;NetWork&quot;:&quot;10.2.0.0/16&quot;,&quot;SubnetMin&quot;:&quot;10.2.1.0&quot;,&quot;SubnetMax&quot;: &quot;10.2.20.0&quot;,&quot;Backend&quot;: &#123;&quot;Type&quot;: &quot;vxlan&quot;&#125;&#125;&#39;</code></p>
+<p>node启动<code>./flanneld-amd64 -etcd-endpoints=http://192.168.1.12:2379 -iface=ens3</code></p>
+<p>这里ens3是主机上能和外界通信的网卡，如果不设置flannel也会自动找</p>
+<p>出现<code>flannel.1</code>的网卡。如果修改配置后第一次的flannel1无法消失 出现cni0 重启可以解决</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># vim /etc/cni/net.d/10-flannel.conflist</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;name&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">  <span class="string">&quot;cniVersion&quot;</span>: <span class="string">&quot;0.3.1&quot;</span>,</span><br><span class="line">  <span class="string">&quot;plugins&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;flannel&quot;</span>,</span><br><span class="line">      <span class="string">&quot;delegate&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;isDefaultGateway&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;portmap&quot;</span>,</span><br><span class="line">      <span class="string">&quot;capabilities&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;portMappings&quot;</span>: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>nerdctl run -d -v /home/test_mount:/root/test_mount --net flannel -e port=12345 mcastelino/nettools /root/test_mount/test_network</code> 测试网络可行<br>nerdctl对于网络的解析太复杂了，对于pause并没有很多额外的配置，所以直接用ctl启动pause<br>在加入pause的namespace后发现，虽然其他容器有通过虚拟网卡向外找到合适的转发接口的能力，但是并没有DNS server。这里解决方法是使用外部的<code>nerdctl cp</code>命令将首个容器(pause)的<code>/etc/resolv.conf</code> <code>/etc/hosts</code>文件复制给每个该pod下的容器<br>容器内部部署的服务 可在主机上通过容器ip+容器内端口的方式直接访问到，至此实现pod间通信、主机与pod通信，后续交给kube-proxy</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43266367/article/details/127836595">k8s网络插件之Flannel_林凡修的博客-CSDN博客</a></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>由于需要给pod增加dns服务，在master上使用coredns作为dns server，解决方法是在resolve.conf中第一条加入master节点的ip（必须53端口）</p>
+<p>resolv.conf的逻辑是 如果前一个nameserver连接不上，才会继续向下一个nameserver查找。</p>
+<p>如果前一个nameserver连接上了但是没有记录，则会直接报无记录，不会向下一个nameserver查找。</p>
+<p>因此必须保证在集群网络通常的情况下，master节点必须启用coredns并且coredns除了minik8s需要的dns服务，必须包括其他通用的dns服务。</p>
+<h2 id="资源监控"><a href="#资源监控" class="headerlink" title="资源监控"></a>资源监控</h2><p>参考<code>cmd/nerdctl/container_stats_linux.go</code></p>
+<p>可以通过containerd的api拿到metrics对象,不过需要Unmarshal，并且对应的接口离其报错，找不到type，只能照着containerd的源码手动用反射</p>
+<h3 id="memory"><a href="#memory" class="headerlink" title="memory"></a>memory</h3><p>是一个定值，表示占用内存大小，单位byte</p>
+<h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><p>进程创建开始之后累计执行的时间，如果跑在2个核上，过了1s，则记为2s<br>通过与上一次获取的cpu执行时间的delta和时间delta可以计算出CPUPercent，和top展示的cpu%是一模一样的<br>CPUPercent和容器创建指定的cpu参数可对应，例如指定cpu&#x3D;1，则cpu%&#x3D;100%;cpu&#x3D;2,cpu%&#x3D;200%（两核跑满）;cpu&#x3D;500m,cpu%&#x3D;50%</p>
+<h2 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h2><p>kubelet主要做三件事</p>
+<ol>
+<li>websocket与apiserver保持长连接，监听到pod的创建、销毁状态时进行对应的容器操作。</li>
+<li>作为http server接收对于容器资源的请求，获取并计算容器资源后返回。</li>
+<li>每隔一段时间检查所有容器的状态，将存在停止容器的pod的状态通过短链接更新给apiserver</li>
+</ol>
+<p>针对container，1是写，23是读，可能会发生冲突。例如操作2正在统计某容器资源的时候，该容器被操作1删除。</p>
+<p>使用读写锁为每个pod上锁，即<code>map[string]sync.RWMutex</code> 其中key为<code>namespace-podname</code> 锁必须细粒度，因为2操作非常慢。</p>
+<p>go的map本身是线程不安全的，在对于同一个pod同时拿锁时可能创建两个不同的锁，严重时可能导致对于map的修改崩溃，因此将map替换为<code>sync.Map</code>。虽然同时写map没问题，但是很可能出现t1创建完并拿完锁之后return t2再次创建并拿锁，原因是并没有另一把锁来让对于map中某个key的访问设为临界区。使用<code>sync.Map</code>提供的<code>LoadOrStore(key,value)</code>方法，它会先判断是否存在某个key，如果存在返回<code>map[key]</code>，否则设置<code>map[key]=value</code>后返回value，最后用value.lock。这个方法只是压缩代码行数到了两行，但仍然不是原子的。最好是有类似<code>tbb::concurrent_hash_map::accessor</code>之类的东西。</p>
+<p>解决方法是使用一把大锁保护<code>sync.Map</code>，每次写map都需要拿锁，虽然粒度从pod变大到了整个空间，但是这里锁保护的临界区非常小，之后对于map数据结构的写，很快。</p>
+<p>在和apiserver连接中断后，任务2会继续做，任务1会每5s再发起一次连接请求，任务3会按之前的频率继续做(由于get请求会失败所以拿不到pod信息)</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/misc/GPU/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/misc/GPU/" class="post-title-link" itemprop="url">GPU</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="GPU"><a href="#GPU" class="headerlink" title="GPU"></a>GPU</h1><h2 id="交我算平台"><a href="#交我算平台" class="headerlink" title="交我算平台"></a>交我算平台</h2><p><a target="_blank" rel="noopener" href="https://docs.hpc.sjtu.edu.cn/job/slurm.html">Slurm 作业调度系统 — 上海交大超算平台用户手册 文档 (sjtu.edu.cn)</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.hpc.sjtu.edu.cn/job/dgx.html">AI平台使用文档 — 上海交大超算平台用户手册 文档 (sjtu.edu.cn)</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.hpc.sjtu.edu.cn/job/jobsample2.html#cuda">作业示例（开发者） — 上海交大超算平台用户手册 文档 (sjtu.edu.cn)</a></p>
+<p><code>srun -p dgx2 -N 1 -n 1 --gres=gpu:1 --cpus-per-task=6 --pty /bin/bash</code>直接进计算节点</p>
+<p><code>sbatch xx.slurm</code>提交</p>
+<p><code>squeue</code>查看未执行</p>
+<p><code>sacct</code>查看任务</p>
+<h2 id="NFS"><a href="#NFS" class="headerlink" title="NFS"></a>NFS</h2><h3 id="master"><a href="#master" class="headerlink" title="master"></a>master</h3><p><code>apt-get install -y nfs-kernel-server</code></p>
+<p><code>/etc/exports</code>最后<code>/minik8s-sharedata *(rw,sync,no_subtree_check)</code></p>
+<p><code>/etc/init.d/nfs-kernel-server restart</code></p>
+<h3 id="node"><a href="#node" class="headerlink" title="node"></a>node</h3><p><code>apt-get install -y nfs-common</code></p>
+<p><code>mount master:/minik8s-sharedata /minik8s-sharedata</code></p>
+<p>master节点创建的文件&#x2F;文件夹在node节点readonly</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><h3 id="主机与容器"><a href="#主机与容器" class="headerlink" title="主机与容器"></a>主机与容器</h3><p>通过查询相关资料，发现job的数据是只能通过与主机挂载目录完成的。master节点提交任务，最终跑在node节点，如何共享文件。</p>
+<ol>
+<li>把gpu的job yaml放在master节点，cu和Makefile放在node节点，且为该node节点加上gpu标签，yaml中的nodeselector加此标签。 这种方式把node暴露给用户，不合适。</li>
+<li>集群部署docker registry，master节点build一个镜像，然后node节点pull。这样可以获得上传的文件，但是无法把结果拿给master。</li>
+<li>NFS。master和node通过nfs，共享<code>/minik8s-sharedata</code>文件夹</li>
+</ol>
+<p>yaml文件挂载容器目录与主机共享文件夹，用环境变量指定参数和gpu文件</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">gpu-job</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">gpu</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gpu-server</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">gpu-server</span></span><br><span class="line">      <span class="attr">command:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">&quot;./job.py&quot;</span></span><br><span class="line">      <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">source-path</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">/gpu</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">job-name</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">gpu-matrix</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">partition</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">dgx2</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;N&quot;</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">&quot;1&quot;</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">ntasks-per-node</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">&quot;1&quot;</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">cpus-per-task</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">&quot;6&quot;</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">gres</span></span><br><span class="line">          <span class="attr">value:</span> <span class="string">gpu:1</span></span><br><span class="line">      <span class="attr">volumeMounts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">share-data</span></span><br><span class="line">          <span class="attr">mountPath:</span> <span class="string">/gpu</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">share-data</span></span><br><span class="line">      <span class="attr">hostPath:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">/minik8s-sharedata/gpu/matrix</span></span><br></pre></td></tr></table></figure>
+
+<p>注意这里N是个奇怪的关键字，必须加引号否则会解析错误</p>
+<p>容器把用户提供的source文件夹（包括代码文件和Makefile）整个上传到hpc服务器，以job-name命名，并本地生成slurm也上传到这个目录。要求用户代码将需要生成的文件放入source&#x2F;result中，并且一定要提前创建好，slurm会将程序的标准输入输出也放入source&#x2F;result中，最后可在主机的共享文件夹中拿到结果。</p>
+<p>用户可以灵活地自由添加任意源文件，只需要提供Makefile。规定的只有两点：</p>
+<ol>
+<li>用户代码需要把生成的文件存到同目录下result子目录中</li>
+<li>用户需要配置make build和make run两个命令</li>
+</ol>
+<h3 id="主机与hpc服务器"><a href="#主机与hpc服务器" class="headerlink" title="主机与hpc服务器"></a>主机与hpc服务器</h3><p>交大云主机<code>ssh-keygen -t rsa</code>为本机生成rsa公私钥</p>
+<p><code>ssh-copy-id stu1648@pilogin.hpc.sjtu.edu.cn</code>将交大云主机公钥添加到hpc登陆节点的authorized_keys中</p>
+<p>输入密码，添加成功</p>
+<p>之后ssh scp均无须密码，不需要把密码硬编码在代码中，安全</p>
+<h3 id="容器与hpc服务器"><a href="#容器与hpc服务器" class="headerlink" title="容器与hpc服务器"></a>容器与hpc服务器</h3><h4 id="build"><a href="#build" class="headerlink" title="build"></a>build</h4><p>所有node节点提前build镜像</p>
+<p>可以用<code>nerdctl tag gpu-server master:5000/gpu-server</code></p>
+<p><code>nerdctl push/pull master:5000/gpu-server --insecure-registry</code></p>
+<p>containerd的镜像与docker不共享 不可以用<code>docker build</code>（或者通过docker registry中转）</p>
+<p>如果用<code>nerdctl build</code> 需要存在<code>buildctl</code>(任意路径可调用)与<code>buildkitd</code>(提前跑的后台进程)<a target="_blank" rel="noopener" href="https://github.com/moby/buildkit/">Releases · moby&#x2F;buildkit (github.com)</a></p>
+<p>需要为容器创建.ssh目录放入主机的rsa私钥和known_hosts文件，便于不需要输yes和输密码</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get update</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get -y install openssh-server python3-pip vim</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip3 install paramiko scp</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /root</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">mkdir</span>  .ssh</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./id_rsa .ssh/id_rsa</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./known_hosts .ssh/known_hosts</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./job.py job.py</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>nerdctl build -t gpu-server .</code></p>
+<p><code>scp stu1648@data.hpc.sjtu.edu.cn:~/test_gpu.cu .</code></p>
+<p>仅使用shell命令只能做到文件传输，无法向远程主机发送需要执行的指令</p>
+<p>解决方法是使用expect或具有ssh功能的语言编写程序</p>
+<h4 id="expect"><a href="#expect" class="headerlink" title="expect"></a>expect</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/usr/bin/expect -f</span></span><br><span class="line">spawn bash -c &quot;ssh stu1648@pilogin.hpc.sjtu.edu.cn&quot;</span><br><span class="line"></span><br><span class="line">set timeout 6</span><br><span class="line">expect &quot;stu1648@pilogin*&quot;</span><br><span class="line">send &quot;mkdir abc\r&quot;</span><br><span class="line">expect &quot;stu1648@pilogin*&quot;</span><br><span class="line">send &quot;exit\r&quot;</span><br><span class="line"></span><br><span class="line">expect eof</span><br></pre></td></tr></table></figure>
+
+<p>expect正如名字所表达的，必须对服务端返回值在有限范围内进行预测，这是做不到从服务端拿到sbatch的返回值job_id的，故根据sacct或squeue查看job情况也无法完成，只能实现比较简单的提交任务操作。</p>
+<h4 id="python"><a href="#python" class="headerlink" title="python"></a>python</h4><p>使用python，可以不需要提前编译</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">import</span> paramiko</span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> sleep</span><br><span class="line"><span class="keyword">from</span> scp <span class="keyword">import</span> SCPClient</span><br><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> getenv</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">NREAD = <span class="number">100000</span></span><br><span class="line">ssh = paramiko.SSHClient()</span><br><span class="line">ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())</span><br><span class="line">ssh.connect(<span class="string">&quot;pilogin.hpc.sjtu.edu.cn&quot;</span>,<span class="number">22</span>,<span class="string">&quot;stu1648&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">job_submit_tag = <span class="string">&quot;Submitted batch job&quot;</span></span><br><span class="line">line_finish_tag = <span class="string">&quot;[stu1648@&quot;</span></span><br><span class="line">PENDING = <span class="string">&quot;PENDING&quot;</span></span><br><span class="line">COMPLETED = <span class="string">&quot;COMPLETED&quot;</span></span><br><span class="line">FAILED = <span class="string">&quot;FAILED&quot;</span></span><br><span class="line"></span><br><span class="line">source_path = getenv(<span class="string">&quot;source-path&quot;</span>)</span><br><span class="line">job_name = getenv(<span class="string">&quot;job-name&quot;</span>)</span><br><span class="line">partition= getenv(<span class="string">&quot;partition&quot;</span>)</span><br><span class="line">N = getenv(<span class="string">&quot;N&quot;</span>)</span><br><span class="line">ntasks_per_node = getenv(<span class="string">&quot;ntasks-per-node&quot;</span>)</span><br><span class="line">cpus_per_task = getenv(<span class="string">&quot;cpus-per-task&quot;</span>)</span><br><span class="line">gres = getenv(<span class="string">&quot;gres&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> job_name <span class="keyword">or</span> <span class="keyword">not</span> source_path:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;env error&quot;</span>)</span><br><span class="line">    exit(<span class="number">0</span>)</span><br><span class="line"><span class="keyword">if</span> source_path[-<span class="number">1</span>] == <span class="string">&quot;/&quot;</span>:</span><br><span class="line">    <span class="comment"># scp send whole source</span></span><br><span class="line">    source_path = source_path[:-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> partition:</span><br><span class="line">    partition = <span class="string">&quot;dgx2&quot;</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> N:</span><br><span class="line">    N = <span class="number">1</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> ntasks_per_node:</span><br><span class="line">    ntasks_per_node = <span class="number">1</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> cpus_per_task:</span><br><span class="line">    cpus_per_task = <span class="number">6</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> gres:</span><br><span class="line">    gres = <span class="string">&quot;gpu:1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_slurm</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;generating slurm&quot;</span>)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">f&quot;./<span class="subst">&#123;job_name&#125;</span>.slurm&quot;</span>,<span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(<span class="string">&quot;#!/bin/bash\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --job-name=<span class="subst">&#123;job_name&#125;</span>\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --partition=<span class="subst">&#123;partition&#125;</span>\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH -N <span class="subst">&#123;N&#125;</span>\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --ntasks-per-node=<span class="subst">&#123;ntasks_per_node&#125;</span>\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --cpus-per-task=<span class="subst">&#123;cpus_per_task&#125;</span>\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --gres=<span class="subst">&#123;gres&#125;</span>\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="comment"># result must exist . is the same dir as .slurm</span></span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --output=result/output.txt\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;#SBATCH --error=result/error.txt\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">        f.write(<span class="string">f&quot;ulimit -s unlimited\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">f&quot;ulimit -l unlimited\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">        f.write(<span class="string">&quot;module load gcc/8.3.0 cuda/10.1.243-gcc-8.3.0\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">        f.write(<span class="string">&quot;make build\n&quot;</span>)</span><br><span class="line">        f.write(<span class="string">&quot;make run\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">upload_source</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;uploading source&quot;</span>)</span><br><span class="line">    scp = SCPClient(ssh.get_transport(),socket_timeout=<span class="number">16</span>)</span><br><span class="line">    scp.put(source_path,recursive=<span class="literal">True</span>,remote_path=<span class="string">f&quot;~/<span class="subst">&#123;job_name&#125;</span>&quot;</span>)</span><br><span class="line">    scp.put(<span class="string">f&quot;./<span class="subst">&#123;job_name&#125;</span>.slurm&quot;</span>,<span class="string">f&quot;~/<span class="subst">&#123;job_name&#125;</span>/<span class="subst">&#123;job_name&#125;</span>.slurm&quot;</span>)</span><br><span class="line">    scp.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">download_result</span>(<span class="params">job_id</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;downloading result&quot;</span>)</span><br><span class="line">    scp = SCPClient(ssh.get_transport(),socket_timeout=<span class="number">16</span>)</span><br><span class="line">    scp = SCPClient(ssh.get_transport(),socket_timeout=<span class="number">16</span>)</span><br><span class="line">    <span class="comment">#scp.get(f&quot;~/result/&#123;job_id&#125;.out&quot;,f&quot;&#123;source_path&#125;/&#123;job_name&#125;.out&quot;)</span></span><br><span class="line">    <span class="comment">#scp.get(f&quot;~/result/&#123;job_id&#125;.err&quot;,f&quot;&#123;source_path&#125;/&#123;job_name&#125;.err&quot;)</span></span><br><span class="line">    scp.get(<span class="string">f&quot;~/<span class="subst">&#123;job_name&#125;</span>/result&quot;</span>,recursive=<span class="literal">True</span>,local_path=<span class="string">f&quot;<span class="subst">&#123;source_path&#125;</span>/&quot;</span>)</span><br><span class="line">    scp.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">submit_job</span>():</span><br><span class="line">    t = <span class="number">3</span></span><br><span class="line">    <span class="keyword">while</span> t:</span><br><span class="line">        s = ssh.invoke_shell()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;starting ssh&quot;</span>)</span><br><span class="line">        sleep(<span class="number">2</span>)</span><br><span class="line">        recv = s.recv(NREAD).decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> recv.find(<span class="string">&quot;stu1648&quot;</span>) == -<span class="number">1</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;start ssh failed,retrying&quot;</span>)</span><br><span class="line">            t -= <span class="number">1</span></span><br><span class="line">            sleep(<span class="number">5</span>)</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;start ssh success&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;sending sbatch&quot;</span>)</span><br><span class="line">        s.send(<span class="string">f&quot;cd ~/<span class="subst">&#123;job_name&#125;</span> &amp;&amp; sbatch ./<span class="subst">&#123;job_name&#125;</span>.slurm\n&quot;</span>)</span><br><span class="line">        sleep(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">        recv = s.recv(NREAD).decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        index = recv.find(job_submit_tag)</span><br><span class="line">        <span class="keyword">if</span> index ==-<span class="number">1</span>:</span><br><span class="line">            <span class="built_in">print</span>(recv)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;sbatch failed,retrying&quot;</span>)</span><br><span class="line">            t -= <span class="number">1</span></span><br><span class="line">            sleep(<span class="number">5</span>)</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;sbatch success&quot;</span>)</span><br><span class="line">        job_id = recv[index+<span class="built_in">len</span>(job_submit_tag)+<span class="number">1</span>:recv.index(line_finish_tag)-<span class="number">2</span>]</span><br><span class="line">        <span class="comment">#job_id = 25099457</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;job_id=&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;start checking job status&quot;</span>)</span><br><span class="line"></span><br><span class="line">        check_status_cmd = <span class="string">f&quot;sacct | grep <span class="subst">&#123;job_id&#125;</span> | awk &#x27;&#123;&#123;print $6&#125;&#125;&#x27;&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            s.send(check_status_cmd+<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">            sleep(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">            recv = s.recv(NREAD).decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">            status = recv[recv.index(check_status_cmd)+<span class="built_in">len</span>(check_status_cmd)+<span class="number">2</span>:recv.index(line_finish_tag)-<span class="number">2</span>]</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;status=&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> status.find(FAILED)!=-<span class="number">1</span>:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;job failed&quot;</span>)</span><br><span class="line">                <span class="comment">#user might need error message, still get results</span></span><br><span class="line">                <span class="comment">#exit(0)</span></span><br><span class="line">                <span class="keyword">return</span> job_id</span><br><span class="line">            <span class="keyword">if</span> status.find(COMPLETED)==-<span class="number">1</span>:</span><br><span class="line">                sleep(<span class="number">10</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> job_id</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">generate_slurm()</span><br><span class="line">upload_source()</span><br><span class="line">job_id =  submit_job()</span><br><span class="line"><span class="keyword">if</span> job_id:</span><br><span class="line">    download_result(job_id)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;finish&quot;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>由于containerd目前的使用是直接把所有容器的输出定为stdout，并没有用类似nerdctl支持-d和logs。这样会把python程序的输出都直接放到屏幕上，这样也方便观察结果，可以认为是个feature。</p>
+<p>如果源数据文件比较大，scp上传需要花不少时间</p>
+<h2 id="CUDA程序"><a href="#CUDA程序" class="headerlink" title="CUDA程序"></a>CUDA程序</h2><p>交我算只适合提交自己确认正确的程序，因为几乎全是pending，完全无法动态调试。每天晚上十一点之后会稍微好一点。</p>
+<p><a target="_blank" rel="noopener" href="https://colab.research.google.com/github/hussain0048/C-Plus-Plus/blob/master/Basic_of_C%2B%2B.ipynb">Google Colab</a>用这个可以有cuda环境来调试</p>
+<p>由于希望支持的GPU应用是有意义的，所以需要满足两点：</p>
+<ol>
+<li>数据量大</li>
+<li>由用户自己提供输入，以文件形式获得输出</li>
+</ol>
+<p>故添加文件输入输出模块，并提前准备好测试数据。</p>
+<p>为了编译任务快速结束以便展示并且减轻交我算平台的压力，这里还是选择只使用10000*10000的矩阵</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;files.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> N 10000</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> size = (<span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>)N*N*<span class="keyword">sizeof</span>(<span class="type">double</span>);</span><br><span class="line">  <span class="type">double</span> *a = (<span class="type">double</span>*)<span class="built_in">malloc</span>(size);</span><br><span class="line">  <span class="type">double</span> *b = (<span class="type">double</span>*)<span class="built_in">malloc</span>(size);</span><br><span class="line">  <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N; ++row )&#123;</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N; ++col )&#123;</span><br><span class="line">      a[row*N + col] = row;</span><br><span class="line">      b[row*N + col] = col+<span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  write_values_to_file(<span class="string">&quot;matrix_a_data&quot;</span>,a,size);</span><br><span class="line">  write_values_to_file(<span class="string">&quot;matrix_b_data&quot;</span>,b,size);</span><br><span class="line"></span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_a_data&quot;</span>,a,size);</span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_b_data&quot;</span>,b,size);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N; ++row )&#123;</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N; ++col )&#123;</span><br><span class="line">      <span class="keyword">if</span>(a[row*N + col] != row ||b[row*N + col] != col+<span class="number">2</span>)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;error\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;generate data success\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="矩阵加法"><a href="#矩阵加法" class="headerlink" title="矩阵加法"></a>矩阵加法</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;files.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHECK_CORRECTNESS</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> N  10000</span></span><br><span class="line"></span><br><span class="line">__global__ <span class="type">void</span> <span class="title function_">matrixAddGPU</span><span class="params">( <span class="type">double</span> * a, <span class="type">double</span> * b, <span class="type">double</span> * c )</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> row_begin = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">  <span class="type">int</span> col_begin = blockIdx.y * blockDim.y + threadIdx.y;</span><br><span class="line">  <span class="type">int</span> stride_row = gridDim.x * blockDim.x;</span><br><span class="line">  <span class="type">int</span> stride_col = gridDim.y * blockDim.y;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> row = row_begin; row &lt; N ;row += stride_row) &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> col= col_begin; col&lt; N ; col+= stride_col) &#123;</span><br><span class="line">                c[row * N + col] = a[row*N+col] + b[row*N+col];</span><br><span class="line">        &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">matrixAddCPU</span><span class="params">( <span class="type">double</span> * a, <span class="type">double</span> * b, <span class="type">double</span> * c )</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N; ++row )</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N; ++col )</span><br><span class="line">    &#123;</span><br><span class="line">      c[row * N + col] = a[row*N+col]+b[row*N+col];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">        cudaError_t cudaStatus;</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> deviceId;</span><br><span class="line">  <span class="type">int</span> numberOfSMs;</span><br><span class="line"></span><br><span class="line">  cudaGetDevice(&amp;deviceId);</span><br><span class="line">  cudaDeviceGetAttribute(&amp;numberOfSMs, cudaDevAttrMultiProcessorCount, deviceId);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;SM:%d\n&quot;</span>,numberOfSMs);<span class="comment">//80</span></span><br><span class="line"></span><br><span class="line">  <span class="type">double</span> *a, *b, *c_gpu;</span><br><span class="line"></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> size = (<span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>)N * N * <span class="keyword">sizeof</span> (<span class="type">double</span>); <span class="comment">// Number of bytes of an N x N matrix</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Allocate memory</span></span><br><span class="line">  cudaMallocManaged (&amp;a, size);</span><br><span class="line">  cudaMallocManaged (&amp;b, size);</span><br><span class="line">  cudaMallocManaged (&amp;c_gpu, size);</span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_a_data&quot;</span>, a, size);</span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_b_data&quot;</span>, b, size);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//if too large,invalid configuration argument</span></span><br><span class="line">  dim3 <span class="title function_">threads_per_block</span><span class="params">(<span class="number">32</span>,<span class="number">32</span>,<span class="number">1</span>)</span>;</span><br><span class="line">  dim3 <span class="title function_">number_of_blocks</span> <span class="params">(<span class="number">16</span>*numberOfSMs,<span class="number">16</span>*numberOfSMs, <span class="number">1</span>)</span>;</span><br><span class="line">  cudaMemPrefetchAsync(a, size, deviceId);</span><br><span class="line">  cudaMemPrefetchAsync(b, size, deviceId);</span><br><span class="line">  cudaMemPrefetchAsync(c_gpu, size, deviceId);</span><br><span class="line">  matrixAddGPU &lt;&lt;&lt; number_of_blocks, threads_per_block &gt;&gt;&gt; ( a, b, c_gpu );</span><br><span class="line">        cudaStatus = cudaGetLastError();</span><br><span class="line">        <span class="keyword">if</span> (cudaStatus != cudaSuccess) &#123;</span><br><span class="line">                <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;call matrixAddGPU error: %s\n&quot;</span>, cudaGetErrorString(cudaStatus));</span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">  cudaDeviceSynchronize(); <span class="comment">// Wait for the GPU to finish before proceeding</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Call the CPU version to check our work</span></span><br><span class="line">    <span class="comment">// Compare the two answers to make sure they are equal</span></span><br><span class="line">  <span class="type">bool</span> error = <span class="literal">false</span>;</span><br><span class="line">  <span class="meta">#<span class="keyword">ifdef</span> CHECK_CORRECTNESS</span></span><br><span class="line">    <span class="type">double</span> *c_cpu;</span><br><span class="line">    cudaMallocManaged (&amp;c_cpu, size);</span><br><span class="line">    matrixAddCPU( a, b, c_cpu );</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N &amp;&amp; !error; ++row )</span><br><span class="line">      <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N &amp;&amp; !error; ++col )</span><br><span class="line">        <span class="keyword">if</span> (c_cpu[row * N + col] != c_gpu[row * N + col])</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">printf</span>(<span class="string">&quot;FOUND ERROR at c[%d][%d]\n&quot;</span>, row, col);</span><br><span class="line">          error = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    cudaFree( c_cpu );</span><br><span class="line">  <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="keyword">if</span> (!error)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Success!\n&quot;</span>);</span><br><span class="line">  write_values_to_file(<span class="string">&quot;result/matrix_c_data&quot;</span>, c_gpu, size);</span><br><span class="line">  <span class="comment">// Free all our allocated memory</span></span><br><span class="line">  cudaFree(a);</span><br><span class="line">  cudaFree(b);</span><br><span class="line">  cudaFree( c_gpu );</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="矩阵乘法"><a href="#矩阵乘法" class="headerlink" title="矩阵乘法"></a>矩阵乘法</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;files.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHECK_CORRECTNESS</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> N  10000</span></span><br><span class="line"></span><br><span class="line">__global__ <span class="type">void</span> <span class="title function_">matrixMulGPU</span><span class="params">( <span class="type">double</span> * a, <span class="type">double</span> * b, <span class="type">double</span> * c )</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> row_begin = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line">  <span class="type">int</span> col_begin = blockIdx.y * blockDim.y + threadIdx.y;</span><br><span class="line">  <span class="type">int</span> stride_row = gridDim.x * blockDim.x;</span><br><span class="line">  <span class="type">int</span> stride_col = gridDim.y * blockDim.y;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> row = row_begin; row &lt; N ;row += stride_row) &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> col= col_begin; col&lt; N ; col+= stride_col) &#123;</span><br><span class="line">                <span class="type">double</span> val = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">0</span>; k &lt; N; ++k )&#123;</span><br><span class="line">                        val += a[row * N + k] * b[k * N + col];</span><br><span class="line">                        c[row * N + col] = val;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">matrixMulCPU</span><span class="params">( <span class="type">double</span> * a, <span class="type">double</span> * b, <span class="type">double</span> * c )</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N; ++row )</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N; ++col )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">double</span> val = <span class="number">0</span>;</span><br><span class="line">      <span class="keyword">for</span> ( <span class="type">int</span> k = <span class="number">0</span>; k &lt; N; ++k )</span><br><span class="line">        val += a[row * N + k] * b[k * N + col];</span><br><span class="line">      c[row * N + col] = val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">        cudaError_t cudaStatus;</span><br><span class="line"></span><br><span class="line">  <span class="type">int</span> deviceId;</span><br><span class="line">  <span class="type">int</span> numberOfSMs;</span><br><span class="line"></span><br><span class="line">  cudaGetDevice(&amp;deviceId);</span><br><span class="line">  cudaDeviceGetAttribute(&amp;numberOfSMs, cudaDevAttrMultiProcessorCount, deviceId);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;SM:%d\n&quot;</span>,numberOfSMs);<span class="comment">//80</span></span><br><span class="line"></span><br><span class="line">  <span class="type">double</span> *a, *b, *c_gpu;</span><br><span class="line"></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span> size = (<span class="type">unsigned</span> <span class="type">long</span> <span class="type">long</span>)N * N * <span class="keyword">sizeof</span> (<span class="type">double</span>); <span class="comment">// Number of bytes of an N x N matrix</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Allocate memory</span></span><br><span class="line">  cudaMallocManaged (&amp;a, size);</span><br><span class="line">  cudaMallocManaged (&amp;b, size);</span><br><span class="line">  cudaMallocManaged (&amp;c_gpu, size);</span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_a_data&quot;</span>, a, size);</span><br><span class="line">  read_values_from_file(<span class="string">&quot;matrix_b_data&quot;</span>, b, size);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//if too large,invalid configuration argument</span></span><br><span class="line">  dim3 <span class="title function_">threads_per_block</span><span class="params">(<span class="number">32</span>,<span class="number">32</span>,<span class="number">1</span>)</span>;</span><br><span class="line">  dim3 <span class="title function_">number_of_blocks</span> <span class="params">(<span class="number">16</span>*numberOfSMs,<span class="number">16</span>*numberOfSMs, <span class="number">1</span>)</span>;</span><br><span class="line">  cudaMemPrefetchAsync(a, size, deviceId);</span><br><span class="line">  cudaMemPrefetchAsync(b, size, deviceId);</span><br><span class="line">  cudaMemPrefetchAsync(c_gpu, size, deviceId);</span><br><span class="line">  matrixMulGPU &lt;&lt;&lt; number_of_blocks, threads_per_block &gt;&gt;&gt; ( a, b, c_gpu );</span><br><span class="line">        cudaStatus = cudaGetLastError();</span><br><span class="line">        <span class="keyword">if</span> (cudaStatus != cudaSuccess) &#123;</span><br><span class="line">                <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;call matrixAddGPU error: %s\n&quot;</span>, cudaGetErrorString(cudaStatus));</span><br><span class="line">                <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">  cudaDeviceSynchronize(); <span class="comment">// Wait for the GPU to finish before proceeding</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Call the CPU version to check our work</span></span><br><span class="line">    <span class="comment">// Compare the two answers to make sure they are equal</span></span><br><span class="line">  <span class="type">bool</span> error = <span class="literal">false</span>;</span><br><span class="line">  <span class="meta">#<span class="keyword">ifdef</span> CHECK_CORRECTNESS</span></span><br><span class="line">    <span class="type">double</span> *c_cpu;</span><br><span class="line">    cudaMallocManaged (&amp;c_cpu, size);</span><br><span class="line">    matrixMulCPU( a, b, c_cpu );</span><br><span class="line">    <span class="keyword">for</span>( <span class="type">int</span> row = <span class="number">0</span>; row &lt; N &amp;&amp; !error; ++row )</span><br><span class="line">      <span class="keyword">for</span>( <span class="type">int</span> col = <span class="number">0</span>; col &lt; N &amp;&amp; !error; ++col )</span><br><span class="line">        <span class="keyword">if</span> (c_cpu[row * N + col] != c_gpu[row * N + col])</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">printf</span>(<span class="string">&quot;FOUND ERROR at c[%d][%d]\n&quot;</span>, row, col);</span><br><span class="line">          error = <span class="literal">true</span>;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    cudaFree( c_cpu );</span><br><span class="line">  <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="keyword">if</span> (!error)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Success!\n&quot;</span>);</span><br><span class="line">  write_values_to_file(<span class="string">&quot;result/matrix_c_data&quot;</span>, c_gpu, size);</span><br><span class="line">  <span class="comment">// Free all our allocated memory</span></span><br><span class="line">  cudaFree(a);</span><br><span class="line">  cudaFree(b);</span><br><span class="line">  cudaFree( c_gpu );</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">build:</span></span><br><span class="line">        nvcc -o matrix-mul matrix-mul.cu -I .</span><br><span class="line"><span class="section">run:</span></span><br><span class="line">        ./matrix-mul</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>-I 表示在当前目录寻找include的头文件</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1618,13 +1993,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">69k</span>
+    <span title="Word count total">71k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:12</span>
+    <span title="Reading time total">4:19</span>
   </span>
 </div>
 <div class="busuanzi-count">

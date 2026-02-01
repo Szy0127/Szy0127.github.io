@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution EnvironmentsNDSS’25  针对端侧 DNN 模型的隔离环境 BackgroundDNN 模型隐私保护  保护知识产权 保护训练数据信息  现有 TEE 方案（TrustZone）的缺陷：  内存有限">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution EnvironmentsNDSS’25  针对端侧 DNN 模型的隔离环境 BackgroundDNN 模型隐私保护  保护知识产权 保护训练数据信息  现有 TEE 方案（TrustZone）的缺陷：  内存有限">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://szy0127.github.io/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png">
+<meta property="og:image" content="http://szy0127.github.io/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png">
+<meta property="og:image" content="http://szy0127.github.io/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png">
+<meta property="og:image" content="http://szy0127.github.io/images/CN2sb3Rafon5VbxyKqrcEduonFb.png">
+<meta property="og:image" content="http://szy0127.github.io/images/SJB1bh04lomsKvxQueHcckHWnth.png">
+<meta property="og:image" content="http://szy0127.github.io/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png">
+<meta property="og:image" content="http://szy0127.github.io/images/Fnrobkqato9TGhxykq8czlBsnab.png">
+<meta property="og:image" content="http://szy0127.github.io/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png">
+<meta property="og:image" content="http://szy0127.github.io/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png">
+<meta property="og:image" content="http://szy0127.github.io/images/LBTNbklO3oNOnKxY596cgpufn3r.png">
+<meta property="og:image" content="http://szy0127.github.io/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png">
+<meta property="og:image" content="http://szy0127.github.io/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png">
+<meta property="article:published_time" content="2026-02-01T16:54:16.250Z">
+<meta property="article:modified_time" content="2026-02-01T16:54:16.251Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://szy0127.github.io/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/","path":"2026/02/02/papers/ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments/","title":"ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><span class="nav-number">1.</span> <span class="nav-text">ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Background"><span class="nav-number">1.1.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Design-Goal"><span class="nav-number">1.2.</span> <span class="nav-text">Design Goal</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Design-Details-Evaluation"><span class="nav-number">1.3.</span> <span class="nav-text">Design Details &amp; Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Secure-Accelerator-I-O-Passthrough"><span class="nav-number">1.3.1.</span> <span class="nav-text">Secure Accelerator I&#x2F;O Passthrough</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCB-and-Attack-Surface-Reduction"><span class="nav-number">1.3.2.</span> <span class="nav-text">TCB and Attack Surface Reduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DNN-Inference-Latency-Optimization"><span class="nav-number">1.3.3.</span> <span class="nav-text">DNN Inference Latency Optimization</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">1.4.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-02-02 00:54:16" itemprop="dateCreated datePublished" datetime="2026-02-02T00:54:16+08:00">2026-02-02</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
+<p><img src="/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png" title="image"></p>
+<p>针对端侧 DNN 模型的隔离环境</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN 模型隐私保护</p>
+<ul>
+<li>保护知识产权</li>
+<li>保护训练数据信息</li>
+</ul>
+<p>现有 TEE 方案（TrustZone）的缺陷：</p>
+<ul>
+<li>内存有限</li>
+<li>无法安全访问加速器（部分卸载到 REE 则会容易被攻击，加密或混淆则开销大）</li>
+<li>需要 TEE-OS，与加速器软件栈不兼容</li>
+</ul>
+<p><img src="/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png" title="image"></p>
+<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出 ASGARD：</p>
+<ul>
+<li>虚拟化隔离（pkvm）</li>
+<li>加速器直通给虚拟机 （VFIO）</li>
+<li>改 EL2 不改 EL3</li>
+<li>Guest 用 Linux 加速器驱动不需要改</li>
+</ul>
+<p>问题和挑战：</p>
+<ol>
+<li>基于虚拟化的 TEE 方案没有安全 IO 直通的方案</li>
+<li>IOMMU 驱动和依赖都在 TCB</li>
+<li>虚拟化给推理带来性能影响</li>
+</ol>
+<p><img src="/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png" title="image"></p>
+<ol>
+<li>启动平台 验证（pkvm）</li>
+<li>启动 enclave  （pkvm）</li>
+<li>DNN 模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
+<li>加速器分配 （配置 MMU 与 IOMMU 页表）</li>
+<li>DNN 推理服务 （通过 vsock 和共享内存通信）</li>
+</ol>
+<p><img src="/images/CN2sb3Rafon5VbxyKqrcEduonFb.png" title="image"></p>
+<p>EL2 的 TEEvisor 保证：</p>
+<ol>
+<li>对于 NPU 的访问必须经过授权，未经授权的 Host 无法直接通过 NPU 接口来窃取数据。</li>
+<li>NPU 对 enclave memory 的访问必须经过授权，当 Host 占有 NPU 时无法通过 IOMMU 访问 enclave 内存</li>
+</ol>
+<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
+<li>RK3588S （Armv8.2-A SoC  RockchipNPU）</li>
+<li>PKVM</li>
+</ul>
+<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
+<ul>
+<li>有且仅有 TEEVisor 对敏感接口有控制权</li>
+<li>加速器任何时刻只分给一个 enclave</li>
+<li>enclave 使用完后，加速器无残留状态和数据</li>
+</ul>
+<p>TEEvisor 保证控制：</p>
+<ul>
+<li>stage2 MMU</li>
+<li>所有 IOMMU 的寄存器地址范围</li>
+<li>加速器敏感接口</li>
+</ul>
+<p>Guest 需要用或者释放 NPU 的时候 hypercall 到 pkvm EL2 会执行 flush iotlb 等操作</p>
+<p>加速器使用过程：</p>
+<ul>
+<li>初始化：配置所有 IOMMU，只有加速器的 IOMMU 可以访问 enclave 内存；enclave 访问加速器 MMIO 区域</li>
+<li>切换：重新配置 MMU IOMMU  需要刷 tlb  iotlb。需要加速器设备支持 reset 接口</li>
+<li>回收：REE 可以任意时候回收，TEE 清除数据 改 enclave stage2 页表 IOMMU 页表</li>
+</ul>
+<p>切换开销：</p>
+<p><img src="/images/SJB1bh04lomsKvxQueHcckHWnth.png" title="image"></p>
+<p>推理 latency（224x224 图像分类任务）</p>
+<p><img src="/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png" title="image"></p>
+<ul>
+<li>TrustZone 方案需要混淆，性能差</li>
+<li>ASGARD 对 REE 方案 overhead 只有 2.01%</li>
+</ul>
+<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
+<li>IOMMU 电源 时钟管理给 REEVisor。当 REE 关闭 IOMMU 对应的设备自动关了 不会绕过</li>
+<li>不需要 guest kernel 中的其他进程间隔离方案，禁用 Seccomp SELinux</li>
+<li>去掉没用的 kernel features 定制 rootfs ，大部份 busybox 的可执行文件是不需要的</li>
+</ul>
+<p><img src="/images/Fnrobkqato9TGhxykq8czlBsnab.png" title="image"></p>
+<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt;  vmexit 很慢</p>
+<p><img src="/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png" title="image"></p>
+<p>优化方案：分析计算图 把不存在依赖的需要 fallback 的算子集中到一起 用一个 vm exit</p>
+<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要 fallback 的 要么全是需要 fallback 的 这样一个子图只需要 fallback 一次</p>
+<p><img src="/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png" title="image"></p>
+<p>多个 fallback 算子没有依赖，但是由于默认 DFS 执行的顺序，会先后执行。可以切分子图，把这些没有依赖的 fallback 划分到一个子图里</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
+
+<p>具体实现上：</p>
+<p>rknn 的编译器和 runtime 都是闭源的，所以计算图是静态划分的，分成多个.rknn model 文件</p>
+<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据</p>
+<ul>
+<li>NPU 调 rknn_run</li>
+<li>CPU 调 TensorFlow Lite runtime</li>
+</ul>
+<p><img src="/images/LBTNbklO3oNOnKxY596cgpufn3r.png" title="image"></p>
+<p>input：16 tokens，执行一次生成过程，统计 latency</p>
+<p><img src="/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png" title="image"></p>
+<p>对 REE 来说，一次推理需要 1ms，遇到 38 次 fallback 中断。</p>
+<p>对 ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
+<p><img src="/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png" title="image"></p>
+<p>观察内存的使用，exit-coalescing 的优化并不会对内存占用产生负面影响（峰值相同）</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
+<li>提出 NPU 安全直通方案，主要是由 TEEvisor 进行 MMIOregion 和页表的切换</li>
+<li>识别出 DNN 推理过程中虚拟化带来的开销来源（CPU-fallback 算子导致的 vm-exit），并通过划分计算子图的方式进行优化。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs_1/" rel="prev" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs">
+                  <i class="fa fa-angle-left"></i> Gramine-TDX: A Lightweight OS Kernel for Confidential VMs
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">71k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">4:19</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
