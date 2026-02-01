@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,546 +169,6 @@
     </div>
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/" class="post-title-link" itemprop="url">ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2026-02-02 00:54:16" itemprop="dateCreated datePublished" datetime="2026-02-02T00:54:16+08:00">2026-02-02</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>1k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
-<p><img src="/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png" title="image"></p>
-<p>针对端侧 DNN 模型的隔离环境</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN 模型隐私保护</p>
-<ul>
-<li>保护知识产权</li>
-<li>保护训练数据信息</li>
-</ul>
-<p>现有 TEE 方案（TrustZone）的缺陷：</p>
-<ul>
-<li>内存有限</li>
-<li>无法安全访问加速器（部分卸载到 REE 则会容易被攻击，加密或混淆则开销大）</li>
-<li>需要 TEE-OS，与加速器软件栈不兼容</li>
-</ul>
-<p><img src="/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png" title="image"></p>
-<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出 ASGARD：</p>
-<ul>
-<li>虚拟化隔离（pkvm）</li>
-<li>加速器直通给虚拟机 （VFIO）</li>
-<li>改 EL2 不改 EL3</li>
-<li>Guest 用 Linux 加速器驱动不需要改</li>
-</ul>
-<p>问题和挑战：</p>
-<ol>
-<li>基于虚拟化的 TEE 方案没有安全 IO 直通的方案</li>
-<li>IOMMU 驱动和依赖都在 TCB</li>
-<li>虚拟化给推理带来性能影响</li>
-</ol>
-<p><img src="/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png" title="image"></p>
-<ol>
-<li>启动平台 验证（pkvm）</li>
-<li>启动 enclave  （pkvm）</li>
-<li>DNN 模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
-<li>加速器分配 （配置 MMU 与 IOMMU 页表）</li>
-<li>DNN 推理服务 （通过 vsock 和共享内存通信）</li>
-</ol>
-<p><img src="/images/CN2sb3Rafon5VbxyKqrcEduonFb.png" title="image"></p>
-<p>EL2 的 TEEvisor 保证：</p>
-<ol>
-<li>对于 NPU 的访问必须经过授权，未经授权的 Host 无法直接通过 NPU 接口来窃取数据。</li>
-<li>NPU 对 enclave memory 的访问必须经过授权，当 Host 占有 NPU 时无法通过 IOMMU 访问 enclave 内存</li>
-</ol>
-<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
-<li>RK3588S （Armv8.2-A SoC  RockchipNPU）</li>
-<li>PKVM</li>
-</ul>
-<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
-<ul>
-<li>有且仅有 TEEVisor 对敏感接口有控制权</li>
-<li>加速器任何时刻只分给一个 enclave</li>
-<li>enclave 使用完后，加速器无残留状态和数据</li>
-</ul>
-<p>TEEvisor 保证控制：</p>
-<ul>
-<li>stage2 MMU</li>
-<li>所有 IOMMU 的寄存器地址范围</li>
-<li>加速器敏感接口</li>
-</ul>
-<p>Guest 需要用或者释放 NPU 的时候 hypercall 到 pkvm EL2 会执行 flush iotlb 等操作</p>
-<p>加速器使用过程：</p>
-<ul>
-<li>初始化：配置所有 IOMMU，只有加速器的 IOMMU 可以访问 enclave 内存；enclave 访问加速器 MMIO 区域</li>
-<li>切换：重新配置 MMU IOMMU  需要刷 tlb  iotlb。需要加速器设备支持 reset 接口</li>
-<li>回收：REE 可以任意时候回收，TEE 清除数据 改 enclave stage2 页表 IOMMU 页表</li>
-</ul>
-<p>切换开销：</p>
-<p><img src="/images/SJB1bh04lomsKvxQueHcckHWnth.png" title="image"></p>
-<p>推理 latency（224x224 图像分类任务）</p>
-<p><img src="/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png" title="image"></p>
-<ul>
-<li>TrustZone 方案需要混淆，性能差</li>
-<li>ASGARD 对 REE 方案 overhead 只有 2.01%</li>
-</ul>
-<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
-<li>IOMMU 电源 时钟管理给 REEVisor。当 REE 关闭 IOMMU 对应的设备自动关了 不会绕过</li>
-<li>不需要 guest kernel 中的其他进程间隔离方案，禁用 Seccomp SELinux</li>
-<li>去掉没用的 kernel features 定制 rootfs ，大部份 busybox 的可执行文件是不需要的</li>
-</ul>
-<p><img src="/images/Fnrobkqato9TGhxykq8czlBsnab.png" title="image"></p>
-<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt;  vmexit 很慢</p>
-<p><img src="/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png" title="image"></p>
-<p>优化方案：分析计算图 把不存在依赖的需要 fallback 的算子集中到一起 用一个 vm exit</p>
-<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要 fallback 的 要么全是需要 fallback 的 这样一个子图只需要 fallback 一次</p>
-<p><img src="/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png" title="image"></p>
-<p>多个 fallback 算子没有依赖，但是由于默认 DFS 执行的顺序，会先后执行。可以切分子图，把这些没有依赖的 fallback 划分到一个子图里</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
-
-<p>具体实现上：</p>
-<p>rknn 的编译器和 runtime 都是闭源的，所以计算图是静态划分的，分成多个.rknn model 文件</p>
-<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据</p>
-<ul>
-<li>NPU 调 rknn_run</li>
-<li>CPU 调 TensorFlow Lite runtime</li>
-</ul>
-<p><img src="/images/LBTNbklO3oNOnKxY596cgpufn3r.png" title="image"></p>
-<p>input：16 tokens，执行一次生成过程，统计 latency</p>
-<p><img src="/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png" title="image"></p>
-<p>对 REE 来说，一次推理需要 1ms，遇到 38 次 fallback 中断。</p>
-<p>对 ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
-<p><img src="/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png" title="image"></p>
-<p>观察内存的使用，exit-coalescing 的优化并不会对内存占用产生负面影响（峰值相同）</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
-<li>提出 NPU 安全直通方案，主要是由 TEEvisor 进行 MMIOregion 和页表的切换</li>
-<li>识别出 DNN 推理过程中虚拟化带来的开销来源（CPU-fallback 算子导致的 vm-exit），并通过划分计算子图的方式进行优化。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs_1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs_1/" class="post-title-link" itemprop="url">Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2026-02-02 00:52:40" itemprop="dateCreated datePublished" datetime="2026-02-02T00:52:40+08:00">2026-02-02</time>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>951</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs"><a href="#Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs" class="headerlink" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs"></a>Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</h1><p><img src="/images/EjhCb11gMoUmnixOxmzcr9KAn0c.png" title="image"></p>
-<p>CCS24</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>Linux 内核庞大且复杂，其中很多功能对于机密计算应用来说都是冗余的，除了增大 TCB 与攻击面之外没有意义。</p>
-<p>CVM 攻击面包括：</p>
-<ul>
-<li>Shared memory</li>
-<li>PIO MMIO</li>
-<li>Hypercall</li>
-<li>Interrupts exceptions</li>
-<li>CPUID leaves</li>
-</ul>
-<p>Heckler(Security’24) 是已经公开的利用 int 0x80 恶意中断进行攻击的例子</p>
-<p><img src="/images/KwDzbkJbwoUC7fx5RUtcX0rHnGc.png" title="image"></p>
-<p><img src="/images/T4iPbqDapoadACxheN4czjVDnRb.png" title="image"></p>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Gramine-TDX 是一个轻量级的 LibOS（完全代替 Linux 作为 guest kernel）</p>
-<p>Hypervisor 使用 QEMU&#x2F;KVM</p>
-<p><img src="/images/HazHb7kbMoaXPPxGW6lcxJPdnNd.png" title="image"></p>
-<h3 id="LibOS"><a href="#LibOS" class="headerlink" title="LibOS"></a>LibOS</h3><ul>
-<li>不支持多进程 fork 没有 IPC</li>
-<li>不能用硬件 例如 GPU</li>
-<li>不支持 legacy 16&#x2F;32bit 只支持 64bit</li>
-<li>1:1 mapping</li>
-<li>没有 network stack 和 fs stack</li>
-<li>不需要修改 APP，不限语言 例如 C, C++, Rust, Python, Java, Go</li>
-<li>有且仅有三个 virtio 驱动，并且完全按照 TDX 威胁模型重写，过滤不合法输入</li>
-</ul>
-<p><img src="/images/Jf70bwwFcobp6DxTl5Ec5L4ZnGg.png" title="image"></p>
-<h3 id="Deployment-Model"><a href="#Deployment-Model" class="headerlink" title="Deployment Model"></a>Deployment Model</h3><p>不需要虚拟机镜像，需要的文件直接从主机文件系统读取</p>
-<ul>
-<li>配置信息 （manifest）</li>
-<li>共享库（提前准备好的一份 glibc patch 过的）</li>
-<li>其他文件 提前加密好 gramine 负责解密</li>
-</ul>
-<p>不用虚拟网卡 不用网络配置</p>
-<h3 id="Chain-of-Trust"><a href="#Chain-of-Trust" class="headerlink" title="Chain of Trust"></a>Chain of Trust</h3><p><img src="/images/Qwzkbnd9ao9fBXxlctAcQ0j4nAg.png" title="image"></p>
-<ul>
-<li>bios -&gt; MRTD</li>
-<li>gramine kernel 二进制-&gt;RTMR1</li>
-<li>配置文件 manifest 其中包括了其他普通文件的哈希 RTMR2</li>
-</ul>
-<p>td 启动时 tdx module 会验证二进制，记录到这些寄存器中，之后提供给远程验证</p>
-<p>对于 RTMR2 td 可以自己 extend 定制化的内容（使用 tdcall 请求 tdx module）</p>
-<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>manifest 中指定 entry point app hard-code 写死输入 防止 attacker 通过 verbose 等泄漏信息</p>
-<p>提供一个 patch 过的 libc 用于适配 gramine 的内核，提前编译成动态库，然后 mount 给虚拟机</p>
-<h3 id="virtio-fs"><a href="#virtio-fs" class="headerlink" title="virtio-fs"></a>virtio-fs</h3><p>本身用于 host-guest 共享文件  host 是 fuse server，guest 是 fuse client</p>
-<p>gramine-tdx 在 host 上用 virtiofsd</p>
-<p>文件请求通过 fuse 与 virtio 直接转到 host，因此 guest 不需要 fs stack</p>
-<h4 id="intel-protected-fs"><a href="#intel-protected-fs" class="headerlink" title="intel protected fs"></a>intel protected fs</h4><p>intel 基于自己的硬件已经实现了一套软件的加密 fs 协议 host 上的文件数据是加密的 读取的时候 gramine-tdx kernel 自动透明地会进行解密</p>
-<ul>
-<li>manifest 中 fs.mount type&#x3D;”encrypted”</li>
-<li>manifest 中 sgx.trusted_files 可以记录 file 和对应的 sha256 检察 完整性 （manifest 的完整性也会被检察）</li>
-</ul>
-<h3 id="virtio-vsock"><a href="#virtio-vsock" class="headerlink" title="virtio-vsock"></a>virtio-vsock</h3><p>本身用于 host-guest 传输网络包</p>
-<ul>
-<li>guest 上和 host 上都用 socket api 同一套地址 就可以通信</li>
-<li>host&#x2F;guest 上都可以用 socat 进行 socket 包和 TCP 包的转化</li>
-</ul>
-<ol>
-<li>guest 内 app 全都不需要改 正常通过端口提供服务 例如 8080</li>
-<li>gramine-tdx 的 kernel 实现中会进行网络包的转化，并通过 virtio-vsock 转交给 host</li>
-<li>host 上 <code>socat TCP4-LISTEN:8080,reuseaddr,fork VSOCK-CONNECT:123:1234</code> 可以在 host 上的 8080 访问 guest 内的服务</li>
-</ol>
-<h3 id="sum"><a href="#sum" class="headerlink" title="sum"></a>sum</h3><p>无法复制加载中的内容</p>
-<p>减小 TCB 减小攻击面 但是 fuse 和 socat 会带来 overhead</p>
-<h2 id="Security-Analysis"><a href="#Security-Analysis" class="headerlink" title="Security Analysis"></a>Security Analysis</h2><p><img src="/images/NSc3bjOMKoOGaOxBpCFcS98vnTb.png" title="image"></p>
-<p><img src="/images/Bk7zbtaaQoYMGTxNGRyczwqcnyQ.png" title="image"></p>
-<p>基本就是控制 input、检查 input 合法</p>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p>Testbed：</p>
-<ul>
-<li>Intel Xeon Platinum 8570 CPU , 56 cores , 1 TB (16 channels × 64 GB&#x2F;DIMM) DRAM</li>
-<li>Host：Ubuntu 24.04, Intel TDX-enabled Linux kernel v6.8.</li>
-<li>Intel TDX-patched QEMU v8.2.</li>
-<li>Guest： Ubuntu 24.04,intel TDX-enabled guest Linux v6.8</li>
-<li>Intel TDX Module v1.5 (build_num 698).</li>
-<li>vCPU 数量与 Application 需要线程数量相等</li>
-</ul>
-<p>Varaints</p>
-<p><img src="/images/RIR4bVfAooDvwWxmBhPcX40Innh.png" title="image"></p>
-<h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p><img src="/images/C6R9bRSsHotWtOxP3uAcSP9znzh.png" title="image"></p>
-<p>In-memory 计算开销小于 5%</p>
-<p>IO 性能差，在于 gramine-tdx 中的 virtio-fs 驱动实现过于简单</p>
-<h3 id="AI-Frameworks"><a href="#AI-Frameworks" class="headerlink" title="AI Frameworks"></a>AI Frameworks</h3><ul>
-<li>PyTorch: AlexNet for image classification.</li>
-<li>OpenVINO,TensorFlow:ResNet-50 for inference</li>
-<li>TensorFlow:BERT for inference</li>
-<li>Candle:LLaMA</li>
-</ul>
-<p><img src="/images/HrjbbXIraoi5GOxjis9chlk8nBg.png" title="image"></p>
-<p>大部分情况下几乎和 native 一致，平均性能 overhead 在 10%</p>
-<p>其他 Application 例如 databse 和 web server，由于需要 socat 的转发，并且 gramine-tdx 的 virito-vsock 设计过于简单，性能会降至 10%</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Gramine-TDX 为 TDX 机密虚拟机定制了 guest kernel，大幅减小了攻击面，提升了安全性。</p>
-<p>由于重点在安全和代码质量上，性能方面看来目前只适合不需要网络的纯计算任务（例如模型推理）</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees_1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees_1/" class="post-title-link" itemprop="url">CortenMM: Efficient Memory Management with Strong Correctness Guarantees</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-02-02 00:48:09 / Modified: 00:48:17" itemprop="dateCreated datePublished" datetime="2026-02-02T00:48:09+08:00">2026-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>822</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees"><a href="#CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees" class="headerlink" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees"></a>CortenMM: Efficient Memory Management with Strong Correctness Guarantees</h1><p><img src="/images/YeKsbBKfiogZegxUDSac0ZrUndZ.png" title="image"></p>
-<p>SOSP‘25 Best Paper</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><h3 id="VMA"><a href="#VMA" class="headerlink" title="VMA"></a>VMA</h3><p>内存管理上 Linux 采用 VMA+ 页表的两层抽象，在内存操作上需要两种类型的锁，限制了可扩展性</p>
-<p><img src="/images/O8nkbhZW8oBqMvxkM0dcqqdgnOl.png" title="image"></p>
-<p><img src="/images/ZtSqbl2kVor08jxOHdBcMgTSnRd.png" title="image"></p>
-<ul>
-<li>可扩展性差</li>
-<li>并发 Bug 多（CVE）</li>
-</ul>
-<p><img src="/images/RRjdbAp1Coh2lXxf606cYY7gn6f.png" title="image"></p>
-<ul>
-<li>两个地址范围不相交的 page fault 在页表层面不存在冲突，但是如果处于同一段 VMA 中 就会因为抢 VMA 锁导致竞争</li>
-<li>Real-world application 中存在各种 mmap mprotect 的调用 比较复杂</li>
-</ul>
-<h3 id="Asterinas"><a href="#Asterinas" class="headerlink" title="Asterinas"></a>Asterinas</h3><p>星绽操作系统</p>
-<p><img src="/images/MLQHbKAZrosPGqxIiG5cC9Ypnsd.png" title="image"></p>
-<p><img src="/images/EDwPb7CLMoODR8xHmVDcF8ojnvg.png" title="image"></p>
-<p><img src="/images/C7FUbOBBaoDSBxx6VoWcZHnnnDg.png" title="image"></p>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Key insight：</p>
-<ol>
-<li>两层抽象的设计是由于历史原因，目前大部分现代 ISA 和 MMU 采用相似的多级页表设计</li>
-<li>为了实现 On-demand paging COW swap 等高级的内存管理语义，并不需要多一层抽象</li>
-</ol>
-<p><img src="/images/SLvXbYraFo5mESx0SD2cItNjnPd.png" title="image"></p>
-<ul>
-<li>通过页表页的物理地址 可以找到 page descriptor</li>
-<li>有且仅有每个页表页存在锁</li>
-<li>通过 page descriptor 找到 per-PTE 的 metadata array 存放其他信息</li>
-</ul>
-<p>从这个设计上能做的简单推论：</p>
-<ol>
-<li>锁的粒度变细（2M 粒度） 可扩展性变好</li>
-<li>On-demand paging 需要复制整个页表 会比复制 VMA 慢 （mmap &#x2F; fork）</li>
-</ol>
-<h3 id="Lock-protocol"><a href="#Lock-protocol" class="headerlink" title="Lock protocol"></a>Lock protocol</h3><p>CortenMM-rw 读写锁：在遍历页表的过程中拿读锁 找到对应的页表页以后拿写锁</p>
-<p><img src="/images/Ios8bgizooEsrlxhL6Ac6cVRnXc.png" title="image"></p>
-<p>读锁之间仍然有竞争（原子变量）</p>
-<p>CoartenMM-adv：RCU+ 互斥锁</p>
-<p>遍历页表的时候不加锁 只记录 RCU 状态</p>
-<p><img src="/images/NRqpbc07Coyw96xeT3HcGFqrnSc.png" title="image"></p>
-<h3 id="内存接口实现"><a href="#内存接口实现" class="headerlink" title="内存接口实现"></a>内存接口实现</h3><p><img src="/images/ULtvbZuVdoee5PxRMZWcG78GnJe.png" title="image"></p>
-<p><img src="/images/VbIPbc2XwoQML9xDSsicx0WfnNg.png" title="image"></p>
-<h2 id="Verification"><a href="#Verification" class="headerlink" title="Verification"></a>Verification</h2><p>用 Verus(半自动的基于 SMT 的验证器) 进行形式化验证</p>
-<ol>
-<li>locking protocol 正确，即 两个线程并发访问范围相交的地址 不可能同时拿到锁</li>
-<li>对页表的修改正确（map unmap mark），并且页表结构正确（始终处于合法状态）</li>
-</ol>
-<p><img src="/images/UOndbwNRPo9wJPxplq5cpD9NnSf.png" title="image"></p>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ul>
-<li>AMD EPYC 9965</li>
-<li>192-core CPU * 2 &#x3D; 384 cores</li>
-<li>512GB DRAM * 2 &#x3D; 1T</li>
-</ul>
-<h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p><img src="/images/Rkuvbyvcxo6zaSx5OPTczO2xn5e.png" title="image"></p>
-<p>单线程</p>
-<p><img src="/images/Cjs0b1D5QoY1hwxu5s6cGerznFh.png" title="image"></p>
-<ul>
-<li>Linux 只需要创建 VMA</li>
-<li>Cortenmm 需要分配、创建页表页</li>
-</ul>
-<p>&#x3D;&gt; mmap 慢</p>
-<p>发生 page fault Linux 仍然需要创建页表</p>
-<p>&#x3D;&gt; mmap+PF 快</p>
-<p><img src="/images/HTbcbBqffo8kqBxZJ6kcTvwQnqg.png" title="image"></p>
-<ul>
-<li>Fork：-17.7%</li>
-<li>fork+exec ：+23%</li>
-</ul>
-<p>多线程</p>
-<ul>
-<li>low-contention:每个线程在私有内存区域上访问</li>
-<li>high-contention：每个线程在共享内存上随机访问</li>
-</ul>
-<p><img src="/images/GKXqbslSzo5hNlxoyVUculUYneb.png" title="image"></p>
-<ul>
-<li>cortenmm 几乎线性增长，384thread 情况下 PF 快 33 倍 unmap-virt 快 2270 倍</li>
-<li>Cortenmm 64thread 开始掉的原因：最后一层页表页发生竞争</li>
-</ul>
-<h3 id="Real-world-benchmark"><a href="#Real-world-benchmark" class="headerlink" title="Real-world benchmark"></a>Real-world benchmark</h3><p><img src="/images/WHqqbC1EioGradxjbXJcf5I3nEb.png" title="image"></p>
-<p>cortenmm 减少了并发情况下 application 在 page fault&#x2F;unmap&#x2F;mprotect 上的耗时</p>
-<p><img src="/images/JlEpb4LctonQi4xZj1hce95pnod.png" title="image"></p>
-<p>在某些应用场景下，使用更先进的内存分配器（tcmalloc） 可以大幅度提升 Linux 的可扩展性（通过减少对 unmap 等 syscall 的调用）</p>
-<p>但是使用 tcmalloc 会造成其他副作用 比如占用内存变多</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>CortenMM 简化了内存管理系统，摈弃了传统的 VMA，而使用单层抽象，同时提出了一种面向 MMU 编程的事务型接口，并配套设计了相应的加锁协议。这些加锁协议避免了在软件抽象层上产生不必要的竞争，在维持事务原子性的同时显著提升了性能和可扩展性。加锁协议和事务接口中的基本功能进行了形式化验证，从而提供了强有力的一致性保障。在真实世界基准测试中， CortenMM 性能比 Linux 高出 1.2 倍至 26 倍。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -746,18 +206,8 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-02-02 00:48:00 / Modified: 00:48:17" itemprop="dateCreated datePublished" datetime="2026-02-02T00:48:00+08:00">2026-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <time title="Created: 2026-02-02 00:57:15" itemprop="dateCreated datePublished" datetime="2026-02-02T00:57:15+08:00">2026-02-02</time>
     </span>
 
   
@@ -954,18 +404,8 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-02-02 00:41:37 / Modified: 00:42:43" itemprop="dateCreated datePublished" datetime="2026-02-02T00:41:37+08:00">2026-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <time title="Created: 2026-02-02 00:57:05" itemprop="dateCreated datePublished" datetime="2026-02-02T00:57:05+08:00">2026-02-02</time>
     </span>
 
   
@@ -1103,7 +543,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/papers/Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1121,7 +561,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/papers/Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/" class="post-title-link" itemprop="url">Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</a>
+          <a href="/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/" class="post-title-link" itemprop="url">Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1131,18 +571,8 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-01-31 14:28:47 / Modified: 14:29:45" itemprop="dateCreated datePublished" datetime="2026-01-31T14:28:47+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <time title="Created: 2026-02-02 00:56:53" itemprop="dateCreated datePublished" datetime="2026-02-02T00:56:53+08:00">2026-02-02</time>
     </span>
 
   
@@ -1152,14 +582,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>1k</span>
+      <span>951</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>3 mins.</span>
     </span>
 </div>
 
@@ -1170,111 +600,98 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NDgwZTFhOGEzYTE3ODI4MDg5ZmE1OGYxZTYwYzUzMThfYnM5cm54TkFoVDFRbko1aXZKeGdYRVp2bkNSekRqOGxfVG9rZW46U3pPQ2JlRGdvb0R0OUN4a0Q3TmNEZ1M3blljXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>针对端侧DNN模型的隔离环境</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN模型隐私保护</p>
+          <h1 id="Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs"><a href="#Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs" class="headerlink" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs"></a>Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</h1><p><img src="/images/EjhCb11gMoUmnixOxmzcr9KAn0c.png" title="image"></p>
+<p>CCS24</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>Linux 内核庞大且复杂，其中很多功能对于机密计算应用来说都是冗余的，除了增大 TCB 与攻击面之外没有意义。</p>
+<p>CVM 攻击面包括：</p>
 <ul>
-<li>保护知识产权</li>
-<li>保护训练数据信息</li>
+<li>Shared memory</li>
+<li>PIO MMIO</li>
+<li>Hypercall</li>
+<li>Interrupts exceptions</li>
+<li>CPUID leaves</li>
 </ul>
-<p>现有TEE方案（TrustZone）的缺陷：</p>
+<p>Heckler(Security’24) 是已经公开的利用 int 0x80 恶意中断进行攻击的例子</p>
+<p><img src="/images/KwDzbkJbwoUC7fx5RUtcX0rHnGc.png" title="image"></p>
+<p><img src="/images/T4iPbqDapoadACxheN4czjVDnRb.png" title="image"></p>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Gramine-TDX 是一个轻量级的 LibOS（完全代替 Linux 作为 guest kernel）</p>
+<p>Hypervisor 使用 QEMU&#x2F;KVM</p>
+<p><img src="/images/HazHb7kbMoaXPPxGW6lcxJPdnNd.png" title="image"></p>
+<h3 id="LibOS"><a href="#LibOS" class="headerlink" title="LibOS"></a>LibOS</h3><ul>
+<li>不支持多进程 fork 没有 IPC</li>
+<li>不能用硬件 例如 GPU</li>
+<li>不支持 legacy 16&#x2F;32bit 只支持 64bit</li>
+<li>1:1 mapping</li>
+<li>没有 network stack 和 fs stack</li>
+<li>不需要修改 APP，不限语言 例如 C, C++, Rust, Python, Java, Go</li>
+<li>有且仅有三个 virtio 驱动，并且完全按照 TDX 威胁模型重写，过滤不合法输入</li>
+</ul>
+<p><img src="/images/Jf70bwwFcobp6DxTl5Ec5L4ZnGg.png" title="image"></p>
+<h3 id="Deployment-Model"><a href="#Deployment-Model" class="headerlink" title="Deployment Model"></a>Deployment Model</h3><p>不需要虚拟机镜像，需要的文件直接从主机文件系统读取</p>
 <ul>
-<li>内存有限</li>
-<li>无法安全访问加速器（部分卸载到REE则会容易被攻击，加密或混淆则开销大）</li>
-<li>需要TEE-OS，与加速器软件栈不兼容</li>
+<li>配置信息 （manifest）</li>
+<li>共享库（提前准备好的一份 glibc patch 过的）</li>
+<li>其他文件 提前加密好 gramine 负责解密</li>
 </ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NWI3MTJlYzllZmQ2MTcwZmQ5MGUyNWNhNzVmZGFiYzhfZFFUWldyaHhjTUViNFJKVmNrYXVyVGY3cVZ6amJ5VlhfVG9rZW46SlZ2NGJIRmszbzBXYUR4RVc2QWNKZVVwbndDXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出ASGARD：</p>
+<p>不用虚拟网卡 不用网络配置</p>
+<h3 id="Chain-of-Trust"><a href="#Chain-of-Trust" class="headerlink" title="Chain of Trust"></a>Chain of Trust</h3><p><img src="/images/Qwzkbnd9ao9fBXxlctAcQ0j4nAg.png" title="image"></p>
 <ul>
-<li>虚拟化隔离（pkvm）</li>
-<li>加速器直通给虚拟机 （VFIO）</li>
-<li>改EL2 不改EL3</li>
-<li>Guest用Linux 加速器驱动不需要改</li>
+<li>bios -&gt; MRTD</li>
+<li>gramine kernel 二进制-&gt;RTMR1</li>
+<li>配置文件 manifest 其中包括了其他普通文件的哈希 RTMR2</li>
 </ul>
-<p>问题和挑战：</p>
+<p>td 启动时 tdx module 会验证二进制，记录到这些寄存器中，之后提供给远程验证</p>
+<p>对于 RTMR2 td 可以自己 extend 定制化的内容（使用 tdcall 请求 tdx module）</p>
+<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>manifest 中指定 entry point app hard-code 写死输入 防止 attacker 通过 verbose 等泄漏信息</p>
+<p>提供一个 patch 过的 libc 用于适配 gramine 的内核，提前编译成动态库，然后 mount 给虚拟机</p>
+<h3 id="virtio-fs"><a href="#virtio-fs" class="headerlink" title="virtio-fs"></a>virtio-fs</h3><p>本身用于 host-guest 共享文件  host 是 fuse server，guest 是 fuse client</p>
+<p>gramine-tdx 在 host 上用 virtiofsd</p>
+<p>文件请求通过 fuse 与 virtio 直接转到 host，因此 guest 不需要 fs stack</p>
+<h4 id="intel-protected-fs"><a href="#intel-protected-fs" class="headerlink" title="intel protected fs"></a>intel protected fs</h4><p>intel 基于自己的硬件已经实现了一套软件的加密 fs 协议 host 上的文件数据是加密的 读取的时候 gramine-tdx kernel 自动透明地会进行解密</p>
+<ul>
+<li>manifest 中 fs.mount type&#x3D;”encrypted”</li>
+<li>manifest 中 sgx.trusted_files 可以记录 file 和对应的 sha256 检察 完整性 （manifest 的完整性也会被检察）</li>
+</ul>
+<h3 id="virtio-vsock"><a href="#virtio-vsock" class="headerlink" title="virtio-vsock"></a>virtio-vsock</h3><p>本身用于 host-guest 传输网络包</p>
+<ul>
+<li>guest 上和 host 上都用 socket api 同一套地址 就可以通信</li>
+<li>host&#x2F;guest 上都可以用 socat 进行 socket 包和 TCP 包的转化</li>
+</ul>
 <ol>
-<li>基于虚拟化的TEE方案没有安全IO直通的方案</li>
-<li>IOMMU驱动和依赖都在TCB</li>
-<li>虚拟化给推理带来性能影响</li>
+<li>guest 内 app 全都不需要改 正常通过端口提供服务 例如 8080</li>
+<li>gramine-tdx 的 kernel 实现中会进行网络包的转化，并通过 virtio-vsock 转交给 host</li>
+<li>host 上 <code>socat TCP4-LISTEN:8080,reuseaddr,fork VSOCK-CONNECT:123:1234</code> 可以在 host 上的 8080 访问 guest 内的服务</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MGM1YzZhN2I4ZDI4NGU1ZjA3OTM4ZjY3NTA2YzEwNzdfdzNyRjhKUktvZGxUbFREcXVaR21OU21tU1ZVa0ZwRk9fVG9rZW46RXZwTmJzendnb0wxSE54ZlRCcWNrYkx5bjViXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<ol>
-<li>启动平台 验证（pkvm）</li>
-<li>启动enclave （pkvm）</li>
-<li>DNN模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
-<li>加速器分配 （配置MMU与IOMMU页表）</li>
-<li>DNN推理服务 （通过vsock和共享内存通信）</li>
-</ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OGNjMTk1OTYzYWJkNjcyNWUzMTAzZjg1ZTMxZmFmZjlfcTNRQWRzZmYwS2t2a0JDdE9QaXBYTnhIM2hFWWJ1OXBfVG9rZW46UnFLVWJvRHpjbzBaWW94YXRnd2M4RWp1bnNGXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>EL2的TEEvisor保证：</p>
-<ol>
-<li>对于NPU的访问必须经过授权，未经授权的Host无法直接通过NPU接口来窃取数据。</li>
-<li>NPU对enclave memory的访问必须经过授权，当Host占有NPU时无法通过IOMMU访问enclave内存</li>
-</ol>
-<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
-<li>RK3588S （Armv8.2-A SoC RockchipNPU）</li>
-<li>PKVM</li>
-</ul>
-<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
+<h3 id="sum"><a href="#sum" class="headerlink" title="sum"></a>sum</h3><p>无法复制加载中的内容</p>
+<p>减小 TCB 减小攻击面 但是 fuse 和 socat 会带来 overhead</p>
+<h2 id="Security-Analysis"><a href="#Security-Analysis" class="headerlink" title="Security Analysis"></a>Security Analysis</h2><p><img src="/images/NSc3bjOMKoOGaOxBpCFcS98vnTb.png" title="image"></p>
+<p><img src="/images/Bk7zbtaaQoYMGTxNGRyczwqcnyQ.png" title="image"></p>
+<p>基本就是控制 input、检查 input 合法</p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p>Testbed：</p>
 <ul>
-<li>有且仅有TEEVisor对敏感接口有控制权</li>
-<li>加速器任何时刻只分给一个enclave</li>
-<li>enclave使用完后，加速器无残留状态和数据</li>
+<li>Intel Xeon Platinum 8570 CPU , 56 cores , 1 TB (16 channels × 64 GB&#x2F;DIMM) DRAM</li>
+<li>Host：Ubuntu 24.04, Intel TDX-enabled Linux kernel v6.8.</li>
+<li>Intel TDX-patched QEMU v8.2.</li>
+<li>Guest： Ubuntu 24.04,intel TDX-enabled guest Linux v6.8</li>
+<li>Intel TDX Module v1.5 (build_num 698).</li>
+<li>vCPU 数量与 Application 需要线程数量相等</li>
 </ul>
-<p>TEEvisor保证控制：</p>
-<ul>
-<li>stage2 MMU</li>
-<li>所有IOMMU的寄存器地址范围</li>
-<li>加速器敏感接口</li>
+<p>Varaints</p>
+<p><img src="/images/RIR4bVfAooDvwWxmBhPcX40Innh.png" title="image"></p>
+<h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p><img src="/images/C6R9bRSsHotWtOxP3uAcSP9znzh.png" title="image"></p>
+<p>In-memory 计算开销小于 5%</p>
+<p>IO 性能差，在于 gramine-tdx 中的 virtio-fs 驱动实现过于简单</p>
+<h3 id="AI-Frameworks"><a href="#AI-Frameworks" class="headerlink" title="AI Frameworks"></a>AI Frameworks</h3><ul>
+<li>PyTorch: AlexNet for image classification.</li>
+<li>OpenVINO,TensorFlow:ResNet-50 for inference</li>
+<li>TensorFlow:BERT for inference</li>
+<li>Candle:LLaMA</li>
 </ul>
-<p>Guest需要用或者释放NPU的时候hypercall到pkvm EL2会执行flush iotlb等操作</p>
-<p>加速器使用过程：</p>
-<ul>
-<li>初始化：配置所有IOMMU，只有加速器的IOMMU可以访问enclave内存；enclave访问加速器MMIO区域</li>
-<li>切换：重新配置MMU IOMMU 需要刷tlb iotlb。需要加速器设备支持reset 接口</li>
-<li>回收：REE可以任意时候回收，TEE 清除数据 改enclave stage2页表 IOMMU页表</li>
-</ul>
-<p>切换开销：</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NTA3M2EzNGIyOTA3NjEzNDRjNWQyMmNmNjM3Njg5MmRfZGp5ZHRJODNaajh3WTQ2enhUMUxoaVhoNllPZ0lvZzVfVG9rZW46VWNWYmI2NVhsb3owUmt4TDEzdGN0bTJXbjJjXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>推理latency（224x224图像分类任务）</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NmRiOWI4ZDE1N2VjZGI0MTFkY2ZiNjYwYjk4MWRmZjlfZmlneGVwQTI4UTBqNG9YQ04zam5wRUVOaEtwRDhFbWpfVG9rZW46UU84bWI4M25tbzZVSzF4clE0emNpVFplblJkXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<ul>
-<li>TrustZone方案需要混淆，性能差</li>
-<li>ASGARD对REE方案overhead只有2.01%</li>
-</ul>
-<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
-<li>IOMMU 电源 时钟管理给REEVisor。当REE关闭IOMMU 对应的设备自动关了 不会绕过</li>
-<li>不需要guest kernel中的其他进程间隔离方案，禁用Seccomp SELinux</li>
-<li>去掉没用的kernel features 定制rootfs ，大部份busybox的可执行文件是不需要的</li>
-</ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YjNhNDI1YzAyNTJhMjQ0MDQ2ZDQxNzBkMzkwZTkzMzRfWWRaSEFVZ3E3WEk4ZldSOGcxWXIwSmk2WUN2NndVaHlfVG9rZW46T0ZtMmIyQTk5b2RSbDN4T1FPQWMzcXM4bjZaXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt; vmexit 很慢</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Zjk2ZTg2OTQzZGM0YzgzZDFjMzMyODI4YThhZGE3YjhfM2Q2U0hwbjluajJvUHJzTzk2emRDcWV0Wmk2clllakVfVG9rZW46VEgxZ2JOS2FJb0R1N1Z4NUtTWGN1MjZNbndiXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>优化方案：分析计算图 把不存在依赖的需要fallback的算子集中到一起 用一个vm exit</p>
-<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要fallback的 要么全是需要fallback的 这样一个子图只需要fallback一次</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MTk2OGVjYTVlNmQwODc3NWRjNjBiMzZmMGM0Nzk2YThfRXBMOGVoUjlJMGhvSFU2R1hsdXpLMDRTQUhxYWRhNm5fVG9rZW46U2JyV2JmTkNHb1J2a2h4V2VXN2NVakJtbm9jXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>多个fallback算子没有依赖，但是由于默认DFS执行的顺序，会先后执行。可以切分子图，把这些没有依赖的fallback划分到一个子图里</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
-
-<p>具体实现上：</p>
-<p>rknn的编译器和runtime都是闭源的，所以计算图是静态划分的，分成多个.rknn model文件</p>
-<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据 </p>
-<ul>
-<li>NPU 调rknn_run</li>
-<li>CPU 调TensorFlow Lite runtime</li>
-</ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTBjOTE5YzYzZmVkZDFhM2FkOTZkMjdkZDU4NTgzMmVfNXpDc0E5dUhDQjBUVVd5Q040NW43WlRld0lvSGRDS1RfVG9rZW46QUxzUmJBRGhkb1d0cHZ4NW5sRGNNaXhXbmlmXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>input：16 tokens，执行一次生成过程，统计latency</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZTNhM2ZmMjhjZTAxZDYzMjFlMWE3OWYxNmIwNjEwNTZfSW9HR2hhTEtVVFFjTTVOWFlTeFRsU0pnZ0dLMXFtVnpfVG9rZW46Sk04NWJTNnRYb2htZHZ4Rk1Yc2NIUlkybjRyXzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>对REE来说，一次推理需要1ms，遇到38次fallback 中断。</p>
-<p>对ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YjYxNjQ4MTQ0YThkYjFhZjc3MzY3NTI5NThjODVmNjRfYmd2eVA5alhTdXBZRkJCZmUzS0hPbzlSY0xpNEhVcFlfVG9rZW46Rm1CTmJJNVhzb1VRaHl4ek40dWNMV0djbnR6XzE3Njk4NDA5MjI6MTc2OTg0NDUyMl9WNA" alt="img"></p>
-<p>观察内存的使用，exit-coalescing的优化并不会对内存占用产生负面影响（峰值相同）</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
-<li>提出NPU安全直通方案，主要是由TEEvisor进行MMIOregion和页表的切换</li>
-<li>识别出DNN推理过程中虚拟化带来的开销来源（CPU-fallback算子导致的vm-exit），并通过划分计算子图的方式进行优化。</li>
-</ul>
+<p><img src="/images/HrjbbXIraoi5GOxjis9chlk8nBg.png" title="image"></p>
+<p>大部分情况下几乎和 native 一致，平均性能 overhead 在 10%</p>
+<p>其他 Application 例如 databse 和 web server，由于需要 socat 的转发，并且 gramine-tdx 的 virito-vsock 设计过于简单，性能会降至 10%</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Gramine-TDX 为 TDX 机密虚拟机定制了 guest kernel，大幅减小了攻击面，提升了安全性。</p>
+<p>由于重点在安全和代码质量上，性能方面看来目前只适合不需要网络的纯计算任务（例如模型推理）</p>
 
       
     </div>
@@ -1301,7 +718,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1319,7 +736,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/" class="post-title-link" itemprop="url">Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</a>
+          <a href="/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/" class="post-title-link" itemprop="url">ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1329,18 +746,8 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-01-31 14:28:29 / Modified: 14:29:45" itemprop="dateCreated datePublished" datetime="2026-01-31T14:28:29+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <time title="Created: 2026-02-02 00:56:47" itemprop="dateCreated datePublished" datetime="2026-02-02T00:56:47+08:00">2026-02-02</time>
     </span>
 
   
@@ -1368,136 +775,111 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs"><a href="#Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs" class="headerlink" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs"></a>Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</h1><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmJiODc1ZTgxNzY3MjkxYjc4NTFmNTI0NWVlZDQ1ZjdfUlU3ZldzV1ZURzA0WE83U3NFNlJSbWRLTTRJNTZCQWRfVG9rZW46WmFkU2JGR1h6bzk5ZFJ4U3pVYmNzY2VFbk9pXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p>CCS24</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>Linux内核庞大且复杂，其中很多功能对于机密计算应用来说都是冗余的，除了增大TCB与攻击面之外没有意义。</p>
-<p>CVM攻击面包括：</p>
+          <h1 id="ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
+<p><img src="/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png" title="image"></p>
+<p>针对端侧 DNN 模型的隔离环境</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN 模型隐私保护</p>
 <ul>
-<li>Shared memory</li>
-<li>PIO MMIO</li>
-<li>Hypercall</li>
-<li>Interrupts exceptions</li>
-<li>CPUID leaves</li>
+<li>保护知识产权</li>
+<li>保护训练数据信息</li>
 </ul>
-<p>Heckler(Security’24) 是已经公开的利用int 0x80恶意中断进行攻击的例子</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjAzN2Y2MWQ3YzQ2Y2FhOTNlZDAwMTQxNzI1MzkyZjVfNnhQSldJdTRlbDJpdkcxRzRjU1l2b3FKQThLeDBLckhfVG9rZW46QVdpS2I1NVp1b2FJUm94aGFhSmNhRGY0bkllXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NTk0YTkxMjRhYjMwYWYyNzNkMzJkMjAyZGU4ODg3NThfVUpMUVhNUkdHNlNXd0F6bzJOSzlja2E2SzdrUEowekRfVG9rZW46UDF3V2JzaEhHb1hzeTh4ZXpRYmNDUklkbjljXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Gramine-TDX是一个轻量级的LibOS（完全代替Linux作为guest kernel）</p>
-<p>Hypervisor使用QEMU&#x2F;KVM</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjQ1YTZlMTIxMzQ2MzM4NWUzNjBhNDY1ZjE5ZTM5YmFfdDhUUDdDSXRpZEF5MVNJR0RQQTlKMk91ZnRLRkRySTJfVG9rZW46Wk1ZZ2JRVEw2b1BBaml4VVBzSWNvenhXbmdjXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<h3 id="LibOS"><a href="#LibOS" class="headerlink" title="LibOS"></a>LibOS</h3><ul>
-<li>不支持多进程 fork 没有IPC</li>
-<li>不能用硬件 例如GPU</li>
-<li>不支持legacy 16&#x2F;32bit 只支持64bit</li>
-<li>1:1 mapping</li>
-<li>没有network stack和fs stack</li>
-<li>不需要修改APP，不限语言 例如C, C++, Rust, Python, Java, Go</li>
-<li>有且仅有三个virtio驱动，并且完全按照TDX威胁模型重写，过滤不合法输入</li>
-</ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmZhMzhkNTdiMmM0OTJiNDgwMDlmZDBiN2I2OTk3NzdfN1B4ajVOYXNXN0RxZ1ZkcklkZzVEWUY0NzhzdFlMSWdfVG9rZW46U0dLbWIwd2lzb0tiZjl4cDdTZmNjcFRLbkhkXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<h3 id="Deployment-Model"><a href="#Deployment-Model" class="headerlink" title="Deployment Model"></a>Deployment Model</h3><p>不需要虚拟机镜像，需要的文件直接从主机文件系统读取 </p>
+<p>现有 TEE 方案（TrustZone）的缺陷：</p>
 <ul>
-<li>配置信息 （manifest）</li>
-<li>共享库（提前准备好的一份glibc patch过的）</li>
-<li>其他文件 提前加密好 gramine负责解密</li>
+<li>内存有限</li>
+<li>无法安全访问加速器（部分卸载到 REE 则会容易被攻击，加密或混淆则开销大）</li>
+<li>需要 TEE-OS，与加速器软件栈不兼容</li>
 </ul>
-<p>不用虚拟网卡 不用网络配置</p>
-<h3 id="Chain-of-Trust"><a href="#Chain-of-Trust" class="headerlink" title="Chain of Trust"></a>Chain of Trust</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTAwMmY5ZGVhM2QwMTU4NDQ2MjJlMTIwNDE4NzZiZjhfc09yYVBlVndaVEVib1o3ZnNEVDdpUEUybkFrNFZTTnFfVG9rZW46VjY5eWJuVVdUb2Jxelh4NThWTGNpamZkblpkXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
+<p><img src="/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png" title="image"></p>
+<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出 ASGARD：</p>
 <ul>
-<li>bios -&gt; MRTD</li>
-<li>gramine kernel二进制-&gt;RTMR1</li>
-<li>配置文件manifest 其中包括了其他普通文件的哈希 RTMR2</li>
+<li>虚拟化隔离（pkvm）</li>
+<li>加速器直通给虚拟机 （VFIO）</li>
+<li>改 EL2 不改 EL3</li>
+<li>Guest 用 Linux 加速器驱动不需要改</li>
 </ul>
-<p>td启动时tdx module会验证二进制，记录到这些寄存器中，之后提供给远程验证</p>
-<p>对于RTMR2 td可以自己extend定制化的内容（使用tdcall请求tdx module）</p>
-<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>manifest中指定entry point app hard-code写死输入 防止attacker通过verbose等泄漏信息</p>
-<p>提供一个patch过的libc 用于适配gramine的内核，提前编译成动态库，然后mount给虚拟机</p>
-<h3 id="virtio-fs"><a href="#virtio-fs" class="headerlink" title="virtio-fs"></a>virtio-fs</h3><p>本身用于host-guest共享文件 host是fuse server，guest是fuse client </p>
-<p>gramine-tdx在host上用virtiofsd</p>
-<p>文件请求通过fuse与virtio直接转到host，因此guest不需要fs stack</p>
-<h4 id="intel-protected-fs"><a href="#intel-protected-fs" class="headerlink" title="intel protected fs"></a>intel protected fs</h4><p>intel基于自己的硬件已经实现了一套软件的加密fs协议 host上的文件数据是加密的 读取的时候gramine-tdx kernel自动透明地会进行解密</p>
-<ul>
-<li>manifest中 fs.mount type&#x3D;”encrypted”</li>
-<li>manifest中sgx.trusted_files 可以记录file和对应的sha256 检察 完整性 （manifest的完整性也会被检察）</li>
-</ul>
-<h3 id="virtio-vsock"><a href="#virtio-vsock" class="headerlink" title="virtio-vsock"></a>virtio-vsock</h3><p>本身用于host-guest传输网络包</p>
-<ul>
-<li>guest上和host上都用socket api 同一套地址 就可以通信</li>
-<li>host&#x2F;guest上都可以用socat进行socket包和TCP包的转化</li>
-</ul>
+<p>问题和挑战：</p>
 <ol>
-<li>guest内app全都不需要改 正常通过端口提供服务 例如8080</li>
-<li>gramine-tdx的kernel实现中会进行网络包的转化，并通过virtio-vsock转交给host</li>
-<li>host上<code>socat TCP4-LISTEN:8080,reuseaddr,fork VSOCK-CONNECT:123:1234</code> 可以在host上的8080访问guest内的服务</li>
+<li>基于虚拟化的 TEE 方案没有安全 IO 直通的方案</li>
+<li>IOMMU 驱动和依赖都在 TCB</li>
+<li>虚拟化给推理带来性能影响</li>
 </ol>
-<h3 id="sum"><a href="#sum" class="headerlink" title="sum"></a>sum</h3><table>
-<thead>
-<tr>
-<th></th>
-<th>Virtio-fs</th>
-<th>Virtio-vsock</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>功能</td>
-<td>文件</td>
-<td>网络</td>
-</tr>
-<tr>
-<td>一般方案</td>
-<td>virtio-blk</td>
-<td>virtio-net</td>
-</tr>
-<tr>
-<td>一般情况</td>
-<td>virtio-&gt;guest fs stack-&gt;块设备</td>
-<td>virtio-&gt;guest network stack-&gt;NIC</td>
-</tr>
-<tr>
-<td>一般使用</td>
-<td>qemu virtio device 然后在guest中mount</td>
-<td>qemu virtio device 然后用socket api 或者用socat</td>
-</tr>
-<tr>
-<td>Gramine使用</td>
-<td>guest侧mount写在kernel中 host用virtiofsd</td>
-<td>guest侧socat写在kernel中 host用socat</td>
-</tr>
-<tr>
-<td>Gramine</td>
-<td>virtio-&gt;host fuse-&gt;host fs stack</td>
-<td>virtio-&gt;host socat-&gt;host network stack</td>
-</tr>
-</tbody></table>
-<p>减小TCB 减小攻击面 但是fuse和socat会带来overhead</p>
-<h2 id="Security-Analysis"><a href="#Security-Analysis" class="headerlink" title="Security Analysis"></a>Security Analysis</h2><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Yjk1YmZiM2MzMWJhZjQ0OTIxNGQ1MGRhN2Y2ZWI5YjdfOTRDNTQ2NG1qNjNCQzU4Y3Fxd0Z3SWl1M1hOd0dpV2xfVG9rZW46VGFzbWJuU0ZOb3BZeGp4QkFoRGM4NGlpbjVkXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NDQ2YWJlMWRkODQxOTkyNTc2NGJiMjIyYTk5ZDNhZDNfN1RiY3dFcG5zazdOZFhSSFRkMXhxRkt0Szl6ZGMwTU5fVG9rZW46WndiN2JxWDVQb0tSUGd4SkUxWmNaOU9ZblRkXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p>基本就是控制input、检查input合法</p>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p>Testbed：</p>
+<p><img src="/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png" title="image"></p>
+<ol>
+<li>启动平台 验证（pkvm）</li>
+<li>启动 enclave  （pkvm）</li>
+<li>DNN 模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
+<li>加速器分配 （配置 MMU 与 IOMMU 页表）</li>
+<li>DNN 推理服务 （通过 vsock 和共享内存通信）</li>
+</ol>
+<p><img src="/images/CN2sb3Rafon5VbxyKqrcEduonFb.png" title="image"></p>
+<p>EL2 的 TEEvisor 保证：</p>
+<ol>
+<li>对于 NPU 的访问必须经过授权，未经授权的 Host 无法直接通过 NPU 接口来窃取数据。</li>
+<li>NPU 对 enclave memory 的访问必须经过授权，当 Host 占有 NPU 时无法通过 IOMMU 访问 enclave 内存</li>
+</ol>
+<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
+<li>RK3588S （Armv8.2-A SoC  RockchipNPU）</li>
+<li>PKVM</li>
+</ul>
+<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
 <ul>
-<li>Intel Xeon Platinum 8570 CPU , 56 cores , 1 TB (16 channels × 64 GB&#x2F;DIMM) DRAM</li>
-<li>Host：Ubuntu 24.04, Intel TDX-enabled Linux kernel v6.8. </li>
-<li>Intel TDX-patched QEMU v8.2. </li>
-<li>Guest： Ubuntu 24.04,intel TDX-enabled guest Linux v6.8</li>
-<li>Intel TDX Module v1.5 (build_num 698).</li>
-<li>vCPU数量与Application需要线程数量相等</li>
+<li>有且仅有 TEEVisor 对敏感接口有控制权</li>
+<li>加速器任何时刻只分给一个 enclave</li>
+<li>enclave 使用完后，加速器无残留状态和数据</li>
 </ul>
-<p>Varaints</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NGRlZjIyMmFmOWZkMTliNzE0ZTQyODM3M2U2YzJiN2JfcUlnYUYwTFdOR3ZyUExjNG4wcEpZMFQyMUR0VGpMS2pfVG9rZW46S2lSeWJsTGFob1B1VXp4b1cwOGM4ZHR2bjVmXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MGQyOGI0OTdlYTU5OGNjZjNhYmFhODkyM2E0ODNhMmNfYmhFVmxYcWt1RDFzTkh4Y2xhdkthYUNjVTZSbHVLTVNfVG9rZW46VEJkTGJIOTZBbzMwVFh4bno1RmM4M2xmbndrXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p>In-memory 计算开销小于5% </p>
-<p>IO性能差，在于gramine-tdx中的virtio-fs驱动实现过于简单</p>
-<h3 id="AI-Frameworks"><a href="#AI-Frameworks" class="headerlink" title="AI Frameworks"></a>AI Frameworks</h3><ul>
-<li>PyTorch: AlexNet for image classification.</li>
-<li>OpenVINO,TensorFlow:ResNet-50 for inference</li>
-<li>TensorFlow:BERT for inference</li>
-<li>Candle:LLaMA</li>
+<p>TEEvisor 保证控制：</p>
+<ul>
+<li>stage2 MMU</li>
+<li>所有 IOMMU 的寄存器地址范围</li>
+<li>加速器敏感接口</li>
 </ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ODcyNmUzMzZiOTBkNWE2ODE3YjA5NDg3YTdmOGYzMTVfWmRtcFBtS0dsV1IwYVdNZEI0TjBSNEVDcE4xQlB3TFJfVG9rZW46Sm1JeGIweER4b3Z3Sml4MDY4S2NycTBubjVmXzE3Njk4NDA4Nzk6MTc2OTg0NDQ3OV9WNA" alt="img"></p>
-<p>大部分情况下几乎和native一致，平均性能overhead在10%</p>
-<p>其他Application例如databse和web server，由于需要socat的转发，并且gramine-tdx的virito-vsock设计过于简单，性能会降至10%</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Gramine-TDX为TDX机密虚拟机定制了guest kernel，大幅减小了攻击面，提升了安全性。</p>
-<p>由于重点在安全和代码质量上，性能方面看来目前只适合不需要网络的纯计算任务（例如模型推理）</p>
+<p>Guest 需要用或者释放 NPU 的时候 hypercall 到 pkvm EL2 会执行 flush iotlb 等操作</p>
+<p>加速器使用过程：</p>
+<ul>
+<li>初始化：配置所有 IOMMU，只有加速器的 IOMMU 可以访问 enclave 内存；enclave 访问加速器 MMIO 区域</li>
+<li>切换：重新配置 MMU IOMMU  需要刷 tlb  iotlb。需要加速器设备支持 reset 接口</li>
+<li>回收：REE 可以任意时候回收，TEE 清除数据 改 enclave stage2 页表 IOMMU 页表</li>
+</ul>
+<p>切换开销：</p>
+<p><img src="/images/SJB1bh04lomsKvxQueHcckHWnth.png" title="image"></p>
+<p>推理 latency（224x224 图像分类任务）</p>
+<p><img src="/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png" title="image"></p>
+<ul>
+<li>TrustZone 方案需要混淆，性能差</li>
+<li>ASGARD 对 REE 方案 overhead 只有 2.01%</li>
+</ul>
+<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
+<li>IOMMU 电源 时钟管理给 REEVisor。当 REE 关闭 IOMMU 对应的设备自动关了 不会绕过</li>
+<li>不需要 guest kernel 中的其他进程间隔离方案，禁用 Seccomp SELinux</li>
+<li>去掉没用的 kernel features 定制 rootfs ，大部份 busybox 的可执行文件是不需要的</li>
+</ul>
+<p><img src="/images/Fnrobkqato9TGhxykq8czlBsnab.png" title="image"></p>
+<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt;  vmexit 很慢</p>
+<p><img src="/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png" title="image"></p>
+<p>优化方案：分析计算图 把不存在依赖的需要 fallback 的算子集中到一起 用一个 vm exit</p>
+<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要 fallback 的 要么全是需要 fallback 的 这样一个子图只需要 fallback 一次</p>
+<p><img src="/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png" title="image"></p>
+<p>多个 fallback 算子没有依赖，但是由于默认 DFS 执行的顺序，会先后执行。可以切分子图，把这些没有依赖的 fallback 划分到一个子图里</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
+
+<p>具体实现上：</p>
+<p>rknn 的编译器和 runtime 都是闭源的，所以计算图是静态划分的，分成多个.rknn model 文件</p>
+<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据</p>
+<ul>
+<li>NPU 调 rknn_run</li>
+<li>CPU 调 TensorFlow Lite runtime</li>
+</ul>
+<p><img src="/images/LBTNbklO3oNOnKxY596cgpufn3r.png" title="image"></p>
+<p>input：16 tokens，执行一次生成过程，统计 latency</p>
+<p><img src="/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png" title="image"></p>
+<p>对 REE 来说，一次推理需要 1ms，遇到 38 次 fallback 中断。</p>
+<p>对 ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
+<p><img src="/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png" title="image"></p>
+<p>观察内存的使用，exit-coalescing 的优化并不会对内存占用产生负面影响（峰值相同）</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
+<li>提出 NPU 安全直通方案，主要是由 TEEvisor 进行 MMIOregion 和页表的切换</li>
+<li>识别出 DNN 推理过程中虚拟化带来的开销来源（CPU-fallback 算子导致的 vm-exit），并通过划分计算子图的方式进行优化。</li>
+</ul>
 
       
     </div>
@@ -2066,6 +1448,735 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
 
 
 
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/Effective%20Modern%20C++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/Effective%20Modern%20C++/" class="post-title-link" itemprop="url">Effective Modern C++</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Effective-Modern-C"><a href="#Effective-Modern-C" class="headerlink" title="Effective Modern C++"></a>Effective Modern C++</h1><h2 id="型别推导"><a href="#型别推导" class="headerlink" title="型别推导"></a>型别推导</h2><ol>
+<li><p>模板类型推导</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>模板T的类型与ParamType(修饰)是有关的</p>
+<ul>
+<li>无修饰：T不会带const 引用</li>
+<li>参数是指针&#x2F;引用：T不带引用 如果参数修饰带const则T不带const</li>
+<li>参数是万能引用(<code>T&amp;&amp;</code>)：T会和参数类型和传入的参数类型一模一样 带任何修饰  除了参数是右值的情况</li>
+</ul>
+</li>
+<li><p><code>auto</code>的类型推导与模板一模一样</p>
+<p><code>auto&amp;&amp;</code> 万能引用（带修饰  左值-&gt;左值 右值-&gt;右值）</p>
+<p>直接用<code>auto</code> 不会带const 不会带引用（除非右边取地址）</p>
+</li>
+<li><p><code>decltype</code> 带修饰、引用、模板类型，一模一样</p>
+<p><code>decltype(auto)</code>可以保证引用不被去除</p>
+<p>特例：<code>decltype((x))</code>是<code>int&amp;</code></p>
+</li>
+<li><p><code>boost::typeindex::type_id_with_cvr&lt;decltype(x)&gt;().pretty_name()</code>可以精确地输出类型</p>
+<p>IDE对于复杂类型不一定准确</p>
+</li>
+</ol>
+<h2 id="auto"><a href="#auto" class="headerlink" title="auto"></a>auto</h2><ol start="5">
+<li><p><code>auto</code>声明变量的好处：</p>
+<ul>
+<li><p>通过编译器优化时间空间上的处理（lambda表达式返回值是<code>std::function&lt;&gt;</code>）</p>
+</li>
+<li><p>避免自己搞错类型造成bug</p>
+</li>
+<li><p>避免const带来的额外复制开销</p>
+</li>
+</ul>
+<p>副作用是没法一眼看出来类型  但是可以用过好的IDE缓和</p>
+</li>
+</ol>
+<h2 id="转向现代C"><a href="#转向现代C" class="headerlink" title="转向现代C++"></a>转向现代C++</h2><ol start="6">
+<li><p>某些库的实现为了时空性能会使用隐形代理，导致<code>auto</code>被推倒为应对客户隐藏的代理类</p>
+<p>解决方法是使用<code>static_cast&lt;T&gt;</code>强制类型转换</p>
+</li>
+<li><p>大括号初始化最通用</p>
+<p>某些情况下大括号小括号初始化有区别，例如<code>std::vector</code></p>
+<p>可以使用auto先声明一个初始化列表 然后传入小括号</p>
+</li>
+<li><p><code>nullptr</code>代替0或NULL</p>
+</li>
+<li><p><code>using</code>替代<code>typedef</code></p>
+<p>用模板推导的<code>T::type</code>声明前需要加<code>typename</code></p>
+<p>模板元编程变换类型</p>
+<p><code>std::remove_const_v&lt;T&gt;</code></p>
+<p><code>std::remove_reference_v&lt;T&gt;</code></p>
+<p><code>std::add_lvalue_reference_v&lt;T&gt;</code></p>
+<p>给出一种实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">remove_reference</span>&lt;T&gt;&#123;</span><br><span class="line">	<span class="keyword">using</span> type = T;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">using</span> remove_reference_v = <span class="keyword">typename</span> remove_reference&lt;T&gt;::type </span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>enum class E&#123;a,b,c&#125;</code>好处</p>
+<ul>
+<li>限制了作用域 之后可以重名</li>
+<li>强类型 不可以隐式转为int</li>
+</ul>
+</li>
+<li><p><code>=delete</code>删除函数</p>
+<ul>
+<li>类的默认复制函数、拷贝构造函数</li>
+<li>模板的某种特化版本</li>
+<li>参数可被隐式转换的函数</li>
+</ul>
+</li>
+<li><p><code>override</code>改写子类函数时加上，帮助编译器提示</p>
+<p>在成员函数后加上<code>&amp;</code>或<code>&amp;&amp;</code>可以根据<code>(*this)</code>为左值或右值提供不同的重载实现</p>
+</li>
+<li><p><code>const_iterator</code> 例如<code>cbegin cend</code></p>
+</li>
+<li><p><code>noexcept</code>可能会被优化</p>
+</li>
+<li><p><code>constexpr</code>声明的变量或函数可以在编译器用 当作编译器常量 </p>
+</li>
+<li><p>线程安全</p>
+</li>
+<li><p><code>=default</code>生成类的默认移动函数（等）</p>
+</li>
+</ol>
+<h2 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h2><p>裸指针的一些问题：无法判断是否空悬，无法判断如何析构</p>
+<ol start="18">
+<li><p><code>std::unique_ptr</code> 默认情况下和裸指针同样大小</p>
+<p>可以自定义析构函数  但是会增加大小 自定义析构器的型别会导致智能指针型别不同 无法放在一个容器中</p>
+<p>使用lambda捕获变量时更大</p>
+</li>
+<li><p><code>std::shared_ptr</code> 用原子操作计数 大小是裸指针的两倍</p>
+<p>自定义析构器不会影响大小和型别</p>
+</li>
+<li><p><code>std::weak_ptr</code>解决<code>std::shared_ptr</code>环路</p>
+</li>
+<li><p><code>std::make_shared&lt;T&gt;()</code></p>
+<ul>
+<li><p>使用auto作为类型 避免重写两边T</p>
+</li>
+<li><p>避免new之后没有接受导致资源泄露</p>
+</li>
+<li><p>减小一次内存分配次数 提高性能</p>
+</li>
+</ul>
+<p>但不支持自定义析构器，且默认用小括号初始化</p>
+</li>
+<li><p>Pimpl写法 需要把默认析构或其他函数的实现放在完整型别中。</p>
+</li>
+</ol>
+<h2 id="右值引用、移动语义、完美转发"><a href="#右值引用、移动语义、完美转发" class="headerlink" title="右值引用、移动语义、完美转发"></a>右值引用、移动语义、完美转发</h2><ol start="23">
+<li><code>std::move std::forward&lt;&gt;</code>只是强制类型转换</li>
+<li><code>T&amp;&amp;``auto&amp;&amp;</code> 涉及类型推导时成为万能引用</li>
+<li>某些情况下编译器会自行优化 用了<code>std::move</code>反而违反了优化的条件</li>
+<li>重载一个万能引用的模板，可能会导致在意外地情况下匹配到</li>
+<li>解决26的方法 加一个实现函数多一个参数 分派</li>
+<li>引用折叠 引用的引用变为单个引用（右 右-&gt;右 其他左）</li>
+<li>移动操作并不总能提高效率 需要相关型别支持移动语义</li>
+<li>若干种使用完美转发的参数无法通过编译的情况<ul>
+<li>大括号</li>
+<li>static const 成员变量</li>
+<li>重载函数</li>
+<li>位域（一个变量的某些bit）</li>
+</ul>
+</li>
+</ol>
+<h2 id="lambda表达式"><a href="#lambda表达式" class="headerlink" title="lambda表达式"></a>lambda表达式</h2><ol start="31">
+<li><p>引用捕获的变量离开作用域销毁后，可能导致lambda表达式内部的引用空悬</p>
+<p>类里默认捕获会捕获this指针</p>
+</li>
+<li><p>初始化捕获<code>[a=a]</code>左边是lambda闭包作用域 右边是lambda能捕获的作用域</p>
+<p>可以移动捕获</p>
+</li>
+<li><p>lambda实现完美转发  由于无模板T 故需要decltype</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> f = </span><br><span class="line">	[](<span class="keyword">auto</span>&amp;&amp;... params)&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">func</span>(std::forward&lt;<span class="keyword">decltype</span>(params)&gt;(params)...);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用lambda表达式可以代替bind 给函数填入事先确定好的参数使用</p>
+</li>
+</ol>
+<h2 id="并发API"><a href="#并发API" class="headerlink" title="并发API"></a>并发API</h2><ol start="35">
+<li><p><code>std::async</code>相比直接开线程的好处：</p>
+<ul>
+<li>能够拿到返回值和异常</li>
+<li>由C++标准库完成调度 避免超订 影响性能</li>
+</ul>
+</li>
+<li><p><code>std::launch::async</code>才能保证一定开线程（并发）</p>
+</li>
+<li><p>必须保证创建<code>std::thread</code>的函数在任一返回路径前让其变为join或detach，否则如果这个线程引用了这个函数的局部变量 会导致意外的后果</p>
+</li>
+<li><p>future可能会发生阻塞 导致某些析构阻塞</p>
+</li>
+<li><p>线程同步的方法：</p>
+<ul>
+<li><p>使用<code>atomic&lt;bool&gt; flag</code> <code>while(!flag)</code>：缺点 占用资源</p>
+</li>
+<li><p>使用条件变量：缺点 需要一把互斥锁 两个线程必须竞争锁</p>
+</li>
+<li><p>使用<code>std::promise``std::future</code> 一次性通信</p>
+<p>暂停：<code>p.get_future().wait()</code></p>
+<p>继续：<code>p.set_value()</code></p>
+</li>
+</ul>
+</li>
+<li><p><code>std::atomic</code>多线程</p>
+<p><code>volatile</code>特种内存 多条语句不会被编译器优化成一条</p>
+</li>
+</ol>
+<h2 id="微调"><a href="#微调" class="headerlink" title="微调"></a>微调</h2><ol start="41">
+<li>按值传递后用move再传入其他函数是一种30的解决方案</li>
+<li><code>emplace</code>置入函数比<code>push</code>插入函数更高效（通常）</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/" class="post-title-link" itemprop="url">C++ Concurrency in Action</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>847</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="C-Concurrency-in-Action"><a href="#C-Concurrency-in-Action" class="headerlink" title="C++ Concurrency in Action"></a>C++ Concurrency in Action</h1><h2 id="Managing-threads"><a href="#Managing-threads" class="headerlink" title="Managing threads"></a>Managing threads</h2><ol>
+<li><p><code>std::thread</code> 创建对象就会直接开始新线程。有默认构造函数 不会和任意线程绑定 需要通过move接受别的</p>
+</li>
+<li><p>必须使用join或者detach。 使用detach可成为守护线程，生命周期和程序一样长；为了避免exception导致没有join可以使用一个类，析构里join</p>
+<p><code>std::for_each(threads.begin(),threads.end(),std::mem_fn(&amp;std::thread::join))</code></p>
+</li>
+<li><p><code>std::thread</code>默认copy参数，即使函数使用引用，如果要用引用需要手动加<code>std::ref</code></p>
+</li>
+<li><p>如果给的参数是创建线程的函数的临时变量，函数结束变量销毁可能导致线程的指针问题</p>
+</li>
+<li><p>如果需要用类的函数，语法为<code>std::thread(&amp;Object::f,&amp;object,a,b,c)</code> 类似<code>std::bind</code></p>
+</li>
+<li><p><code>std::thread</code>可以move不能copy 类似<code>std::ifstream</code> <code>std::unique_ptr</code></p>
+<p>通过move转义控制权到另一个<code>std::thread</code>对象</p>
+<p>当出现临时的<code>std::thread</code>对象时会隐式move</p>
+<p>可以放在<code>std::vector</code>中</p>
+</li>
+<li><p><code>std::this_thread::get_id()</code>拿到<code>std::thread::id</code> 支持比较操作</p>
+</li>
+<li><p><code>std::this_thread::yield()</code>不同于sleep等信号打断或睡眠固定时间，此操作让出time slice 供cpu调度</p>
+</li>
+</ol>
+<h2 id="Sharing-data-between-threads"><a href="#Sharing-data-between-threads" class="headerlink" title="Sharing data between threads"></a>Sharing data between threads</h2><ol start="9">
+<li><p><code>std::mutex</code>有成员函数lock和unlock 但是不推荐使用 因为必须记得放锁</p>
+<p>最好配合lock_guard等离开作用域自动放锁的对象一起用</p>
+</li>
+<li><p><code>boost::shared_lock&lt;boost::shared_mutex&gt;</code>访问只读对象，此时互斥锁会等待</p>
+</li>
+<li><p><code>std::lock</code>同时锁多个 避免死锁</p>
+</li>
+</ol>
+<p><code>std::adopt_lock</code>作为参数不用等直接拿已经有的</p>
+<ol start="12">
+<li><p>不一定只有锁才会导致死锁，join或者wait都会，在设计时需要留意</p>
+</li>
+<li><p>一些避免死锁的guidelines  hierarchi  try_lock</p>
+</li>
+<li><p><code>std::unique_lock</code>可以用<code>std::defer_lock</code>作为第二个参数，先不拿锁，之后手动lock</p>
+</li>
+<li><p>锁的范围应该最小</p>
+</li>
+</ol>
+<p><code>std::once_flag</code>配合<code>std::call_once</code>在任意多的线程中只执行一次，进行初始化的操作</p>
+<ol start="16">
+<li>允许多个同时读，但不允许多个写或读写一起,c++不提供，可以使用boost</li>
+</ol>
+<p>   读：<code>boost::shared_lock&lt;boost::shared_mutex&gt;</code></p>
+<p>   写：<code>std::unique_lock&lt;boost::shared_mutex&gt;</code></p>
+<h2 id="Synchronizing-concurrent-operations"><a href="#Synchronizing-concurrent-operations" class="headerlink" title="Synchronizing concurrent operations"></a>Synchronizing concurrent operations</h2><ol start="17">
+<li><p><code>std::condition_variable</code> </p>
+<p>wait 接受一个锁和一个lambda表达式作为参数 防止先notify再wait</p>
+<p>notify_one&#x2F;notify_all 唤醒wait等待的线程</p>
+</li>
+<li><p><code>std::async</code>用法和<code>std::thread</code>用法一样，但不是返回线程，而是返回<code>std::future&lt;T&gt;</code></p>
+<p>可以通过get方法拿到最后的返回值</p>
+<p>可以增加参数 不立即执行 （实际上是否开线程不确定）</p>
+</li>
+<li><p><code>std::package_task&lt;&gt;</code> 接受函数作为参数，可以在适当的时候通过（）直接调用</p>
+<p>get_future可以拿到future</p>
+<p>想开线程执行一个函数 拿到返回值 可以先构造task 然后拿到future task传给thread执行，最后从future中拿出数据</p>
+<p>返回类型可用<code>std::result_of&lt;&gt;</code></p>
+</li>
+<li><p><code>std::promise&lt;T&gt;</code>get_future拿到<code>std::future&lt;T&gt;</code></p>
+<p>可以通过set_value在线程间传递数据</p>
+</li>
+<li><p>cv和future都可以wait_for&#x2F;wait_until设置timeout</p>
+<p>返回<code>std::future_status</code> 可以判断timeout ready等状态</p>
+</li>
+</ol>
+<h2 id="The-C-memory-model-and-operations-on-atomic-types"><a href="#The-C-memory-model-and-operations-on-atomic-types" class="headerlink" title="The C++ memory model and operations on atomic types"></a>The C++ memory model and operations on atomic types</h2><ol start="22">
+<li><p><code>std::atomic&lt;T&gt;</code> 原子类型 有load store exchange等原子操作</p>
+<p>is_lock_free判断是否需要锁保护</p>
+</li>
+<li><p>memory ordering 指定操作顺序 对于不同变量的操作可能是乱序的</p>
+</li>
+<li><p>通过原子操作可用不需要锁实现并发安全的数据结构</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/effectiveC++/" class="post-title-link" itemprop="url">Effective C++</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>9 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Effective-C"><a href="#Effective-C" class="headerlink" title="Effective C++"></a>Effective C++</h1><h2 id="让自己习惯C"><a href="#让自己习惯C" class="headerlink" title="让自己习惯C++"></a>让自己习惯C++</h2><ol>
+<li><ol>
+<li>c++有4个主要的次语言</li>
+</ol>
+<ul>
+<li>C 没有模板 异常 重载</li>
+<li>C++ 类 封装 继承 多态 虚函数</li>
+<li>Template 泛型</li>
+<li>STL</li>
+</ul>
+<p>不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）</p>
+</li>
+<li><p>#define 直接被替换 报错时找不到信息 并且占用内存可能反而更大</p>
+<ul>
+<li>const 取地址合法</li>
+<li>enum 取地址不合法</li>
+<li>inline</li>
+</ul>
+</li>
+<li><p>用const修饰变量，函数等</p>
+<p>返回的对象可以使用const修饰 避免 <code>if(a*b=c)</code></p>
+<p>const可非const可重载</p>
+<p>非const可转型为const</p>
+</li>
+<li><p>类的成员变量的初始化发生在进入构造函数之前，且一定按声明的顺序</p>
+<p>使用初始化列表，内置类型也使用xx()的形式</p>
+</li>
+</ol>
+<h2 id="构造-析构-赋值运算"><a href="#构造-析构-赋值运算" class="headerlink" title="构造&#x2F;析构&#x2F;赋值运算"></a>构造&#x2F;析构&#x2F;赋值运算</h2><ol start="5">
+<li><p>默认构造函数会初始化基类和非静态成员变量，默认析构会自动调用析构（所以不用写），默认拷贝函数会复制每个非const对象</p>
+<p>三种情况 不会生成默认拷贝函数</p>
+<ul>
+<li>有引用成员变量</li>
+<li>有const成员变量</li>
+<li>基类的拷贝函数为private</li>
+</ul>
+</li>
+<li><p>不想使用默认的函数，可以声明为private</p>
+</li>
+<li><p>多态的基类的析构函数加virtual 避免用基类指针释放派生类对象出现内存泄漏</p>
+<p>虚函数使用虚函数指针管理，会增加内存占用</p>
+<p>如果基类的析构没有virtual 不适合派生，例如STL</p>
+</li>
+<li><p>在析构中catch异常，不向下传递</p>
+</li>
+<li><p>在派生类的构造&#x2F;析构函数调用基类的构造&#x2F;析构函数时，派生类的信息已经消失，所以在基类的构造&#x2F;析构函数中调用虚函数是无效的</p>
+</li>
+<li><p>为了实现连续赋值，让operator&#x3D;返回左值引用</p>
+</li>
+<li><p>operator&#x3D;的两个对象如果相同可能会出现删掉自己的问题 </p>
+<p>解决方法如下：</p>
+<ul>
+<li>开头判断是否相等 如果相等直接返回    增加了取址 条件跳转 影响效率</li>
+<li>调整顺序 先改再删 </li>
+<li>用swap</li>
+</ul>
+</li>
+<li><p>自定义拷贝构造函数和拷贝函数需要保证复制了每个成员变量，编译器不会提醒</p>
+<ul>
+<li>复制自己所有的成员变量</li>
+<li>调用基类的拷贝构造函数 <code>XX::operator=(rhs)</code></li>
+</ul>
+<p>拷贝构造函数和拷贝函数重复的代码可用一个private的init函数来写</p>
+</li>
+</ol>
+<h2 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h2><p>除了内存，文件描述符，锁、连接、socket都是资源</p>
+<ol start="13">
+<li><p>在一个函数中，使用指针 最后delete 可能导致由于中间部分的问题而没有delete</p>
+<p>使用智能指针管理，借助离开函数自动调用析构函数的机制 <code>std::auto_ptr&lt;A&gt; p(new A)</code></p>
+<p>智能指针默认执行delete 而不是delete[] 无法管理数组</p>
+<p>需要open close成对出现的资源 可以写在一个类中，close写在类的析构中，出现异常自动调用</p>
+</li>
+<li><p>资源管理类小心复制，可以直接禁止复制</p>
+</li>
+<li><p>虽然智能指针可以通过*或-&gt;像指针一样使用，但是<code>*A</code>与<code>std::auto_ptr&lt;A&gt;</code>类型并不相同，不能被函数接受</p>
+<p>智能指针提供get方法拿到原始指针，但是这样用户会觉得麻烦</p>
+<p>另一种方法是在类中定义隐式转换的函数 但这样会出现非预期的转换 造成bug</p>
+</li>
+<li><p>new delete ； new[]  delete[]  否则都会有bug</p>
+<ul>
+<li>多个构造函数用相同形式的new</li>
+<li>使用typedef 注意是否是数组</li>
+</ul>
+</li>
+<li><p>new得到的指针放入指针智能时使用独立语句，否则可能导致中间步骤的失败丢失new出来的指针</p>
+</li>
+</ol>
+<h2 id="设计与声明"><a href="#设计与声明" class="headerlink" title="设计与声明"></a>设计与声明</h2><ol start="18">
+<li><p>良好的接口不应该被误用，例如返回指针会导致没有delete&#x2F;delete两次&#x2F;错误方式delete等</p>
+<p>可以返回一个智能指针，同时设置好deleter 强制让用户使用智能指针来接受</p>
+<p>防止同类型的参数顺序出错，可以新声明几个类型，强制让用户使用新类型</p>
+</li>
+<li><p>设计class应该像设计type一样 考虑创建销毁 初始化赋值 传递 合法值 转换 操作符 接口等一系列问题</p>
+</li>
+<li><p>函数参数传递是按值传递，会调用构造函数，效率低，尽量使用引用传递，为了防止引用传递的后果 加const</p>
+<p>这样做可以解决对象切割的问题，即使用基类对象接受派生类，依然可以正确找到派生类声明为virtual的函数</p>
+<p>内置类型比较小 用引用涉及到指针反而慢， stl容器也尽量用值传递</p>
+</li>
+<li><p>函数的返回值也会涉及到构造与析构的浪费，但是此处并没有办法节省（除非返回值并不是函数生成的）</p>
+<p>尝试方法与问题如下：</p>
+<ul>
+<li>栈上分配 返回引用   返回时已经销毁 拿到已经销毁的变量</li>
+<li>堆上分配 返回指针   没人delete&#x2F;连续运算时丢失临时变量的指针</li>
+<li>使用static     static对象只看现值 严重bug</li>
+</ul>
+</li>
+<li><p>所有类的成员变量都应该是private 需要的话设置getter和setter通过函数访问</p>
+<p>好处如下：</p>
+<ul>
+<li>提供的接口都是函数，统一使用括号访问</li>
+<li>封装 可以随意修改实现方法</li>
+<li>取消此变量后不会让客户代码与派生类代码发生破坏</li>
+</ul>
+</li>
+<li><p>封装的内容越多，可访问内容的函数越少，改动影响的部分越少，可改动的弹性越大</p>
+<p>所以在两个函数具有相同功能的时候，尽量使用non-member&#x2F;non-friend去替代member(成员)函数</p>
+<p>可以使用namespace把工具函数和类放在同一区域中</p>
+<p>不同的源文件不能切分类，但是可以使用同一个namespace 切分工具函数</p>
+</li>
+<li><p>如果一个函数的所有参数都需要类型转换，应该成为non-member</p>
+<p>member函数一方是this 无法隐式转换</p>
+</li>
+<li><p>？ swap</p>
+</li>
+</ol>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol start="26">
+<li><p>尽量延后变量定义式出现的时间，否则可能会由于中途的异常而没有使用却承担了构造析构的成本</p>
+<p>直接给初值，而不是初始化之后再赋值</p>
+<p>循环中需要的变量放在内还是外需要对比构造析构与赋值操作的时间，放内部不影响作用域及可理解性、易维护性</p>
+</li>
+<li><p>少转型 用新式转型替代旧式转型</p>
+<p>转型不是只改变解释方式不改变数据，转型会生成代码（int和double的表示方式都不同）</p>
+<ul>
+<li>static_cast  强迫转型 但是在类的成员函数中转成基类调基类的函数会导致生成函数副本，使用错误的this</li>
+<li>dynamic_cast 向下转型，可以通过基类派生类，但是效率不高，最好用virtual实现相同的功能</li>
+</ul>
+</li>
+<li><p>避免返回handles（引用，指针，迭代器）</p>
+<p>风险如下：</p>
+<ul>
+<li>操作了private成员&#x2F;声明为const的函数&#x2F;变量实际修改了内容</li>
+<li>handles所指内容的主体已经被析构，造成空悬</li>
+</ul>
+<p>例外：string vector等容器的operator&#x3D;返回的是引用</p>
+</li>
+<li><p>函数需要异常安全</p>
+<p>三个等级：</p>
+<ul>
+<li>基本：不破坏数据结构（例如资源泄露，打乱排序数组）</li>
+<li>强烈：保证状态不变 可以通过copy-swap实现，及创建副本 修改在副本上 然后交换 但可能效率较低 复杂程度较高；并且，如果这个函数中调用了其他函数，但是其他函数并没有强烈的异常安全保证，自己也不行。</li>
+<li>不抛异常</li>
+</ul>
+</li>
+<li><p>inline 用函数本体替换每次调用的地方，编译时候完成，编译器会选择（太复杂或者virtual会拒绝）</p>
+<ul>
+<li><p>好处：减小函数调用的开销</p>
+</li>
+<li><p>坏处：可能增大字节码，修改后必须重新编译</p>
+</li>
+</ul>
+</li>
+<li><p>？传统的方式（.h&#x2F;.cpp）并没有编译依存最小化，仅仅修改一部分就需要全部编译</p>
+<p>可通过以下两种方式解耦接口与实现：</p>
+<ul>
+<li>handle classes：通过组合方式，类A使用类AImpl完全其所有的函数</li>
+<li>interface classes：通过继承方式，类A提供接口，全是纯虚函数，类B继承类A实现这些函数。</li>
+</ul>
+</li>
+</ol>
+<h2 id="继承与面向对象设计"><a href="#继承与面向对象设计" class="headerlink" title="继承与面向对象设计"></a>继承与面向对象设计</h2><ol start="32">
+<li><p>public继承必须满足is-a的关系（里氏替换原则）</p>
+</li>
+<li><p>派生类函数会遮蔽基类的函数，具体情况为基类有多个重载的函数，派生类有一个同名的函数，那么基类的多个函数全被遮蔽（与virtual无关），如果是public继承则违反了is-a的关系 </p>
+<p>解决方法是使用<code>using Base::f</code> 但这样会把所有的重载的f都拿到作用域中</p>
+<p>如果只想用某一个，可以先用private继承，然后在同名函数中直接调用<code>Base::f()</code></p>
+</li>
+<li><p>区分接口继承和实现继承</p>
+<p>用virtual 同时继承接口和实现，可以重写各自的实现，但问题是如果忘记重写了编译器并不会报错，而是会使用基类的函数</p>
+<p>用pure virtual 可以强制让派生类提供实现，但是可能会出现相同代码</p>
+<p>在基类中提供一个default版本的代码供派生类调用，但这样会多一个函数，且造成命名混乱</p>
+<p>解决方法：给纯虚函数提供实现，派生类通过<code>Base::f()</code>调用此函数</p>
+</li>
+<li><p>？设计模式   替代virtual</p>
+<p>private  virtual&#x2F;public non-virtual调用virtual</p>
+</li>
+<li><p>non-virtual函数不应该被重新定义</p>
+</li>
+<li><p>函数参数的缺省值是看静态类型的，所以virtual函数的参数缺省值只有基类起作用</p>
+</li>
+<li><p>复合  has-a</p>
+</li>
+<li><p>？private继承</p>
+<p>private继承得到的接口都是private 禁止调用</p>
+<p>在设计层面上无意义，只是方便实现</p>
+<p>尽可能用复合而不是private继承</p>
+<p>空对象也有大小</p>
+</li>
+<li><p>？多重继承</p>
+<p>菱形继承 virtual继承</p>
+</li>
+</ol>
+<h2 id="模板与泛型编程"><a href="#模板与泛型编程" class="headerlink" title="模板与泛型编程"></a>模板与泛型编程</h2><p>41. </p>
+<p>42. </p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2089,13 +2200,13 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">71k</span>
+    <span title="Word count total">68k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:19</span>
+    <span title="Reading time total">4:09</span>
   </span>
 </div>
 <div class="busuanzi-count">
