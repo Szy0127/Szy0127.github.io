@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -178,7 +178,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/01/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone_1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -196,7 +196,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/01/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/" class="post-title-link" itemprop="url">CortenMM: Efficient Memory Management with Strong Correctness Guarantees</a>
+          <a href="/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone_1/" class="post-title-link" itemprop="url">TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</a>
         </h2>
 
         <div class="post-meta-container">
@@ -206,18 +206,206 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-02-01 20:14:22 / Modified: 20:15:47" itemprop="dateCreated datePublished" datetime="2026-02-01T20:14:22+08:00">2026-02-01</time>
+      <time title="Created: 2026-02-02 00:42:30" itemprop="dateCreated datePublished" datetime="2026-02-02T00:42:30+08:00">2026-02-02</time>
     </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>892</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone"><a href="#TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone" class="headerlink" title="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"></a>TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</h1><p><img src="/images/JFbabXzZUoOVKSxD8qtcrRNnn1d.png" title="image"></p>
+<p>EuroSys‘26</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>现代移动应用能够自动将用户数据整合到大语言模型的提示中，以生成个性化的响应。与使用云端系统不同，当前出现了一种日益增长的趋势，即将 LLM 推理任务直接部署在移动设备上运行，因为这样做可以消除查询云服务所带来的网络延迟，并将用户的私有数据保留在其本地设备上。</p>
+<p>然而，在移动设备上存储 LLM 模型参数也带来了专有模型泄露给不可信用户的风险，因为移动设备容易遭受越狱攻击。模型泄露可能给模型提供方造成重大经济损失，因为此类模型的开发成本可能高达数百万美元。此外，泄露还可能严重削弱模型提供方在竞争激烈的大语言模型市场中的竞争优势。</p>
+<p>根据先前的研究，大多数移动应用对其设备端模型完全未加保护，而其他一些应用虽然对模型文件进行了加密，但仍允许攻击者从内存中提取出明文形式的模型参数。</p>
+<p><img src="/images/WMXJba05poqw4Xx16PZc8n8unRc.png" title="image"></p>
+<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>存在 Memory efficiency 和 fast inference 的 trade off</p>
+<p>大模型推理需要内存太大，如果动态扩缩容，就会面临冷启动的问题。</p>
+<p><img src="/images/PQCHbDGyCoVOU5x95mncnzTWnOh.png" title="image"></p>
+<h3 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h3><p>REE&#x2F;TEE 缺少安全 NPU 共享的方案</p>
+<ul>
+<li>NPU 在启动时默认配置为非安全设备</li>
+<li>Rockchip NPU 将 llama3-8B 模型的 prefill 提高 12.5 倍 decode 提高 1.3 倍</li>
+<li>使用两个驱动，REE&#x2F;TEE 中 detach&#x2F;attach 进行完整的切换，一次需要 32ms 太慢</li>
+</ul>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p><img src="/images/PR1PbxK2Hodqymx9tMbcxsGvn0d.png" title="image"></p>
+<ul>
+<li>TA：llama.cpp</li>
+<li>REE OS:OpenHarmony v4.1 with Linux v5.10</li>
+<li>TEE OS: OpenHarmony OS and chcore</li>
+</ul>
+<h3 id="Pipelined-Parameter-Restoration"><a href="#Pipelined-Parameter-Restoration" class="headerlink" title="Pipelined Parameter Restoration"></a>Pipelined Parameter Restoration</h3><p><img src="/images/OXqEbd8QYoZn6GxZocVcQrgCnBh.png" title="image"></p>
+<p>相对于传统的纯计算操作，额外增加了三个算子</p>
+<ul>
+<li>Allocation  (CPU)</li>
+<li>Loading (IO)</li>
+<li>Decryption (CPU)</li>
+</ul>
+<p>优先级调度策略：</p>
+<ol>
+<li>Computation</li>
+<li>Decryption</li>
+<li>Allocation</li>
+<li>Loading</li>
+</ol>
+<p>允许 CPU 抢占</p>
+<h3 id="Pipeline-Aware-Secure-Memory-Management"><a href="#Pipeline-Aware-Secure-Memory-Management" class="headerlink" title="Pipeline-Aware Secure Memory Management"></a>Pipeline-Aware Secure Memory Management</h3><p><img src="/images/LipqbNh6PomMTLxK6X1cWLZQnze.png" title="image"></p>
+<p>两个 TZASC region：</p>
+<ul>
+<li>LLM 参数</li>
+<li>KV cache, activations,and other data</li>
+</ul>
+<p>通过 CMA 实现连续内存获取</p>
+<h3 id="TEE-REE-NPU-Time-Sharing"><a href="#TEE-REE-NPU-Time-Sharing" class="headerlink" title="TEE-REE NPU Time-Sharing"></a>TEE-REE NPU Time-Sharing</h3><p><img src="/images/IIpFb7yIzo37C3xNviPcHF5UnTc.png" title="image"></p>
+<p>Data plane 负责：</p>
+<ol>
+<li>初始化 job 上下文，包括 IOPT 内存  register buffer 等</li>
+<li>MMIO 提交 job 到硬件</li>
+<li>处理中断</li>
+</ol>
+<p>Control plane 负责：</p>
+<ol>
+<li>提交 job 到软件队列</li>
+<li>调度 job</li>
+<li>通过 data plane 提交 job 到硬件</li>
+<li>调度下一个 job</li>
+</ol>
+<p><img src="/images/BTVdb3oc3oXxVuxZ9CPcW1N1nte.png" title="image"></p>
+<ul>
+<li>REE kernel 中放完整的 NPU driver  包括调度功能</li>
+<li>TEE 中放部分 NPU driver 只有构造 job 和提交 job 到硬件</li>
+</ul>
+<p>NPU multiplexing 实现：</p>
+<ol>
+<li>TA 有一个乘法任务 提交到 TEE NPU driver</li>
+<li>TEE NPU driver 构造一个 secure job 通过 tzdriver （smc）通知 REE NPU driver</li>
+<li>REE NPU driver 把这个 secure job 加入调度队列</li>
+<li>REE NPU driver 进行正常的调度和计算</li>
+<li>REE NPU driver 调度到一个 secure job</li>
+<li>通过 tzdriver 控制流返回到 TEE NPU driver</li>
+<li>TEE NPU driver 配置 TZPC TZASC GIC 把 NPU 切换为 secure mode</li>
+<li>TEE NPU driver 通过 MMIO 提交 secure job 到硬件</li>
+<li>TEE NPU driver 等待任务完成 配置 TZPC TZASC GIC  把 NPU 切换为 normal mode</li>
+</ol>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ol>
+<li>TTFT</li>
+</ol>
+<p><img src="/images/C2zBbCyTto4eNWxveEZceAUmnUg.png" title="image"></p>
+<ul>
+<li>Strawmen baseline: 77.1%-91.1% improvement</li>
+<li>REE-Flash baseline：2.5%∼22.3%, 22.2%∼55.3%, 10.2%∼15.2% overhead</li>
+<li>REE-Memory baseline: up to 8.5× overhead (parameter restoration)</li>
+</ul>
+<p><img src="/images/AUfFbo6jLoq6XcxkPTScNJb2nJb.png" title="image"></p>
+<p>prompt 短的情况下 overhead 非常明显</p>
+<ol>
+<li>Decode</li>
+</ol>
+<p><img src="/images/Q6LjbvcBvoTXv0x4vgUcCZdenPe.png" title="image"></p>
+<ul>
+<li>Straewman baseline: 0.9%∼23.2% improvement</li>
+<li>REE baseline:1.3%∼4.9% overhead (NPU multiplexing)</li>
+</ul>
+<ol>
+<li>NPU</li>
+</ol>
+<p><img src="/images/HoN7bYhOToAG30x60wvc1LhInSh.png" title="image"></p>
+<ul>
+<li>额外 3.8% and 3.0% 的 overhead</li>
+<li>smc switch + TZASC TZPC 配置 +GIC 配置耗时在 prefill decode 阶段占比为 1.6%∼2.7% and 2.3%∼5.7%</li>
+</ul>
+<h2 id="Drawback"><a href="#Drawback" class="headerlink" title="Drawback"></a>Drawback</h2><p>Secure memory 需要 CMA 分配连续内存</p>
+<ol>
+<li>耗时久</li>
+</ol>
+<p><img src="/images/LGSDb8n3Ro3oJYxNN04cw9aanvg.png" title="image"></p>
+<p><img src="/images/Et40bJ5YrorZ66xA18XckcyGnZd.png" title="image"></p>
+<p><img src="/images/RJuXbsvzgodRxpxynHPcQHUonU9.png" title="image"></p>
+<ol>
+<li>影响其他应用性能</li>
+</ol>
+<p><img src="/images/BwF8bx6zFoYduvxeTJEcktHDnud.png" title="image"></p>
+<ol>
+<li>需要改 EL3</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/" class="post-title-link" itemprop="url">CortenMM: Efficient Memory Management with Strong Correctness Guarantees</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
+        <i class="far fa-calendar"></i>
       </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-02-02 00:41:37" itemprop="dateCreated datePublished" datetime="2026-02-02T00:41:37+08:00">2026-02-02</time>
     </span>
 
   
@@ -245,30 +433,30 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees"><a href="#CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees" class="headerlink" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees"></a>CortenMM: Efficient Memory Management with Strong Correctness Guarantees</h1><p><img src="/../papers/static/YeKsbBKfiogZegxUDSac0ZrUndZ.png"></p>
+          <h1 id="CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees"><a href="#CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees" class="headerlink" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees"></a>CortenMM: Efficient Memory Management with Strong Correctness Guarantees</h1><p><img src="/images/YeKsbBKfiogZegxUDSac0ZrUndZ.png" title="image"></p>
 <p>SOSP‘25 Best Paper</p>
 <h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><h3 id="VMA"><a href="#VMA" class="headerlink" title="VMA"></a>VMA</h3><p>内存管理上 Linux 采用 VMA+ 页表的两层抽象，在内存操作上需要两种类型的锁，限制了可扩展性</p>
-<p><img src="/../papers/static/O8nkbhZW8oBqMvxkM0dcqqdgnOl.png"></p>
-<p><img src="/../papers/static/ZtSqbl2kVor08jxOHdBcMgTSnRd.png"></p>
+<p><img src="/images/O8nkbhZW8oBqMvxkM0dcqqdgnOl.png" title="image"></p>
+<p><img src="/images/ZtSqbl2kVor08jxOHdBcMgTSnRd.png" title="image"></p>
 <ul>
 <li>可扩展性差</li>
 <li>并发 Bug 多（CVE）</li>
 </ul>
-<p><img src="/../papers/static/RRjdbAp1Coh2lXxf606cYY7gn6f.png"></p>
+<p><img src="/images/RRjdbAp1Coh2lXxf606cYY7gn6f.png" title="image"></p>
 <ul>
 <li>两个地址范围不相交的 page fault 在页表层面不存在冲突，但是如果处于同一段 VMA 中 就会因为抢 VMA 锁导致竞争</li>
 <li>Real-world application 中存在各种 mmap mprotect 的调用 比较复杂</li>
 </ul>
 <h3 id="Asterinas"><a href="#Asterinas" class="headerlink" title="Asterinas"></a>Asterinas</h3><p>星绽操作系统</p>
-<p><img src="/../papers/static/MLQHbKAZrosPGqxIiG5cC9Ypnsd.png"></p>
-<p><img src="/../papers/static/EDwPb7CLMoODR8xHmVDcF8ojnvg.png"></p>
-<p><img src="/../papers/static/C7FUbOBBaoDSBxx6VoWcZHnnnDg.png"></p>
+<p><img src="/images/MLQHbKAZrosPGqxIiG5cC9Ypnsd.png" title="image"></p>
+<p><img src="/images/EDwPb7CLMoODR8xHmVDcF8ojnvg.png" title="image"></p>
+<p><img src="/images/C7FUbOBBaoDSBxx6VoWcZHnnnDg.png" title="image"></p>
 <h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Key insight：</p>
 <ol>
 <li>两层抽象的设计是由于历史原因，目前大部分现代 ISA 和 MMU 采用相似的多级页表设计</li>
 <li>为了实现 On-demand paging COW swap 等高级的内存管理语义，并不需要多一层抽象</li>
 </ol>
-<p><img src="/../papers/static/SLvXbYraFo5mESx0SD2cItNjnPd.png"></p>
+<p><img src="/images/SLvXbYraFo5mESx0SD2cItNjnPd.png" title="image"></p>
 <ul>
 <li>通过页表页的物理地址 可以找到 page descriptor</li>
 <li>有且仅有每个页表页存在锁</li>
@@ -280,27 +468,27 @@
 <li>On-demand paging 需要复制整个页表 会比复制 VMA 慢 （mmap &#x2F; fork）</li>
 </ol>
 <h3 id="Lock-protocol"><a href="#Lock-protocol" class="headerlink" title="Lock protocol"></a>Lock protocol</h3><p>CortenMM-rw 读写锁：在遍历页表的过程中拿读锁 找到对应的页表页以后拿写锁</p>
-<p><img src="/../papers/static/Ios8bgizooEsrlxhL6Ac6cVRnXc.png"></p>
+<p><img src="/images/Ios8bgizooEsrlxhL6Ac6cVRnXc.png" title="image"></p>
 <p>读锁之间仍然有竞争（原子变量）</p>
 <p>CoartenMM-adv：RCU+ 互斥锁</p>
 <p>遍历页表的时候不加锁 只记录 RCU 状态</p>
-<p><img src="/../papers/static/NRqpbc07Coyw96xeT3HcGFqrnSc.png"></p>
-<h3 id="内存接口实现"><a href="#内存接口实现" class="headerlink" title="内存接口实现"></a>内存接口实现</h3><p><img src="/../papers/static/ULtvbZuVdoee5PxRMZWcG78GnJe.png"></p>
-<p><img src="/../papers/static/VbIPbc2XwoQML9xDSsicx0WfnNg.png"></p>
+<p><img src="/images/NRqpbc07Coyw96xeT3HcGFqrnSc.png" title="image"></p>
+<h3 id="内存接口实现"><a href="#内存接口实现" class="headerlink" title="内存接口实现"></a>内存接口实现</h3><p><img src="/images/ULtvbZuVdoee5PxRMZWcG78GnJe.png" title="image"></p>
+<p><img src="/images/VbIPbc2XwoQML9xDSsicx0WfnNg.png" title="image"></p>
 <h2 id="Verification"><a href="#Verification" class="headerlink" title="Verification"></a>Verification</h2><p>用 Verus(半自动的基于 SMT 的验证器) 进行形式化验证</p>
 <ol>
 <li>locking protocol 正确，即 两个线程并发访问范围相交的地址 不可能同时拿到锁</li>
 <li>对页表的修改正确（map unmap mark），并且页表结构正确（始终处于合法状态）</li>
 </ol>
-<p><img src="/../papers/static/UOndbwNRPo9wJPxplq5cpD9NnSf.png"></p>
+<p><img src="/images/UOndbwNRPo9wJPxplq5cpD9NnSf.png" title="image"></p>
 <h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ul>
 <li>AMD EPYC 9965</li>
 <li>192-core CPU * 2 &#x3D; 384 cores</li>
 <li>512GB DRAM * 2 &#x3D; 1T</li>
 </ul>
-<h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p><img src="/../papers/static/Rkuvbyvcxo6zaSx5OPTczO2xn5e.png"></p>
+<h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p><img src="/images/Rkuvbyvcxo6zaSx5OPTczO2xn5e.png" title="image"></p>
 <p>单线程</p>
-<p><img src="/../papers/static/Cjs0b1D5QoY1hwxu5s6cGerznFh.png"></p>
+<p><img src="/images/Cjs0b1D5QoY1hwxu5s6cGerznFh.png" title="image"></p>
 <ul>
 <li>Linux 只需要创建 VMA</li>
 <li>Cortenmm 需要分配、创建页表页</li>
@@ -308,7 +496,7 @@
 <p>&#x3D;&gt; mmap 慢</p>
 <p>发生 page fault Linux 仍然需要创建页表</p>
 <p>&#x3D;&gt; mmap+PF 快</p>
-<p><img src="/../papers/static/HTbcbBqffo8kqBxZJ6kcTvwQnqg.png"></p>
+<p><img src="/images/HTbcbBqffo8kqBxZJ6kcTvwQnqg.png" title="image"></p>
 <ul>
 <li>Fork：-17.7%</li>
 <li>fork+exec ：+23%</li>
@@ -318,14 +506,14 @@
 <li>low-contention:每个线程在私有内存区域上访问</li>
 <li>high-contention：每个线程在共享内存上随机访问</li>
 </ul>
-<p><img src="/../papers/static/GKXqbslSzo5hNlxoyVUculUYneb.png"></p>
+<p><img src="/images/GKXqbslSzo5hNlxoyVUculUYneb.png" title="image"></p>
 <ul>
 <li>cortenmm 几乎线性增长，384thread 情况下 PF 快 33 倍 unmap-virt 快 2270 倍</li>
 <li>Cortenmm 64thread 开始掉的原因：最后一层页表页发生竞争</li>
 </ul>
-<h3 id="Real-world-benchmark"><a href="#Real-world-benchmark" class="headerlink" title="Real-world benchmark"></a>Real-world benchmark</h3><p><img src="/../papers/static/WHqqbC1EioGradxjbXJcf5I3nEb.png"></p>
+<h3 id="Real-world-benchmark"><a href="#Real-world-benchmark" class="headerlink" title="Real-world benchmark"></a>Real-world benchmark</h3><p><img src="/images/WHqqbC1EioGradxjbXJcf5I3nEb.png" title="image"></p>
 <p>cortenmm 减少了并发情况下 application 在 page fault&#x2F;unmap&#x2F;mprotect 上的耗时</p>
-<p><img src="/../papers/static/JlEpb4LctonQi4xZj1hce95pnod.png"></p>
+<p><img src="/images/JlEpb4LctonQi4xZj1hce95pnod.png" title="image"></p>
 <p>在某些应用场景下，使用更先进的内存分配器（tcmalloc） 可以大幅度提升 Linux 的可扩展性（通过减少对 unmap 等 syscall 的调用）</p>
 <p>但是使用 tcmalloc 会造成其他副作用 比如占用内存变多</p>
 <h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>CortenMM 简化了内存管理系统，摈弃了传统的 VMA，而使用单层抽象，同时提出了一种面向 MMU 编程的事务型接口，并配套设计了相应的加锁协议。这些加锁协议避免了在软件抽象层上产生不必要的竞争，在维持事务原子性的同时显著提升了性能和可扩展性。加锁协议和事务接口中的基本功能进行了形式化验证，从而提供了强有力的一致性保障。在真实世界基准测试中， CortenMM 性能比 Linux 高出 1.2 倍至 26 倍。</p>
@@ -1398,142 +1586,6 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">C++20高级编程</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>429</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="C-20高级编程"><a href="#C-20高级编程" class="headerlink" title="C++20高级编程"></a>C++20高级编程</h1><h2 id="类型与对象"><a href="#类型与对象" class="headerlink" title="类型与对象"></a>类型与对象</h2><ol>
-<li><pre><code class="c++">template&lt;typename F,typename...Args&gt;
-using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...))
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. `std::pair a&#123;1,2.3&#125;` 类模板自动推导</span><br><span class="line"></span><br><span class="line">3. 运行时多态 传统面向对象编程 subtype多态 用指针 虚函数</span><br><span class="line"></span><br><span class="line">   用`std::variant` `std::visit` ad-hoc多态 性能更高 </span><br><span class="line"></span><br><span class="line">   看不同设计模式的要求</span><br><span class="line"></span><br><span class="line">   ```c++</span><br><span class="line">   struct Circle&#123;&#125;;</span><br><span class="line">   struct Rectangle&#123;&#125;;</span><br><span class="line">   double getArea(const Circle &amp;c);</span><br><span class="line">   double getArea(const Rectangle &amp;r);</span><br><span class="line">   using Shape = std::variant&lt;Circle,Rectangle&gt;;</span><br><span class="line">   double getArea(const Shape &amp;s)&#123;</span><br><span class="line">   	return std::visit(</span><br><span class="line">   		[](const auto&amp;data)&#123;</span><br><span class="line">   			return getArea(data);</span><br><span class="line">   		&#125;,s</span><br><span class="line">   	)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</code></pre>
-</li>
-<li><p>查看类型-</p>
-<ul>
-<li><code>[[deprecated]]</code>表示弃用，可以通过编译器的警告来看</li>
-<li>编译器提供的宏 <code>_PRETTY_FUNCTION_</code></li>
-<li><a target="_blank" rel="noopener" href="https://cppinsights.io/">https://cppinsights.io</a></li>
-</ul>
-</li>
-</ol>
-<h2 id="编译时多态"><a href="#编译时多态" class="headerlink" title="编译时多态"></a>编译时多态</h2><ol start="5">
-<li><p>函数:</p>
-<ul>
-<li>名称查找：ADL规则 不在作用域内的也可见</li>
-<li>模板函数处理：推导 SFINAE  替换失败不会导致编译错误 只是放弃这个选择</li>
-<li>重载决议：参数最匹配 转换最少；非模板优于模板</li>
-</ul>
-</li>
-<li><p>type traits：输入类型 输出特征 变换类型</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="type">size_t</span> N&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci = fibonacci&lt;N<span class="number">-1</span>&gt; + fibonacci&lt;N<span class="number">-2</span>&gt;;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">0</span>&gt; = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">1</span>&gt; = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">static_assert</span>(fibonacci&lt;<span class="number">10</span>&gt; == <span class="number">55</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><code>[[no_unique_address]]</code>空基类优化成0字节</p>
-</li>
-<li><p><code>condition_t&lt;true,int,float&gt;</code> int</p>
-</li>
-<li><p>类型内省 通过模板偏特化拿到数组长度 函数参数类型等信息</p>
-</li>
-<li><p><code>enable_if</code>或标签分发 可用<code>if constexpr</code> 代替</p>
-</li>
-<li><p>奇异递归模板：把派生类作为基类的模板参数，让基类可用使用派生类提供的方法</p>
-<p>可实现多态，避免虚函数开销</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">static_cast</span>&lt;Derived&amp;&gt;(*<span class="keyword">this</span>).<span class="built_in">f_Impl</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&lt;Derived&gt;&#123;</span><br><span class="line">    <span class="keyword">friend</span> Base;<span class="comment">//struct可以不用</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">f_Impl</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>三路比较操作符<code>&lt;=&gt;</code> 默认强序 根据成员变量声明顺序比较</p>
-</li>
-<li><p><code>make_shared</code>比<code>new</code>效率高</p>
-</li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/Effective%20Modern%20C++/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1967,7 +2019,7 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveSTL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1985,7 +2037,7 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/cpp/effectiveC++/" class="post-title-link" itemprop="url">Effective C++</a>
+          <a href="/2026/01/31/cpp/effectiveSTL/" class="post-title-link" itemprop="url">effective STL</a>
         </h2>
 
         <div class="post-meta-container">
@@ -2016,14 +2068,14 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.6k</span>
+      <span>1.5k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -2034,209 +2086,196 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Effective-C"><a href="#Effective-C" class="headerlink" title="Effective C++"></a>Effective C++</h1><h2 id="让自己习惯C"><a href="#让自己习惯C" class="headerlink" title="让自己习惯C++"></a>让自己习惯C++</h2><ol>
-<li><ol>
-<li>c++有4个主要的次语言</li>
-</ol>
+          <h1 id="effective-STL"><a href="#effective-STL" class="headerlink" title="effective STL"></a>effective STL</h1><h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><ol>
+<li><p>选择容器</p>
+</li>
+<li><p>不同容器有不同的接口 没有办法编写独立于容器的代码</p>
+</li>
+<li><p>容器会默认拷贝，基类容器放入派生类会丢失信息（slicing） 解决方法是用指针</p>
+<p>可以用空容器加reserve方法即拿到空间又避免创建空对象</p>
+</li>
+<li><p>用<code>empty()</code>代替<code>size()==0</code> 因为empty保证了常数时间而size对于某些容器不一定</p>
+<p>对于list <code>splice</code>提供了常数时间的拼接 因此无法维护size是常数时间</p>
+</li>
+<li><p>对于区间操作，写法上避免的循环 更优雅，在效率上会优化</p>
+<p>区间构造、插入、删除、赋值</p>
+</li>
+<li><p>编译器在分析时可能会把对象实例化分析成函数声明</p>
+</li>
+<li><p>使用new创建的对象需要在容器销毁前手动delete 最好的方法是用智能指针</p>
+</li>
+<li><p>不用auto_ptr</p>
+</li>
+<li><p>删除对象</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>某个值</th>
+<th>某些条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vector string deque</td>
+<td>erase-remove</td>
+<td>erase-remove_if</td>
+</tr>
+<tr>
+<td>list</td>
+<td>remove</td>
+<td>remove_if</td>
+</tr>
+<tr>
+<td>set map</td>
+<td>erase</td>
+<td>遍历删除</td>
+</tr>
+</tbody></table>
+<p>循环删除：迭代器+erase</p>
 <ul>
-<li>C 没有模板 异常 重载</li>
-<li>C++ 类 封装 继承 多态 虚函数</li>
-<li>Template 泛型</li>
-<li>STL</li>
-</ul>
-<p>不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）</p>
-</li>
-<li><p>#define 直接被替换 报错时找不到信息 并且占用内存可能反而更大</p>
-<ul>
-<li>const 取地址合法</li>
-<li>enum 取地址不合法</li>
-<li>inline</li>
-</ul>
-</li>
-<li><p>用const修饰变量，函数等</p>
-<p>返回的对象可以使用const修饰 避免 <code>if(a*b=c)</code></p>
-<p>const可非const可重载</p>
-<p>非const可转型为const</p>
-</li>
-<li><p>类的成员变量的初始化发生在进入构造函数之前，且一定按声明的顺序</p>
-<p>使用初始化列表，内置类型也使用xx()的形式</p>
-</li>
-</ol>
-<h2 id="构造-析构-赋值运算"><a href="#构造-析构-赋值运算" class="headerlink" title="构造&#x2F;析构&#x2F;赋值运算"></a>构造&#x2F;析构&#x2F;赋值运算</h2><ol start="5">
-<li><p>默认构造函数会初始化基类和非静态成员变量，默认析构会自动调用析构（所以不用写），默认拷贝函数会复制每个非const对象</p>
-<p>三种情况 不会生成默认拷贝函数</p>
-<ul>
-<li>有引用成员变量</li>
-<li>有const成员变量</li>
-<li>基类的拷贝函数为private</li>
-</ul>
-</li>
-<li><p>不想使用默认的函数，可以声明为private</p>
-</li>
-<li><p>多态的基类的析构函数加virtual 避免用基类指针释放派生类对象出现内存泄漏</p>
-<p>虚函数使用虚函数指针管理，会增加内存占用</p>
-<p>如果基类的析构没有virtual 不适合派生，例如STL</p>
-</li>
-<li><p>在析构中catch异常，不向下传递</p>
-</li>
-<li><p>在派生类的构造&#x2F;析构函数调用基类的构造&#x2F;析构函数时，派生类的信息已经消失，所以在基类的构造&#x2F;析构函数中调用虚函数是无效的</p>
-</li>
-<li><p>为了实现连续赋值，让operator&#x3D;返回左值引用</p>
-</li>
-<li><p>operator&#x3D;的两个对象如果相同可能会出现删掉自己的问题 </p>
-<p>解决方法如下：</p>
-<ul>
-<li>开头判断是否相等 如果相等直接返回    增加了取址 条件跳转 影响效率</li>
-<li>调整顺序 先改再删 </li>
-<li>用swap</li>
+<li>序列容器：用返回值更新迭代器</li>
+<li>关联容器：迭代器后缀自增</li>
 </ul>
 </li>
-<li><p>自定义拷贝构造函数和拷贝函数需要保证复制了每个成员变量，编译器不会提醒</p>
-<ul>
-<li>复制自己所有的成员变量</li>
-<li>调用基类的拷贝构造函数 <code>XX::operator=(rhs)</code></li>
-</ul>
-<p>拷贝构造函数和拷贝函数重复的代码可用一个private的init函数来写</p>
+<li><p>自定义allocater需要注意很多东西，例如接受的参数是T的个数，返回T*</p>
+</li>
+<li><p>自定义allocater的好处有 单线程时避免线程同步的开销、放入同一块堆等</p>
+</li>
+<li><p>STL容器并不能保证线程安全 需要自己加锁</p>
 </li>
 </ol>
-<h2 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h2><p>除了内存，文件描述符，锁、连接、socket都是资源</p>
-<ol start="13">
-<li><p>在一个函数中，使用指针 最后delete 可能导致由于中间部分的问题而没有delete</p>
-<p>使用智能指针管理，借助离开函数自动调用析构函数的机制 <code>std::auto_ptr&lt;A&gt; p(new A)</code></p>
-<p>智能指针默认执行delete 而不是delete[] 无法管理数组</p>
-<p>需要open close成对出现的资源 可以写在一个类中，close写在类的析构中，出现异常自动调用</p>
+<h2 id="vector和string"><a href="#vector和string" class="headerlink" title="vector和string"></a>vector和string</h2><ol start="13">
+<li><p>用vector&#x2F;string代替动态数组 避免delete的麻烦</p>
+<p>string某些实现会使用引用计数来优化，但多线程情况下会带来同步的额外开销</p>
 </li>
-<li><p>资源管理类小心复制，可以直接禁止复制</p>
+<li><p>reserve避免不必要的重新分配空间</p>
 </li>
-<li><p>虽然智能指针可以通过*或-&gt;像指针一样使用，但是<code>*A</code>与<code>std::auto_ptr&lt;A&gt;</code>类型并不相同，不能被函数接受</p>
-<p>智能指针提供get方法拿到原始指针，但是这样用户会觉得麻烦</p>
-<p>另一种方法是在类中定义隐式转换的函数 但这样会出现非预期的转换 造成bug</p>
+<li><p>string的多种实现</p>
 </li>
-<li><p>new delete ； new[]  delete[]  否则都会有bug</p>
-<ul>
-<li>多个构造函数用相同形式的new</li>
-<li>使用typedef 注意是否是数组</li>
-</ul>
+<li><p>兼容C API：</p>
+<p>vector： <code>&amp;v[0]</code> 或<code>&amp;*v.begin()</code> 迭代器不是指针</p>
+<p>string： <code>s.c_str()</code></p>
 </li>
-<li><p>new得到的指针放入指针智能时使用独立语句，否则可能导致中间步骤的失败丢失new出来的指针</p>
+<li><p>删除元素后容器的最大容量并不改变，可以通过swap缩小</p>
+<p><code>vector&lt;T&gt;(v).swap(v)</code></p>
+</li>
+<li><p><code>vector&lt;bool&gt;</code>每个bool占一个二进制位（位域思想）不满足STL标准  []返回代理对象</p>
+<p>用<code>deque&lt;boo&gt;``bitset</code>替代</p>
 </li>
 </ol>
-<h2 id="设计与声明"><a href="#设计与声明" class="headerlink" title="设计与声明"></a>设计与声明</h2><ol start="18">
-<li><p>良好的接口不应该被误用，例如返回指针会导致没有delete&#x2F;delete两次&#x2F;错误方式delete等</p>
-<p>可以返回一个智能指针，同时设置好deleter 强制让用户使用智能指针来接受</p>
-<p>防止同类型的参数顺序出错，可以新声明几个类型，强制让用户使用新类型</p>
+<h2 id="关联容器"><a href="#关联容器" class="headerlink" title="关联容器"></a>关联容器</h2><ol start="19">
+<li><p>相等是数据相等 等价是自己定义的函数 成员函数与stl非成员函数方法不同</p>
 </li>
-<li><p>设计class应该像设计type一样 考虑创建销毁 初始化赋值 传递 合法值 转换 操作符 接口等一系列问题</p>
+<li><p>存指针需要指定比较函数 否则根据十六进制比较</p>
 </li>
-<li><p>函数参数传递是按值传递，会调用构造函数，效率低，尽量使用引用传递，为了防止引用传递的后果 加const</p>
-<p>这样做可以解决对象切割的问题，即使用基类对象接受派生类，依然可以正确找到派生类声明为virtual的函数</p>
-<p>内置类型比较小 用引用涉及到指针反而慢， stl容器也尽量用值传递</p>
+<li><p>比较函数需要保证让相等的值返回false 否则</p>
+<p><code>!(a&lt;=b) &amp;&amp; !(b&lt;=a)</code> 在a&#x3D;b时会返回false</p>
 </li>
-<li><p>函数的返回值也会涉及到构造与析构的浪费，但是此处并没有办法节省（除非返回值并不是函数生成的）</p>
-<p>尝试方法与问题如下：</p>
+<li><p>对于set 修改key(比较的部分)是很危险的</p>
+<p>解决方法：</p>
 <ul>
-<li>栈上分配 返回引用   返回时已经销毁 拿到已经销毁的变量</li>
-<li>堆上分配 返回指针   没人delete&#x2F;连续运算时丢失临时变量的指针</li>
-<li>使用static     static对象只看现值 严重bug</li>
+<li>找到对应元素 复制 修改 删除旧 插入新</li>
+<li><code>const_cast&lt;T&amp;&gt;(*t).f()</code></li>
 </ul>
 </li>
-<li><p>所有类的成员变量都应该是private 需要的话设置getter和setter通过函数访问</p>
-<p>好处如下：</p>
-<ul>
-<li>提供的接口都是函数，统一使用括号访问</li>
-<li>封装 可以随意修改实现方法</li>
-<li>取消此变量后不会让客户代码与派生类代码发生破坏</li>
-</ul>
+<li><p><code>vector</code>使用二分查找的复杂度与关联容器一致，而在存储上更省空间，关联容器基于二叉树，需要额外两个指针。</p>
+<p>因此vector可在每个page上放更多的对象，减少了page fault的次数 从而提高性能</p>
 </li>
-<li><p>封装的内容越多，可访问内容的函数越少，改动影响的部分越少，可改动的弹性越大</p>
-<p>所以在两个函数具有相同功能的时候，尽量使用non-member&#x2F;non-friend去替代member(成员)函数</p>
-<p>可以使用namespace把工具函数和类放在同一区域中</p>
-<p>不同的源文件不能切分类，但是可以使用同一个namespace 切分工具函数</p>
+<li><p>[]会先插入（默认构造）再赋值 适合已经有元素的情况下使用</p>
+<p>insert会构造pair再析构 适合在无元素的情况下使用</p>
 </li>
-<li><p>如果一个函数的所有参数都需要类型转换，应该成为non-member</p>
-<p>member函数一方是this 无法隐式转换</p>
-</li>
-<li><p>？ swap</p>
+<li><p>非标准散列容器</p>
 </li>
 </ol>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol start="26">
-<li><p>尽量延后变量定义式出现的时间，否则可能会由于中途的异常而没有使用却承担了构造析构的成本</p>
-<p>直接给初值，而不是初始化之后再赋值</p>
-<p>循环中需要的变量放在内还是外需要对比构造析构与赋值操作的时间，放内部不影响作用域及可理解性、易维护性</p>
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><ol start="26">
+<li><p>使用iterator而不是其他的 例如const_iterator</p>
 </li>
-<li><p>少转型 用新式转型替代旧式转型</p>
-<p>转型不是只改变解释方式不改变数据，转型会生成代码（int和double的表示方式都不同）</p>
-<ul>
-<li>static_cast  强迫转型 但是在类的成员函数中转成基类调基类的函数会导致生成函数副本，使用错误的this</li>
-<li>dynamic_cast 向下转型，可以通过基类派生类，但是效率不高，最好用virtual实现相同的功能</li>
-</ul>
+<li><p><code>advance(v.begin(),distance&lt;constIter&gt;(v.begin(),ci))</code> const_iterator去掉const</p>
 </li>
-<li><p>避免返回handles（引用，指针，迭代器）</p>
-<p>风险如下：</p>
-<ul>
-<li>操作了private成员&#x2F;声明为const的函数&#x2F;变量实际修改了内容</li>
-<li>handles所指内容的主体已经被析构，造成空悬</li>
-</ul>
-<p>例外：string vector等容器的operator&#x3D;返回的是引用</p>
+<li><p><code>reverse_iterator.base()</code>拿到iterator 插入删除时注意位置</p>
 </li>
-<li><p>函数需要异常安全</p>
-<p>三个等级：</p>
-<ul>
-<li>基本：不破坏数据结构（例如资源泄露，打乱排序数组）</li>
-<li>强烈：保证状态不变 可以通过copy-swap实现，及创建副本 修改在副本上 然后交换 但可能效率较低 复杂程度较高；并且，如果这个函数中调用了其他函数，但是其他函数并没有强烈的异常安全保证，自己也不行。</li>
-<li>不抛异常</li>
-</ul>
-</li>
-<li><p>inline 用函数本体替换每次调用的地方，编译时候完成，编译器会选择（太复杂或者virtual会拒绝）</p>
-<ul>
-<li><p>好处：减小函数调用的开销</p>
-</li>
-<li><p>坏处：可能增大字节码，修改后必须重新编译</p>
-</li>
-</ul>
-</li>
-<li><p>？传统的方式（.h&#x2F;.cpp）并没有编译依存最小化，仅仅修改一部分就需要全部编译</p>
-<p>可通过以下两种方式解耦接口与实现：</p>
-<ul>
-<li>handle classes：通过组合方式，类A使用类AImpl完全其所有的函数</li>
-<li>interface classes：通过继承方式，类A提供接口，全是纯虚函数，类B继承类A实现这些函数。</li>
-</ul>
+<li><pre><code class="c++">ifstream inputFile(&quot;f.txt&quot;);
+string fileData(
+    (istreambuf_iterator&lt;char&gt;(inputFile)),
+    istream_buf_iterator&lt;char&gt;()
+);
+</code></pre>
 </li>
 </ol>
-<h2 id="继承与面向对象设计"><a href="#继承与面向对象设计" class="headerlink" title="继承与面向对象设计"></a>继承与面向对象设计</h2><ol start="32">
-<li><p>public继承必须满足is-a的关系（里氏替换原则）</p>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><ol start="30">
+<li><p><code>transform</code>对容器1的每个元素进行操作 结果放到容器2中</p>
+<p><code>transform(v.begin(),v.end(),back_inserter(res),f)</code></p>
 </li>
-<li><p>派生类函数会遮蔽基类的函数，具体情况为基类有多个重载的函数，派生类有一个同名的函数，那么基类的多个函数全被遮蔽（与virtual无关），如果是public继承则违反了is-a的关系 </p>
-<p>解决方法是使用<code>using Base::f</code> 但这样会把所有的重载的f都拿到作用域中</p>
-<p>如果只想用某一个，可以先用private继承，然后在同名函数中直接调用<code>Base::f()</code></p>
+<li><p>完全排序：sort stable_sort</p>
+<p>部分排序：partial_sort</p>
+<p>找最前n个 不用排序：nth_element</p>
+<p>满足条件的区分：partition stable_partition</p>
 </li>
-<li><p>区分接口继承和实现继承</p>
-<p>用virtual 同时继承接口和实现，可以重写各自的实现，但问题是如果忘记重写了编译器并不会报错，而是会使用基类的函数</p>
-<p>用pure virtual 可以强制让派生类提供实现，但是可能会出现相同代码</p>
-<p>在基类中提供一个default版本的代码供派生类调用，但这样会多一个函数，且造成命名混乱</p>
-<p>解决方法：给纯虚函数提供实现，派生类通过<code>Base::f()</code>调用此函数</p>
+<li><p>remove没有办法真正删掉元素 只是改变了位置 </p>
+<p>remove返回的迭代器是新的逻辑结尾 需要作为erase的第一个参数使用</p>
 </li>
-<li><p>？设计模式   替代virtual</p>
-<p>private  virtual&#x2F;public non-virtual调用virtual</p>
+<li><p>如果管理的是指针 使用remove unique会导致资源泄露</p>
 </li>
-<li><p>non-virtual函数不应该被重新定义</p>
+<li><p>有些函数只有在传入排序区间的情况下才能保证性能</p>
 </li>
-<li><p>函数参数的缺省值是看静态类型的，所以virtual函数的参数缺省值只有基类起作用</p>
+<li><p>默认字符串比较是大小写敏感的  可通过mismatch和tolower自己写一个忽略大小写的</p>
 </li>
-<li><p>复合  has-a</p>
+<li><p>copy_if</p>
 </li>
-<li><p>？private继承</p>
-<p>private继承得到的接口都是private 禁止调用</p>
-<p>在设计层面上无意义，只是方便实现</p>
-<p>尽可能用复合而不是private继承</p>
-<p>空对象也有大小</p>
-</li>
-<li><p>？多重继承</p>
-<p>菱形继承 virtual继承</p>
+<li><p>count count_if max_element</p>
+<p>accumulate 自定义累加函数</p>
+<p>for_each</p>
 </li>
 </ol>
-<h2 id="模板与泛型编程"><a href="#模板与泛型编程" class="headerlink" title="模板与泛型编程"></a>模板与泛型编程</h2><p>41. </p>
-<p>42. </p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ol start="38">
+<li><p>STL用到的函数都是按值传递的，因此需要保证小巧和单态</p>
+</li>
+<li><p>判别式（predicate）：返回bool的函数</p>
+<p>纯函数：结果仅与参数与常数有关</p>
+<p>判别式必须是纯函数 因为判别式会在某些STL函数中被复制使用</p>
+</li>
+<li><p><code>not1``not2</code>等函数配接器可以作用在函数外，配合find_if等函数使用</p>
+<p>需要定义的函数继承<code>std::unary_function&lt;T,bool&gt;</code> 或套一层<code>ptr_fun</code></p>
+</li>
+<li><p>成员函数传给STL组件时使用<code>mem_fun</code> 可用于成员函数自测</p>
+</li>
+<li><p>让<code>less&lt;T&gt;</code>与operator&#x3D;含义相同</p>
+</li>
+</ol>
+<h2 id="在程序中使用STL"><a href="#在程序中使用STL" class="headerlink" title="在程序中使用STL"></a>在程序中使用STL</h2><ol start="43">
+<li><p>用算法避免循环 例如insert find for_each</p>
+<ul>
+<li>循环需要保证迭代器有效</li>
+<li>算法实现者可以通过容器的实现细节提高遍历效率</li>
+<li>算法名称表明意图</li>
+</ul>
+</li>
+<li><p>选择容器的成员函数而不是普通的STL算法</p>
+<p>容器的成员函数是针对容器实现的  效率和正确性都有保证</p>
+</li>
+<li><p>查找：</p>
+<p>未排序：count 遍历所有 返回个数；find 找到第一个就返回迭代器  相等性</p>
+<p>排序：lower_bound upper_bound equal_range 等价性</p>
+<p>count &#x3D; equal_range + distance</p>
+</li>
+<li><p>STL组件传入函数对象而不是函数</p>
+<p>函数对象的()方法可以内联直接被编译器使用</p>
+<p>函数只能作为指针 每次都调用</p>
+</li>
+<li><p>使用STL算法会带来很多的嵌套调用 难以阅读 最好分步 但是仍不用循环</p>
+</li>
+<li><p>不同的平台可能会自动include某些头文件 因此为了方便移植 需要自己加</p>
+</li>
+<li><p>debug时可以用软件把很长的类型进行替换 方便看到核心的错误信息</p>
+</li>
+<li><p>站点</p>
+</li>
+</ol>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
+<p>​    </p>
 
       
     </div>
@@ -2278,13 +2317,13 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">68k</span>
+    <span title="Word count total">69k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:09</span>
+    <span title="Reading time total">4:12</span>
   </span>
 </div>
 <div class="busuanzi-count">
