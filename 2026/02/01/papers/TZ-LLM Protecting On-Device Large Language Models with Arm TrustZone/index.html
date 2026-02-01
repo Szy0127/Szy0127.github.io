@@ -22,38 +22,38 @@
     <meta name="description" content="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone EuroSys‘26 Background现代移动应用能够自动将用户数据整合到大语言模型的提示中，以生成个性化的响应。与使用云端系统不同，当前出现了一种日益增长的趋势，即将 LLM 推理任务直接部署在移动设备上运行，因为这样做可以消除查询云服务所带来的网络延迟">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone">
-<meta property="og:url" content="http://szy0127.github.io/2026/01/31/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/index.html">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/index.html">
 <meta property="og:site_name" content="S blog">
 <meta property="og:description" content="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone EuroSys‘26 Background现代移动应用能够自动将用户数据整合到大语言模型的提示中，以生成个性化的响应。与使用云端系统不同，当前出现了一种日益增长的趋势，即将 LLM 推理任务直接部署在移动设备上运行，因为这样做可以消除查询云服务所带来的网络延迟">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OGMyYWE5NDM2MDdhZWQ1NTg2ZDYyZTcxNmEyNzM3NTlfWmpsdnN0RHpRdVlyNUJHOXNXWGhpY3BGd0NTRk15eGlfVG9rZW46VjhLTmJNSHl5b2s4c054VXpQN2NWa1BmbmZoXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YmUyOWQyMmQyNzkzOGFkNzIzOGFkMmQxNGRjN2JkZGZfY3dxTDlPVjlMNTNhZHRIcU9lY3AwRkNrQnR2MGcyYUZfVG9rZW46Vm00dGJRa1N2b0UwZnR4RWZmUGN3ZkNSblNEXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjZiNTJkYTRmZTA2MmFmZjM4YTNmMzg3NTc3YzkxOTRfVHdrRUdDc1p3MzZ4M2h0bGdscEFyNnZaSEdRTmZnVDdfVG9rZW46RzRvV2JJc3ZvbzlKbXR4RFU1dmNRWGdWbmVmXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NzczYjEwYzFmYmFlOTU2NDYzN2YxMmE5OGQ5YjNkZGRfVU1KNlpxdEM1MVE0RFAzNjdMaWZIVlZLa2UwSHhxc2ZfVG9rZW46VEowbGJWQWlqb25xZGV4b2xoUWN2YzY3blJjXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTY4ZjU4ZDkwMGE5YjlhNjdjYzhjNmQzNTNmZWEzZDJfcnRYbnB5WHU3VEVFbnl5V1RScXRwaVRySE1ESEZOVVZfVG9rZW46VDZ5V2JBOFFJbzVHR0F4NERaT2NIUkdpblViXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ODVjMjQ4YWUzZjVkMjhlOTdiN2RmYTAwNzVmNmIxMmVfcWJMRnpIaWt2SjZTZWR3eTRLS1RYV2RtTVh2aVUydkRfVG9rZW46Tk5WY2JSdk9sb3B6cG54NzVPY2M5RWZSbmZlXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWU3OGM0MjFhZmEyNjU1OGMzMDZlYjAwMWFlNmFmNzRfNm0xWW1xWTdZam5McTRqYWN0WFdMUFR6QVR4WVpqcmNfVG9rZW46WURFUmJxdHJYb0JIT3h4MmdWamN3REw4bm1iXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OWI3Mzg3OTFlYmM2OTY4ZDJmMDhmNGZlZDEzZGJhYjhfeTQzUWlvRHBaRzdUN2ZlQWJHTFFmQmdYUVRjaTUzV1RfVG9rZW46T0RNWWJ1OTRybzZWVWl4bGJnTmNhOXNQbjhGXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmJjNzE4ODg4NzJjODlkNDJkZGQ0NDY2OTY4YmZiYjFfOVd4ZUh2VDFDU2lOR3RFbWNwaWVIRzNYRkhpMzM2bTdfVG9rZW46R2NrTWJQalZZbzlOek54eDBpUmMzTVF1bmNvXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjY0OTQ2YmZhMmRjMTA5MzFjNDYxMjU3YTc3N2Y0MThfZWdyOG9oZExqMHdhNVloSnlQbDU1M2ZEYUtadEQ3dk9fVG9rZW46UEZ0dGIxT1pVbzlXVDV4UUJQSmNmTHRiblVjXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjVhMTVlOTFmZmM1ODg0NmIwZGM0ZGZjYjJiMzJiYjRfc0NHbEdCUXFPeVBmdHNZWlhUMVFzTGdtT0UzQTRoTk5fVG9rZW46V3RBWGJ4Mmtnb0NsNUV4VjZQV2NOcExabk9oXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmQ4YmY0ODBmZjNiZGFhMGYxOGY5YThjYmY3M2NiMjBfUm5DWmxVdlpKSTNhenNjZTNsT1Q4VDhpNzNoRkRvSVNfVG9rZW46UmF3TWJCc29Ib09oOU54clhVSWNyZ0hYbnZlXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MGUwZGQ3NjI5ZTg2N2ZlZmQyNjBmNDBiZWE5NzRhMmJfVEw2UG13cDlvdkZ3UWhvSlRIbk0zZDVZVVVPMnFuYUhfVG9rZW46TFNqcmI5RGRUbzhWUTh4R1FkNGNDVUdYbmtiXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZTNhZDg0MDUzNGNmMzMzYWMxYTdmYzA0M2UyYWMyZDNfYmxZVXdNdW5NazRROWplMGI0aDBmcEJ3cHhVMDlReVhfVG9rZW46WG9UWWI2T2JYb3lwTUZ4QWVlbWNsZVp4blZvXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZGY1NzgzMDczMjEzZmQ5NDc2NDNkMGI0NWIxNTIzOGRfTGE1ZTVZS3NrUk82VmRGUUlSRkdYQXFXNnBaSkxVYjNfVG9rZW46SnNDM2JBV3pib3pYRWV4OEN0S2MzU0dxblRmXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="og:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWNiZTFkNjg1MDg3YTVhZmRiZTk1NmZmNGY2Nzk3OTdfTENCcFdlUFlzY2ZDZnFOVWthNWE2THhsWUZoUEZFRTNfVG9rZW46UzVrdGJhd3lYb3liU014WUxvNWNuUUw1bnRnXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
-<meta property="article:published_time" content="2026-01-31T06:29:05.569Z">
-<meta property="article:modified_time" content="2026-01-31T06:29:45.366Z">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/JFbabXzZUoOVKSxD8qtcrRNnn1d.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/WMXJba05poqw4Xx16PZc8n8unRc.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/PQCHbDGyCoVOU5x95mncnzTWnOh.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/PR1PbxK2Hodqymx9tMbcxsGvn0d.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/OXqEbd8QYoZn6GxZocVcQrgCnBh.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/LipqbNh6PomMTLxK6X1cWLZQnze.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/IIpFb7yIzo37C3xNviPcHF5UnTc.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/BTVdb3oc3oXxVuxZ9CPcW1N1nte.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/C2zBbCyTto4eNWxveEZceAUmnUg.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/AUfFbo6jLoq6XcxkPTScNJb2nJb.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/Q6LjbvcBvoTXv0x4vgUcCZdenPe.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/HoN7bYhOToAG30x60wvc1LhInSh.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/LGSDb8n3Ro3oJYxNN04cw9aanvg.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/Et40bJ5YrorZ66xA18XckcyGnZd.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/RJuXbsvzgodRxpxynHPcQHUonU9.png">
+<meta property="og:image" content="http://szy0127.github.io/papers/static/BwF8bx6zFoYduvxeTJEcktHDnud.png">
+<meta property="article:published_time" content="2026-02-01T12:14:09.534Z">
+<meta property="article:modified_time" content="2026-02-01T12:14:09.534Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OGMyYWE5NDM2MDdhZWQ1NTg2ZDYyZTcxNmEyNzM3NTlfWmpsdnN0RHpRdVlyNUJHOXNXWGhpY3BGd0NTRk15eGlfVG9rZW46VjhLTmJNSHl5b2s4c054VXpQN2NWa1BmbmZoXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA">
+<meta name="twitter:image" content="http://szy0127.github.io/papers/static/JFbabXzZUoOVKSxD8qtcrRNnn1d.png">
 
 
-<link rel="canonical" href="http://szy0127.github.io/2026/01/31/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
+<link rel="canonical" href="http://szy0127.github.io/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/01/31/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/","path":"2026/01/31/papers/TZ-LLM Protecting On-Device Large Language Models with Arm TrustZone/","title":"TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/","path":"2026/02/01/papers/TZ-LLM Protecting On-Device Large Language Models with Arm TrustZone/","title":"TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone | S blog</title>
@@ -201,7 +201,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -229,18 +229,8 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-01-31 14:29:05 / Modified: 14:29:45" itemprop="dateCreated datePublished" datetime="2026-01-31T14:29:05+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
+      <time title="Created: 2026-02-01 20:14:09" itemprop="dateCreated datePublished" datetime="2026-02-01T20:14:09+08:00">2026-02-01</time>
     </span>
 
   
@@ -257,14 +247,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>908</span>
+      <span>1.9k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -274,31 +264,31 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone"><a href="#TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone" class="headerlink" title="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"></a>TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</h1><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OGMyYWE5NDM2MDdhZWQ1NTg2ZDYyZTcxNmEyNzM3NTlfWmpsdnN0RHpRdVlyNUJHOXNXWGhpY3BGd0NTRk15eGlfVG9rZW46VjhLTmJNSHl5b2s4c054VXpQN2NWa1BmbmZoXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+    <div class="post-body" itemprop="articleBody"><h1 id="TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone"><a href="#TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone" class="headerlink" title="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"></a>TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</h1><p><img src="/../papers/static/JFbabXzZUoOVKSxD8qtcrRNnn1d.png"></p>
 <p>EuroSys‘26</p>
 <h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>现代移动应用能够自动将用户数据整合到大语言模型的提示中，以生成个性化的响应。与使用云端系统不同，当前出现了一种日益增长的趋势，即将 LLM 推理任务直接部署在移动设备上运行，因为这样做可以消除查询云服务所带来的网络延迟，并将用户的私有数据保留在其本地设备上。</p>
 <p>然而，在移动设备上存储 LLM 模型参数也带来了专有模型泄露给不可信用户的风险，因为移动设备容易遭受越狱攻击。模型泄露可能给模型提供方造成重大经济损失，因为此类模型的开发成本可能高达数百万美元。此外，泄露还可能严重削弱模型提供方在竞争激烈的大语言模型市场中的竞争优势。</p>
 <p>根据先前的研究，大多数移动应用对其设备端模型完全未加保护，而其他一些应用虽然对模型文件进行了加密，但仍允许攻击者从内存中提取出明文形式的模型参数。</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YmUyOWQyMmQyNzkzOGFkNzIzOGFkMmQxNGRjN2JkZGZfY3dxTDlPVjlMNTNhZHRIcU9lY3AwRkNrQnR2MGcyYUZfVG9rZW46Vm00dGJRa1N2b0UwZnR4RWZmUGN3ZkNSblNEXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>存在Memory efficiency和fast inference的trade off</p>
+<p><img src="/../papers/static/WMXJba05poqw4Xx16PZc8n8unRc.png"></p>
+<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>存在 Memory efficiency 和 fast inference 的 trade off</p>
 <p>大模型推理需要内存太大，如果动态扩缩容，就会面临冷启动的问题。</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjZiNTJkYTRmZTA2MmFmZjM4YTNmMzg3NTc3YzkxOTRfVHdrRUdDc1p3MzZ4M2h0bGdscEFyNnZaSEdRTmZnVDdfVG9rZW46RzRvV2JJc3ZvbzlKbXR4RFU1dmNRWGdWbmVmXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<h3 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h3><p>REE&#x2F;TEE缺少安全NPU共享的方案</p>
+<p><img src="/../papers/static/PQCHbDGyCoVOU5x95mncnzTWnOh.png"></p>
+<h3 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h3><p>REE&#x2F;TEE 缺少安全 NPU 共享的方案</p>
 <ul>
-<li>NPU在启动时默认配置为非安全设备</li>
-<li>Rockchip NPU将llama3-8B模型的prefill提高12.5倍 decode提高1.3倍</li>
-<li>使用两个驱动，REE&#x2F;TEE中detach&#x2F;attach 进行完整的切换，一次需要32ms 太慢</li>
+<li>NPU 在启动时默认配置为非安全设备</li>
+<li>Rockchip NPU 将 llama3-8B 模型的 prefill 提高 12.5 倍 decode 提高 1.3 倍</li>
+<li>使用两个驱动，REE&#x2F;TEE 中 detach&#x2F;attach 进行完整的切换，一次需要 32ms 太慢</li>
 </ul>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NzczYjEwYzFmYmFlOTU2NDYzN2YxMmE5OGQ5YjNkZGRfVU1KNlpxdEM1MVE0RFAzNjdMaWZIVlZLa2UwSHhxc2ZfVG9rZW46VEowbGJWQWlqb25xZGV4b2xoUWN2YzY3blJjXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p><img src="/../papers/static/PR1PbxK2Hodqymx9tMbcxsGvn0d.png"></p>
 <ul>
 <li>TA：llama.cpp</li>
 <li>REE OS:OpenHarmony v4.1 with Linux v5.10</li>
 <li>TEE OS: OpenHarmony OS and chcore</li>
 </ul>
-<h3 id="Pipelined-Parameter-Restoration"><a href="#Pipelined-Parameter-Restoration" class="headerlink" title="Pipelined Parameter Restoration"></a>Pipelined Parameter Restoration</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTY4ZjU4ZDkwMGE5YjlhNjdjYzhjNmQzNTNmZWEzZDJfcnRYbnB5WHU3VEVFbnl5V1RScXRwaVRySE1ESEZOVVZfVG9rZW46VDZ5V2JBOFFJbzVHR0F4NERaT2NIUkdpblViXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<h3 id="Pipelined-Parameter-Restoration"><a href="#Pipelined-Parameter-Restoration" class="headerlink" title="Pipelined Parameter Restoration"></a>Pipelined Parameter Restoration</h3><p><img src="/../papers/static/OXqEbd8QYoZn6GxZocVcQrgCnBh.png"></p>
 <p>相对于传统的纯计算操作，额外增加了三个算子</p>
 <ul>
-<li>Allocation (CPU)</li>
+<li>Allocation  (CPU)</li>
 <li>Loading (IO)</li>
 <li>Decryption (CPU)</li>
 </ul>
@@ -309,85 +299,85 @@
 <li>Allocation</li>
 <li>Loading</li>
 </ol>
-<p>允许CPU抢占</p>
-<h3 id="Pipeline-Aware-Secure-Memory-Management"><a href="#Pipeline-Aware-Secure-Memory-Management" class="headerlink" title="Pipeline-Aware Secure Memory Management"></a>Pipeline-Aware Secure Memory Management</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ODVjMjQ4YWUzZjVkMjhlOTdiN2RmYTAwNzVmNmIxMmVfcWJMRnpIaWt2SjZTZWR3eTRLS1RYV2RtTVh2aVUydkRfVG9rZW46Tk5WY2JSdk9sb3B6cG54NzVPY2M5RWZSbmZlXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<p>两个TZASC region：</p>
+<p>允许 CPU 抢占</p>
+<h3 id="Pipeline-Aware-Secure-Memory-Management"><a href="#Pipeline-Aware-Secure-Memory-Management" class="headerlink" title="Pipeline-Aware Secure Memory Management"></a>Pipeline-Aware Secure Memory Management</h3><p><img src="/../papers/static/LipqbNh6PomMTLxK6X1cWLZQnze.png"></p>
+<p>两个 TZASC region：</p>
 <ul>
-<li>LLM参数</li>
+<li>LLM 参数</li>
 <li>KV cache, activations,and other data</li>
 </ul>
-<p>通过CMA实现连续内存获取</p>
-<h3 id="TEE-REE-NPU-Time-Sharing"><a href="#TEE-REE-NPU-Time-Sharing" class="headerlink" title="TEE-REE NPU Time-Sharing"></a>TEE-REE NPU Time-Sharing</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWU3OGM0MjFhZmEyNjU1OGMzMDZlYjAwMWFlNmFmNzRfNm0xWW1xWTdZam5McTRqYWN0WFdMUFR6QVR4WVpqcmNfVG9rZW46WURFUmJxdHJYb0JIT3h4MmdWamN3REw4bm1iXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<p>Data plane负责：</p>
+<p>通过 CMA 实现连续内存获取</p>
+<h3 id="TEE-REE-NPU-Time-Sharing"><a href="#TEE-REE-NPU-Time-Sharing" class="headerlink" title="TEE-REE NPU Time-Sharing"></a>TEE-REE NPU Time-Sharing</h3><p><img src="/../papers/static/IIpFb7yIzo37C3xNviPcHF5UnTc.png"></p>
+<p>Data plane 负责：</p>
 <ol>
-<li>初始化job上下文，包括IOPT内存 register buffer等</li>
-<li>MMIO提交job到硬件</li>
+<li>初始化 job 上下文，包括 IOPT 内存  register buffer 等</li>
+<li>MMIO 提交 job 到硬件</li>
 <li>处理中断</li>
 </ol>
-<p>Control plane负责：</p>
+<p>Control plane 负责：</p>
 <ol>
-<li>提交job到软件队列</li>
-<li>调度job</li>
-<li>通过data plane提交job到硬件</li>
-<li>调度下一个job</li>
+<li>提交 job 到软件队列</li>
+<li>调度 job</li>
+<li>通过 data plane 提交 job 到硬件</li>
+<li>调度下一个 job</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OWI3Mzg3OTFlYmM2OTY4ZDJmMDhmNGZlZDEzZGJhYjhfeTQzUWlvRHBaRzdUN2ZlQWJHTFFmQmdYUVRjaTUzV1RfVG9rZW46T0RNWWJ1OTRybzZWVWl4bGJnTmNhOXNQbjhGXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/BTVdb3oc3oXxVuxZ9CPcW1N1nte.png"></p>
 <ul>
-<li>REE kernel中放完整的NPU driver 包括调度功能</li>
-<li>TEE 中放部分NPU driver 只有构造job和提交job到硬件</li>
+<li>REE kernel 中放完整的 NPU driver  包括调度功能</li>
+<li>TEE 中放部分 NPU driver 只有构造 job 和提交 job 到硬件</li>
 </ul>
-<p>NPU multiplexing实现：</p>
+<p>NPU multiplexing 实现：</p>
 <ol>
-<li>TA有一个乘法任务 提交到TEE NPU driver</li>
-<li>TEE NPU driver构造一个secure job 通过tzdriver （smc）通知REE NPU driver</li>
-<li>REE NPU driver把这个secure job加入调度队列 </li>
-<li>REE NPU driver进行正常的调度和计算</li>
-<li>REE NPU driver调度到一个secure job</li>
-<li>通过tzdriver 控制流返回到TEE NPU driver</li>
-<li>TEE NPU driver 配置TZPC TZASC GIC 把NPU切换为secure mode</li>
-<li>TEE NPU driver通过MMIO提交secure job到硬件</li>
-<li>TEE NPU driver等待任务完成 配置TZPC TZASC GIC 把NPU 切换为normal mode</li>
+<li>TA 有一个乘法任务 提交到 TEE NPU driver</li>
+<li>TEE NPU driver 构造一个 secure job 通过 tzdriver （smc）通知 REE NPU driver</li>
+<li>REE NPU driver 把这个 secure job 加入调度队列</li>
+<li>REE NPU driver 进行正常的调度和计算</li>
+<li>REE NPU driver 调度到一个 secure job</li>
+<li>通过 tzdriver 控制流返回到 TEE NPU driver</li>
+<li>TEE NPU driver 配置 TZPC TZASC GIC 把 NPU 切换为 secure mode</li>
+<li>TEE NPU driver 通过 MMIO 提交 secure job 到硬件</li>
+<li>TEE NPU driver 等待任务完成 配置 TZPC TZASC GIC  把 NPU 切换为 normal mode</li>
 </ol>
 <h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ol>
 <li>TTFT</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmJjNzE4ODg4NzJjODlkNDJkZGQ0NDY2OTY4YmZiYjFfOVd4ZUh2VDFDU2lOR3RFbWNwaWVIRzNYRkhpMzM2bTdfVG9rZW46R2NrTWJQalZZbzlOek54eDBpUmMzTVF1bmNvXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/C2zBbCyTto4eNWxveEZceAUmnUg.png"></p>
 <ul>
 <li>Strawmen baseline: 77.1%-91.1% improvement</li>
-<li>REE-Flash baseline：2.5%∼22.3%, 22.2%∼55.3%, 10.2%∼15.2% overhead </li>
+<li>REE-Flash baseline：2.5%∼22.3%, 22.2%∼55.3%, 10.2%∼15.2% overhead</li>
 <li>REE-Memory baseline: up to 8.5× overhead (parameter restoration)</li>
 </ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjY0OTQ2YmZhMmRjMTA5MzFjNDYxMjU3YTc3N2Y0MThfZWdyOG9oZExqMHdhNVloSnlQbDU1M2ZEYUtadEQ3dk9fVG9rZW46UEZ0dGIxT1pVbzlXVDV4UUJQSmNmTHRiblVjXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<p>prompt短的情况下 overhead非常明显</p>
+<p><img src="/../papers/static/AUfFbo6jLoq6XcxkPTScNJb2nJb.png"></p>
+<p>prompt 短的情况下 overhead 非常明显</p>
 <ol>
 <li>Decode</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjVhMTVlOTFmZmM1ODg0NmIwZGM0ZGZjYjJiMzJiYjRfc0NHbEdCUXFPeVBmdHNZWlhUMVFzTGdtT0UzQTRoTk5fVG9rZW46V3RBWGJ4Mmtnb0NsNUV4VjZQV2NOcExabk9oXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/Q6LjbvcBvoTXv0x4vgUcCZdenPe.png"></p>
 <ul>
-<li>Straewman baseline: 0.9%∼23.2% improvement </li>
+<li>Straewman baseline: 0.9%∼23.2% improvement</li>
 <li>REE baseline:1.3%∼4.9% overhead (NPU multiplexing)</li>
 </ul>
 <ol>
 <li>NPU</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmQ4YmY0ODBmZjNiZGFhMGYxOGY5YThjYmY3M2NiMjBfUm5DWmxVdlpKSTNhenNjZTNsT1Q4VDhpNzNoRkRvSVNfVG9rZW46UmF3TWJCc29Ib09oOU54clhVSWNyZ0hYbnZlXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/HoN7bYhOToAG30x60wvc1LhInSh.png"></p>
 <ul>
-<li>额外3.8% and 3.0% 的overhead</li>
-<li>smc switch + TZASC TZPC配置+GIC配置耗时在prefill decode阶段占比为1.6%∼2.7% and 2.3%∼5.7%</li>
+<li>额外 3.8% and 3.0% 的 overhead</li>
+<li>smc switch + TZASC TZPC 配置 +GIC 配置耗时在 prefill decode 阶段占比为 1.6%∼2.7% and 2.3%∼5.7%</li>
 </ul>
-<h2 id="Drawback"><a href="#Drawback" class="headerlink" title="Drawback"></a>Drawback</h2><p>Secure memory需要CMA分配连续内存</p>
+<h2 id="Drawback"><a href="#Drawback" class="headerlink" title="Drawback"></a>Drawback</h2><p>Secure memory 需要 CMA 分配连续内存</p>
 <ol>
 <li>耗时久</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MGUwZGQ3NjI5ZTg2N2ZlZmQyNjBmNDBiZWE5NzRhMmJfVEw2UG13cDlvdkZ3UWhvSlRIbk0zZDVZVVVPMnFuYUhfVG9rZW46TFNqcmI5RGRUbzhWUTh4R1FkNGNDVUdYbmtiXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZTNhZDg0MDUzNGNmMzMzYWMxYTdmYzA0M2UyYWMyZDNfYmxZVXdNdW5NazRROWplMGI0aDBmcEJ3cHhVMDlReVhfVG9rZW46WG9UWWI2T2JYb3lwTUZ4QWVlbWNsZVp4blZvXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZGY1NzgzMDczMjEzZmQ5NDc2NDNkMGI0NWIxNTIzOGRfTGE1ZTVZS3NrUk82VmRGUUlSRkdYQXFXNnBaSkxVYjNfVG9rZW46SnNDM2JBV3pib3pYRWV4OEN0S2MzU0dxblRmXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/LGSDb8n3Ro3oJYxNN04cw9aanvg.png"></p>
+<p><img src="/../papers/static/Et40bJ5YrorZ66xA18XckcyGnZd.png"></p>
+<p><img src="/../papers/static/RJuXbsvzgodRxpxynHPcQHUonU9.png"></p>
 <ol>
 <li>影响其他应用性能</li>
 </ol>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWNiZTFkNjg1MDg3YTVhZmRiZTk1NmZmNGY2Nzk3OTdfTENCcFdlUFlzY2ZDZnFOVWthNWE2THhsWUZoUEZFRTNfVG9rZW46UzVrdGJhd3lYb3liU014WUxvNWNuUUw1bnRnXzE3Njk4NDA5Mzk6MTc2OTg0NDUzOV9WNA" alt="img"></p>
+<p><img src="/../papers/static/BwF8bx6zFoYduvxeTJEcktHDnud.png"></p>
 <ol>
-<li>需要改EL3</li>
+<li>需要改 EL3</li>
 </ol>
 
     </div>
@@ -407,7 +397,7 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/01/31/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/" rel="next" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees">
+                <a href="/2026/02/01/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees/" rel="next" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees">
                   CortenMM: Efficient Memory Management with Strong Correctness Guarantees <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -440,13 +430,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">69k</span>
+    <span title="Word count total">309k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:09</span>
+    <span title="Reading time total">4:41</span>
   </span>
 </div>
 <div class="busuanzi-count">
