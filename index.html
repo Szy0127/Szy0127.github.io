@@ -178,7 +178,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone_1/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees_1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -196,7 +196,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone_1/" class="post-title-link" itemprop="url">TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</a>
+          <a href="/2026/02/02/papers/CortenMM%20Efficient%20Memory%20Management%20with%20Strong%20Correctness%20Guarantees_1/" class="post-title-link" itemprop="url">CortenMM: Efficient Memory Management with Strong Correctness Guarantees</a>
         </h2>
 
         <div class="post-meta-container">
@@ -207,7 +207,174 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2026-02-02 00:42:30" itemprop="dateCreated datePublished" datetime="2026-02-02T00:42:30+08:00">2026-02-02</time>
+      <time title="Created: 2026-02-02 00:48:09" itemprop="dateCreated datePublished" datetime="2026-02-02T00:48:09+08:00">2026-02-02</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>822</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees"><a href="#CortenMM-Efficient-Memory-Management-with-Strong-Correctness-Guarantees" class="headerlink" title="CortenMM: Efficient Memory Management with Strong Correctness Guarantees"></a>CortenMM: Efficient Memory Management with Strong Correctness Guarantees</h1><p><img src="/images/YeKsbBKfiogZegxUDSac0ZrUndZ.png" title="image"></p>
+<p>SOSP‘25 Best Paper</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><h3 id="VMA"><a href="#VMA" class="headerlink" title="VMA"></a>VMA</h3><p>内存管理上 Linux 采用 VMA+ 页表的两层抽象，在内存操作上需要两种类型的锁，限制了可扩展性</p>
+<p><img src="/images/O8nkbhZW8oBqMvxkM0dcqqdgnOl.png" title="image"></p>
+<p><img src="/images/ZtSqbl2kVor08jxOHdBcMgTSnRd.png" title="image"></p>
+<ul>
+<li>可扩展性差</li>
+<li>并发 Bug 多（CVE）</li>
+</ul>
+<p><img src="/images/RRjdbAp1Coh2lXxf606cYY7gn6f.png" title="image"></p>
+<ul>
+<li>两个地址范围不相交的 page fault 在页表层面不存在冲突，但是如果处于同一段 VMA 中 就会因为抢 VMA 锁导致竞争</li>
+<li>Real-world application 中存在各种 mmap mprotect 的调用 比较复杂</li>
+</ul>
+<h3 id="Asterinas"><a href="#Asterinas" class="headerlink" title="Asterinas"></a>Asterinas</h3><p>星绽操作系统</p>
+<p><img src="/images/MLQHbKAZrosPGqxIiG5cC9Ypnsd.png" title="image"></p>
+<p><img src="/images/EDwPb7CLMoODR8xHmVDcF8ojnvg.png" title="image"></p>
+<p><img src="/images/C7FUbOBBaoDSBxx6VoWcZHnnnDg.png" title="image"></p>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Key insight：</p>
+<ol>
+<li>两层抽象的设计是由于历史原因，目前大部分现代 ISA 和 MMU 采用相似的多级页表设计</li>
+<li>为了实现 On-demand paging COW swap 等高级的内存管理语义，并不需要多一层抽象</li>
+</ol>
+<p><img src="/images/SLvXbYraFo5mESx0SD2cItNjnPd.png" title="image"></p>
+<ul>
+<li>通过页表页的物理地址 可以找到 page descriptor</li>
+<li>有且仅有每个页表页存在锁</li>
+<li>通过 page descriptor 找到 per-PTE 的 metadata array 存放其他信息</li>
+</ul>
+<p>从这个设计上能做的简单推论：</p>
+<ol>
+<li>锁的粒度变细（2M 粒度） 可扩展性变好</li>
+<li>On-demand paging 需要复制整个页表 会比复制 VMA 慢 （mmap &#x2F; fork）</li>
+</ol>
+<h3 id="Lock-protocol"><a href="#Lock-protocol" class="headerlink" title="Lock protocol"></a>Lock protocol</h3><p>CortenMM-rw 读写锁：在遍历页表的过程中拿读锁 找到对应的页表页以后拿写锁</p>
+<p><img src="/images/Ios8bgizooEsrlxhL6Ac6cVRnXc.png" title="image"></p>
+<p>读锁之间仍然有竞争（原子变量）</p>
+<p>CoartenMM-adv：RCU+ 互斥锁</p>
+<p>遍历页表的时候不加锁 只记录 RCU 状态</p>
+<p><img src="/images/NRqpbc07Coyw96xeT3HcGFqrnSc.png" title="image"></p>
+<h3 id="内存接口实现"><a href="#内存接口实现" class="headerlink" title="内存接口实现"></a>内存接口实现</h3><p><img src="/images/ULtvbZuVdoee5PxRMZWcG78GnJe.png" title="image"></p>
+<p><img src="/images/VbIPbc2XwoQML9xDSsicx0WfnNg.png" title="image"></p>
+<h2 id="Verification"><a href="#Verification" class="headerlink" title="Verification"></a>Verification</h2><p>用 Verus(半自动的基于 SMT 的验证器) 进行形式化验证</p>
+<ol>
+<li>locking protocol 正确，即 两个线程并发访问范围相交的地址 不可能同时拿到锁</li>
+<li>对页表的修改正确（map unmap mark），并且页表结构正确（始终处于合法状态）</li>
+</ol>
+<p><img src="/images/UOndbwNRPo9wJPxplq5cpD9NnSf.png" title="image"></p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ul>
+<li>AMD EPYC 9965</li>
+<li>192-core CPU * 2 &#x3D; 384 cores</li>
+<li>512GB DRAM * 2 &#x3D; 1T</li>
+</ul>
+<h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p><img src="/images/Rkuvbyvcxo6zaSx5OPTczO2xn5e.png" title="image"></p>
+<p>单线程</p>
+<p><img src="/images/Cjs0b1D5QoY1hwxu5s6cGerznFh.png" title="image"></p>
+<ul>
+<li>Linux 只需要创建 VMA</li>
+<li>Cortenmm 需要分配、创建页表页</li>
+</ul>
+<p>&#x3D;&gt; mmap 慢</p>
+<p>发生 page fault Linux 仍然需要创建页表</p>
+<p>&#x3D;&gt; mmap+PF 快</p>
+<p><img src="/images/HTbcbBqffo8kqBxZJ6kcTvwQnqg.png" title="image"></p>
+<ul>
+<li>Fork：-17.7%</li>
+<li>fork+exec ：+23%</li>
+</ul>
+<p>多线程</p>
+<ul>
+<li>low-contention:每个线程在私有内存区域上访问</li>
+<li>high-contention：每个线程在共享内存上随机访问</li>
+</ul>
+<p><img src="/images/GKXqbslSzo5hNlxoyVUculUYneb.png" title="image"></p>
+<ul>
+<li>cortenmm 几乎线性增长，384thread 情况下 PF 快 33 倍 unmap-virt 快 2270 倍</li>
+<li>Cortenmm 64thread 开始掉的原因：最后一层页表页发生竞争</li>
+</ul>
+<h3 id="Real-world-benchmark"><a href="#Real-world-benchmark" class="headerlink" title="Real-world benchmark"></a>Real-world benchmark</h3><p><img src="/images/WHqqbC1EioGradxjbXJcf5I3nEb.png" title="image"></p>
+<p>cortenmm 减少了并发情况下 application 在 page fault&#x2F;unmap&#x2F;mprotect 上的耗时</p>
+<p><img src="/images/JlEpb4LctonQi4xZj1hce95pnod.png" title="image"></p>
+<p>在某些应用场景下，使用更先进的内存分配器（tcmalloc） 可以大幅度提升 Linux 的可扩展性（通过减少对 unmap 等 syscall 的调用）</p>
+<p>但是使用 tcmalloc 会造成其他副作用 比如占用内存变多</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>CortenMM 简化了内存管理系统，摈弃了传统的 VMA，而使用单层抽象，同时提出了一种面向 MMU 编程的事务型接口，并配套设计了相应的加锁协议。这些加锁协议避免了在软件抽象层上产生不必要的竞争，在维持事务原子性的同时显著提升了性能和可扩展性。加锁协议和事务接口中的基本功能进行了形式化验证，从而提供了强有力的一致性保障。在真实世界基准测试中， CortenMM 性能比 Linux 高出 1.2 倍至 26 倍。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/02/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/" class="post-title-link" itemprop="url">TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-02-02 00:48:00" itemprop="dateCreated datePublished" datetime="2026-02-02T00:48:00+08:00">2026-02-02</time>
     </span>
 
   
@@ -404,8 +571,18 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
+      
 
-      <time title="Created: 2026-02-02 00:41:37" itemprop="dateCreated datePublished" datetime="2026-02-02T00:41:37+08:00">2026-02-02</time>
+      <time title="Created: 2026-02-02 00:41:37 / Modified: 00:42:43" itemprop="dateCreated datePublished" datetime="2026-02-02T00:41:37+08:00">2026-02-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
     </span>
 
   
@@ -517,214 +694,6 @@
 <p>在某些应用场景下，使用更先进的内存分配器（tcmalloc） 可以大幅度提升 Linux 的可扩展性（通过减少对 unmap 等 syscall 的调用）</p>
 <p>但是使用 tcmalloc 会造成其他副作用 比如占用内存变多</p>
 <h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>CortenMM 简化了内存管理系统，摈弃了传统的 VMA，而使用单层抽象，同时提出了一种面向 MMU 编程的事务型接口，并配套设计了相应的加锁协议。这些加锁协议避免了在软件抽象层上产生不必要的竞争，在维持事务原子性的同时显著提升了性能和可扩展性。加锁协议和事务接口中的基本功能进行了形式化验证，从而提供了强有力的一致性保障。在真实世界基准测试中， CortenMM 性能比 Linux 高出 1.2 倍至 26 倍。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/01/papers/TZ-LLM%20Protecting%20On-Device%20Large%20Language%20Models%20with%20Arm%20TrustZone/" class="post-title-link" itemprop="url">TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-02-01 20:14:09 / Modified: 22:54:12" itemprop="dateCreated datePublished" datetime="2026-02-01T20:14:09+08:00">2026-02-01</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>892</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone"><a href="#TZ-LLM-Protecting-On-Device-Large-Language-Models-with-Arm-TrustZone" class="headerlink" title="TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone"></a>TZ-LLM: Protecting On-Device Large Language Models with Arm TrustZone</h1><p><img src="/images/JFbabXzZUoOVKSxD8qtcrRNnn1d.png" title="image1"></p>
-<p>EuroSys‘26</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>现代移动应用能够自动将用户数据整合到大语言模型的提示中，以生成个性化的响应。与使用云端系统不同，当前出现了一种日益增长的趋势，即将 LLM 推理任务直接部署在移动设备上运行，因为这样做可以消除查询云服务所带来的网络延迟，并将用户的私有数据保留在其本地设备上。</p>
-<p>然而，在移动设备上存储 LLM 模型参数也带来了专有模型泄露给不可信用户的风险，因为移动设备容易遭受越狱攻击。模型泄露可能给模型提供方造成重大经济损失，因为此类模型的开发成本可能高达数百万美元。此外，泄露还可能严重削弱模型提供方在竞争激烈的大语言模型市场中的竞争优势。</p>
-<p>根据先前的研究，大多数移动应用对其设备端模型完全未加保护，而其他一些应用虽然对模型文件进行了加密，但仍允许攻击者从内存中提取出明文形式的模型参数。</p>
-<p><img src="/../papers/static/WMXJba05poqw4Xx16PZc8n8unRc.png"></p>
-<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><h3 id="Memory"><a href="#Memory" class="headerlink" title="Memory"></a>Memory</h3><p>存在 Memory efficiency 和 fast inference 的 trade off</p>
-<p>大模型推理需要内存太大，如果动态扩缩容，就会面临冷启动的问题。</p>
-<p><img src="/../papers/static/PQCHbDGyCoVOU5x95mncnzTWnOh.png"></p>
-<h3 id="NPU"><a href="#NPU" class="headerlink" title="NPU"></a>NPU</h3><p>REE&#x2F;TEE 缺少安全 NPU 共享的方案</p>
-<ul>
-<li>NPU 在启动时默认配置为非安全设备</li>
-<li>Rockchip NPU 将 llama3-8B 模型的 prefill 提高 12.5 倍 decode 提高 1.3 倍</li>
-<li>使用两个驱动，REE&#x2F;TEE 中 detach&#x2F;attach 进行完整的切换，一次需要 32ms 太慢</li>
-</ul>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p><img src="/../papers/static/PR1PbxK2Hodqymx9tMbcxsGvn0d.png"></p>
-<ul>
-<li>TA：llama.cpp</li>
-<li>REE OS:OpenHarmony v4.1 with Linux v5.10</li>
-<li>TEE OS: OpenHarmony OS and chcore</li>
-</ul>
-<h3 id="Pipelined-Parameter-Restoration"><a href="#Pipelined-Parameter-Restoration" class="headerlink" title="Pipelined Parameter Restoration"></a>Pipelined Parameter Restoration</h3><p><img src="/../papers/static/OXqEbd8QYoZn6GxZocVcQrgCnBh.png"></p>
-<p>相对于传统的纯计算操作，额外增加了三个算子</p>
-<ul>
-<li>Allocation  (CPU)</li>
-<li>Loading (IO)</li>
-<li>Decryption (CPU)</li>
-</ul>
-<p>优先级调度策略：</p>
-<ol>
-<li>Computation</li>
-<li>Decryption</li>
-<li>Allocation</li>
-<li>Loading</li>
-</ol>
-<p>允许 CPU 抢占</p>
-<h3 id="Pipeline-Aware-Secure-Memory-Management"><a href="#Pipeline-Aware-Secure-Memory-Management" class="headerlink" title="Pipeline-Aware Secure Memory Management"></a>Pipeline-Aware Secure Memory Management</h3><p><img src="/../papers/static/LipqbNh6PomMTLxK6X1cWLZQnze.png"></p>
-<p>两个 TZASC region：</p>
-<ul>
-<li>LLM 参数</li>
-<li>KV cache, activations,and other data</li>
-</ul>
-<p>通过 CMA 实现连续内存获取</p>
-<h3 id="TEE-REE-NPU-Time-Sharing"><a href="#TEE-REE-NPU-Time-Sharing" class="headerlink" title="TEE-REE NPU Time-Sharing"></a>TEE-REE NPU Time-Sharing</h3><p><img src="/../papers/static/IIpFb7yIzo37C3xNviPcHF5UnTc.png"></p>
-<p>Data plane 负责：</p>
-<ol>
-<li>初始化 job 上下文，包括 IOPT 内存  register buffer 等</li>
-<li>MMIO 提交 job 到硬件</li>
-<li>处理中断</li>
-</ol>
-<p>Control plane 负责：</p>
-<ol>
-<li>提交 job 到软件队列</li>
-<li>调度 job</li>
-<li>通过 data plane 提交 job 到硬件</li>
-<li>调度下一个 job</li>
-</ol>
-<p><img src="/../papers/static/BTVdb3oc3oXxVuxZ9CPcW1N1nte.png"></p>
-<ul>
-<li>REE kernel 中放完整的 NPU driver  包括调度功能</li>
-<li>TEE 中放部分 NPU driver 只有构造 job 和提交 job 到硬件</li>
-</ul>
-<p>NPU multiplexing 实现：</p>
-<ol>
-<li>TA 有一个乘法任务 提交到 TEE NPU driver</li>
-<li>TEE NPU driver 构造一个 secure job 通过 tzdriver （smc）通知 REE NPU driver</li>
-<li>REE NPU driver 把这个 secure job 加入调度队列</li>
-<li>REE NPU driver 进行正常的调度和计算</li>
-<li>REE NPU driver 调度到一个 secure job</li>
-<li>通过 tzdriver 控制流返回到 TEE NPU driver</li>
-<li>TEE NPU driver 配置 TZPC TZASC GIC 把 NPU 切换为 secure mode</li>
-<li>TEE NPU driver 通过 MMIO 提交 secure job 到硬件</li>
-<li>TEE NPU driver 等待任务完成 配置 TZPC TZASC GIC  把 NPU 切换为 normal mode</li>
-</ol>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ol>
-<li>TTFT</li>
-</ol>
-<p><img src="/../papers/static/C2zBbCyTto4eNWxveEZceAUmnUg.png"></p>
-<ul>
-<li>Strawmen baseline: 77.1%-91.1% improvement</li>
-<li>REE-Flash baseline：2.5%∼22.3%, 22.2%∼55.3%, 10.2%∼15.2% overhead</li>
-<li>REE-Memory baseline: up to 8.5× overhead (parameter restoration)</li>
-</ul>
-<p><img src="/../papers/static/AUfFbo6jLoq6XcxkPTScNJb2nJb.png"></p>
-<p>prompt 短的情况下 overhead 非常明显</p>
-<ol>
-<li>Decode</li>
-</ol>
-<p><img src="/../papers/static/Q6LjbvcBvoTXv0x4vgUcCZdenPe.png"></p>
-<ul>
-<li>Straewman baseline: 0.9%∼23.2% improvement</li>
-<li>REE baseline:1.3%∼4.9% overhead (NPU multiplexing)</li>
-</ul>
-<ol>
-<li>NPU</li>
-</ol>
-<p><img src="/../papers/static/HoN7bYhOToAG30x60wvc1LhInSh.png"></p>
-<ul>
-<li>额外 3.8% and 3.0% 的 overhead</li>
-<li>smc switch + TZASC TZPC 配置 +GIC 配置耗时在 prefill decode 阶段占比为 1.6%∼2.7% and 2.3%∼5.7%</li>
-</ul>
-<h2 id="Drawback"><a href="#Drawback" class="headerlink" title="Drawback"></a>Drawback</h2><p>Secure memory 需要 CMA 分配连续内存</p>
-<ol>
-<li>耗时久</li>
-</ol>
-<p><img src="/../papers/static/LGSDb8n3Ro3oJYxNN04cw9aanvg.png"></p>
-<p><img src="/../papers/static/Et40bJ5YrorZ66xA18XckcyGnZd.png"></p>
-<p><img src="/../papers/static/RJuXbsvzgodRxpxynHPcQHUonU9.png"></p>
-<ol>
-<li>影响其他应用性能</li>
-</ol>
-<p><img src="/../papers/static/BwF8bx6zFoYduvxeTJEcktHDnud.png"></p>
-<ol>
-<li>需要改 EL3</li>
-</ol>
 
       
     </div>
@@ -1586,7 +1555,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/Effective%20Modern%20C++/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1604,7 +1573,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/cpp/Effective%20Modern%20C++/" class="post-title-link" itemprop="url">Effective Modern C++</a>
+          <a href="/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">C++20高级编程</a>
         </h2>
 
         <div class="post-meta-container">
@@ -1635,14 +1604,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.5k</span>
+      <span>429</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -1653,174 +1622,48 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Effective-Modern-C"><a href="#Effective-Modern-C" class="headerlink" title="Effective Modern C++"></a>Effective Modern C++</h1><h2 id="型别推导"><a href="#型别推导" class="headerlink" title="型别推导"></a>型别推导</h2><ol>
-<li><p>模板类型推导</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br></pre></td></tr></table></figure>
+          <h1 id="C-20高级编程"><a href="#C-20高级编程" class="headerlink" title="C++20高级编程"></a>C++20高级编程</h1><h2 id="类型与对象"><a href="#类型与对象" class="headerlink" title="类型与对象"></a>类型与对象</h2><ol>
+<li><pre><code class="c++">template&lt;typename F,typename...Args&gt;
+using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...))
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. `std::pair a&#123;1,2.3&#125;` 类模板自动推导</span><br><span class="line"></span><br><span class="line">3. 运行时多态 传统面向对象编程 subtype多态 用指针 虚函数</span><br><span class="line"></span><br><span class="line">   用`std::variant` `std::visit` ad-hoc多态 性能更高 </span><br><span class="line"></span><br><span class="line">   看不同设计模式的要求</span><br><span class="line"></span><br><span class="line">   ```c++</span><br><span class="line">   struct Circle&#123;&#125;;</span><br><span class="line">   struct Rectangle&#123;&#125;;</span><br><span class="line">   double getArea(const Circle &amp;c);</span><br><span class="line">   double getArea(const Rectangle &amp;r);</span><br><span class="line">   using Shape = std::variant&lt;Circle,Rectangle&gt;;</span><br><span class="line">   double getArea(const Shape &amp;s)&#123;</span><br><span class="line">   	return std::visit(</span><br><span class="line">   		[](const auto&amp;data)&#123;</span><br><span class="line">   			return getArea(data);</span><br><span class="line">   		&#125;,s</span><br><span class="line">   	)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>查看类型-</p>
+<ul>
+<li><code>[[deprecated]]</code>表示弃用，可以通过编译器的警告来看</li>
+<li>编译器提供的宏 <code>_PRETTY_FUNCTION_</code></li>
+<li><a target="_blank" rel="noopener" href="https://cppinsights.io/">https://cppinsights.io</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="编译时多态"><a href="#编译时多态" class="headerlink" title="编译时多态"></a>编译时多态</h2><ol start="5">
+<li><p>函数:</p>
+<ul>
+<li>名称查找：ADL规则 不在作用域内的也可见</li>
+<li>模板函数处理：推导 SFINAE  替换失败不会导致编译错误 只是放弃这个选择</li>
+<li>重载决议：参数最匹配 转换最少；非模板优于模板</li>
+</ul>
+</li>
+<li><p>type traits：输入类型 输出特征 变换类型</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="type">size_t</span> N&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci = fibonacci&lt;N<span class="number">-1</span>&gt; + fibonacci&lt;N<span class="number">-2</span>&gt;;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">0</span>&gt; = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">1</span>&gt; = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">static_assert</span>(fibonacci&lt;<span class="number">10</span>&gt; == <span class="number">55</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>[[no_unique_address]]</code>空基类优化成0字节</p>
+</li>
+<li><p><code>condition_t&lt;true,int,float&gt;</code> int</p>
+</li>
+<li><p>类型内省 通过模板偏特化拿到数组长度 函数参数类型等信息</p>
+</li>
+<li><p><code>enable_if</code>或标签分发 可用<code>if constexpr</code> 代替</p>
+</li>
+<li><p>奇异递归模板：把派生类作为基类的模板参数，让基类可用使用派生类提供的方法</p>
+<p>可实现多态，避免虚函数开销</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">static_cast</span>&lt;Derived&amp;&gt;(*<span class="keyword">this</span>).<span class="built_in">f_Impl</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&lt;Derived&gt;&#123;</span><br><span class="line">    <span class="keyword">friend</span> Base;<span class="comment">//struct可以不用</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">f_Impl</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>模板T的类型与ParamType(修饰)是有关的</p>
-<ul>
-<li>无修饰：T不会带const 引用</li>
-<li>参数是指针&#x2F;引用：T不带引用 如果参数修饰带const则T不带const</li>
-<li>参数是万能引用(<code>T&amp;&amp;</code>)：T会和参数类型和传入的参数类型一模一样 带任何修饰  除了参数是右值的情况</li>
-</ul>
+<p>三路比较操作符<code>&lt;=&gt;</code> 默认强序 根据成员变量声明顺序比较</p>
 </li>
-<li><p><code>auto</code>的类型推导与模板一模一样</p>
-<p><code>auto&amp;&amp;</code> 万能引用（带修饰  左值-&gt;左值 右值-&gt;右值）</p>
-<p>直接用<code>auto</code> 不会带const 不会带引用（除非右边取地址）</p>
+<li><p><code>make_shared</code>比<code>new</code>效率高</p>
 </li>
-<li><p><code>decltype</code> 带修饰、引用、模板类型，一模一样</p>
-<p><code>decltype(auto)</code>可以保证引用不被去除</p>
-<p>特例：<code>decltype((x))</code>是<code>int&amp;</code></p>
-</li>
-<li><p><code>boost::typeindex::type_id_with_cvr&lt;decltype(x)&gt;().pretty_name()</code>可以精确地输出类型</p>
-<p>IDE对于复杂类型不一定准确</p>
-</li>
-</ol>
-<h2 id="auto"><a href="#auto" class="headerlink" title="auto"></a>auto</h2><ol start="5">
-<li><p><code>auto</code>声明变量的好处：</p>
-<ul>
-<li><p>通过编译器优化时间空间上的处理（lambda表达式返回值是<code>std::function&lt;&gt;</code>）</p>
-</li>
-<li><p>避免自己搞错类型造成bug</p>
-</li>
-<li><p>避免const带来的额外复制开销</p>
-</li>
-</ul>
-<p>副作用是没法一眼看出来类型  但是可以用过好的IDE缓和</p>
-</li>
-</ol>
-<h2 id="转向现代C"><a href="#转向现代C" class="headerlink" title="转向现代C++"></a>转向现代C++</h2><ol start="6">
-<li><p>某些库的实现为了时空性能会使用隐形代理，导致<code>auto</code>被推倒为应对客户隐藏的代理类</p>
-<p>解决方法是使用<code>static_cast&lt;T&gt;</code>强制类型转换</p>
-</li>
-<li><p>大括号初始化最通用</p>
-<p>某些情况下大括号小括号初始化有区别，例如<code>std::vector</code></p>
-<p>可以使用auto先声明一个初始化列表 然后传入小括号</p>
-</li>
-<li><p><code>nullptr</code>代替0或NULL</p>
-</li>
-<li><p><code>using</code>替代<code>typedef</code></p>
-<p>用模板推导的<code>T::type</code>声明前需要加<code>typename</code></p>
-<p>模板元编程变换类型</p>
-<p><code>std::remove_const_v&lt;T&gt;</code></p>
-<p><code>std::remove_reference_v&lt;T&gt;</code></p>
-<p><code>std::add_lvalue_reference_v&lt;T&gt;</code></p>
-<p>给出一种实现：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">remove_reference</span>&lt;T&gt;&#123;</span><br><span class="line">	<span class="keyword">using</span> type = T;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">using</span> remove_reference_v = <span class="keyword">typename</span> remove_reference&lt;T&gt;::type </span><br></pre></td></tr></table></figure>
-</li>
-<li><p><code>enum class E&#123;a,b,c&#125;</code>好处</p>
-<ul>
-<li>限制了作用域 之后可以重名</li>
-<li>强类型 不可以隐式转为int</li>
-</ul>
-</li>
-<li><p><code>=delete</code>删除函数</p>
-<ul>
-<li>类的默认复制函数、拷贝构造函数</li>
-<li>模板的某种特化版本</li>
-<li>参数可被隐式转换的函数</li>
-</ul>
-</li>
-<li><p><code>override</code>改写子类函数时加上，帮助编译器提示</p>
-<p>在成员函数后加上<code>&amp;</code>或<code>&amp;&amp;</code>可以根据<code>(*this)</code>为左值或右值提供不同的重载实现</p>
-</li>
-<li><p><code>const_iterator</code> 例如<code>cbegin cend</code></p>
-</li>
-<li><p><code>noexcept</code>可能会被优化</p>
-</li>
-<li><p><code>constexpr</code>声明的变量或函数可以在编译器用 当作编译器常量 </p>
-</li>
-<li><p>线程安全</p>
-</li>
-<li><p><code>=default</code>生成类的默认移动函数（等）</p>
-</li>
-</ol>
-<h2 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h2><p>裸指针的一些问题：无法判断是否空悬，无法判断如何析构</p>
-<ol start="18">
-<li><p><code>std::unique_ptr</code> 默认情况下和裸指针同样大小</p>
-<p>可以自定义析构函数  但是会增加大小 自定义析构器的型别会导致智能指针型别不同 无法放在一个容器中</p>
-<p>使用lambda捕获变量时更大</p>
-</li>
-<li><p><code>std::shared_ptr</code> 用原子操作计数 大小是裸指针的两倍</p>
-<p>自定义析构器不会影响大小和型别</p>
-</li>
-<li><p><code>std::weak_ptr</code>解决<code>std::shared_ptr</code>环路</p>
-</li>
-<li><p><code>std::make_shared&lt;T&gt;()</code></p>
-<ul>
-<li><p>使用auto作为类型 避免重写两边T</p>
-</li>
-<li><p>避免new之后没有接受导致资源泄露</p>
-</li>
-<li><p>减小一次内存分配次数 提高性能</p>
-</li>
-</ul>
-<p>但不支持自定义析构器，且默认用小括号初始化</p>
-</li>
-<li><p>Pimpl写法 需要把默认析构或其他函数的实现放在完整型别中。</p>
-</li>
-</ol>
-<h2 id="右值引用、移动语义、完美转发"><a href="#右值引用、移动语义、完美转发" class="headerlink" title="右值引用、移动语义、完美转发"></a>右值引用、移动语义、完美转发</h2><ol start="23">
-<li><code>std::move std::forward&lt;&gt;</code>只是强制类型转换</li>
-<li><code>T&amp;&amp;``auto&amp;&amp;</code> 涉及类型推导时成为万能引用</li>
-<li>某些情况下编译器会自行优化 用了<code>std::move</code>反而违反了优化的条件</li>
-<li>重载一个万能引用的模板，可能会导致在意外地情况下匹配到</li>
-<li>解决26的方法 加一个实现函数多一个参数 分派</li>
-<li>引用折叠 引用的引用变为单个引用（右 右-&gt;右 其他左）</li>
-<li>移动操作并不总能提高效率 需要相关型别支持移动语义</li>
-<li>若干种使用完美转发的参数无法通过编译的情况<ul>
-<li>大括号</li>
-<li>static const 成员变量</li>
-<li>重载函数</li>
-<li>位域（一个变量的某些bit）</li>
-</ul>
-</li>
-</ol>
-<h2 id="lambda表达式"><a href="#lambda表达式" class="headerlink" title="lambda表达式"></a>lambda表达式</h2><ol start="31">
-<li><p>引用捕获的变量离开作用域销毁后，可能导致lambda表达式内部的引用空悬</p>
-<p>类里默认捕获会捕获this指针</p>
-</li>
-<li><p>初始化捕获<code>[a=a]</code>左边是lambda闭包作用域 右边是lambda能捕获的作用域</p>
-<p>可以移动捕获</p>
-</li>
-<li><p>lambda实现完美转发  由于无模板T 故需要decltype</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> f = </span><br><span class="line">	[](<span class="keyword">auto</span>&amp;&amp;... params)&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">func</span>(std::forward&lt;<span class="keyword">decltype</span>(params)&gt;(params)...);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用lambda表达式可以代替bind 给函数填入事先确定好的参数使用</p>
-</li>
-</ol>
-<h2 id="并发API"><a href="#并发API" class="headerlink" title="并发API"></a>并发API</h2><ol start="35">
-<li><p><code>std::async</code>相比直接开线程的好处：</p>
-<ul>
-<li>能够拿到返回值和异常</li>
-<li>由C++标准库完成调度 避免超订 影响性能</li>
-</ul>
-</li>
-<li><p><code>std::launch::async</code>才能保证一定开线程（并发）</p>
-</li>
-<li><p>必须保证创建<code>std::thread</code>的函数在任一返回路径前让其变为join或detach，否则如果这个线程引用了这个函数的局部变量 会导致意外的后果</p>
-</li>
-<li><p>future可能会发生阻塞 导致某些析构阻塞</p>
-</li>
-<li><p>线程同步的方法：</p>
-<ul>
-<li><p>使用<code>atomic&lt;bool&gt; flag</code> <code>while(!flag)</code>：缺点 占用资源</p>
-</li>
-<li><p>使用条件变量：缺点 需要一把互斥锁 两个线程必须竞争锁</p>
-</li>
-<li><p>使用<code>std::promise``std::future</code> 一次性通信</p>
-<p>暂停：<code>p.get_future().wait()</code></p>
-<p>继续：<code>p.set_value()</code></p>
-</li>
-</ul>
-</li>
-<li><p><code>std::atomic</code>多线程</p>
-<p><code>volatile</code>特种内存 多条语句不会被编译器优化成一条</p>
-</li>
-</ol>
-<h2 id="微调"><a href="#微调" class="headerlink" title="微调"></a>微调</h2><ol start="41">
-<li>按值传递后用move再传入其他函数是一种30的解决方案</li>
-<li><code>emplace</code>置入函数比<code>push</code>插入函数更高效（通常）</li>
+<li></li>
 </ol>
 
       
