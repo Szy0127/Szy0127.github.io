@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,130 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/misc/CICD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/misc/CICD/" class="post-title-link" itemprop="url">CI/CD</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>543</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><h3 id="test"><a href="#test" class="headerlink" title="test"></a>test</h3><p><a target="_blank" rel="noopener" href="https://jiuaidu.com/jianzhan/1046052/">go 覆盖测试工具介绍 - 建站教程 (jiuaidu.com)</a></p>
+<p><code>go test ./...</code>可以测试目录下所有的test文件</p>
+<p><code>go test minik8s/pkg/kubelet/container</code> 测试指定包下的测试文件</p>
+<h3 id="gitlab-runner"><a href="#gitlab-runner" class="headerlink" title="gitlab runner"></a>gitlab runner</h3><h4 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h4><p><code>docker run -d --name gitlab-runner --restart always   -v /srv/gitlab-runner/config:/etc/gitlab-runner   -v /var/run/docker.sock:/var/run/docker.sock   gitlab/gitlab-runner:v15.10.1</code></p>
+<p>执行器选择docker 这里镜像需要先在主机上写Dockerfile手动构建好，然后修改<code>config.toml</code>配置文件把<code>pull_policy</code>修改为<code>if-not-present</code></p>
+<p>对于简单测试没问题，但是对于CNI这种复杂的东西，即使加了privilege&#x3D;true，还是会出现和宿主机上不一样的情况。</p>
+<h4 id="host"><a href="#host" class="headerlink" title="host"></a>host</h4><p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/runner/install/">Install GitLab Runner | GitLab</a></p>
+<p>交大云主机安装二进制</p>
+<p><code>nslookup www.ipads.sjtu.edu.cn</code> 安全组开放所有端口</p>
+<p><code>gitlab-runner register</code> 去gitlab网页的settings&#x2F;cicd复制url和token</p>
+<p>执行器选择shell 在主机上给gitlab-runner用户足够的权限</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39940674/article/details/127616784">【汇总】解决GitLab-Runner执行脚本命令无权限_gitlab-runner 提升权限_成为大佬先秃头的博客-CSDN博客</a></p>
+<p>采用这种方法进行CI&#x2F;CD，gitlab-runner会在主机上的某个目录跑脚本，用的都是主机的环境</p>
+<ul>
+<li>优点：不需要手动配一个拥有所有环境的镜像；没有容器导致的与主机不一致，跑不起来的情况。</li>
+<li>缺点：会对主机产生影响；在缺少依赖的情况下无法更换gitlab-runner所在主机。</li>
+</ul>
+<h3 id="gitlab-ci-yml"><a href="#gitlab-ci-yml" class="headerlink" title=".gitlab-ci.yml"></a>.gitlab-ci.yml</h3><ol>
+<li><p>prepare: 设置go env，防止go test在download时超时</p>
+</li>
+<li><p>test：<code>go test</code> 如果测试涉及到的api需要权限，需要加sudo</p>
+<p>创建多个tag为shell的runner，使test阶段并行测试 （目前一共3个）</p>
+<p>需要修改手动<code>/etc/gitlab-runner/config.toml</code>的concurrent为3</p>
+</li>
+<li><p>build：<code>go build</code> 生成可执行文件在<code>/home/gitlab-runner/$CI_COMMIT_BRANCH/</code>目录下</p>
+<p>不同分支build出的文件不会互相覆盖</p>
+</li>
+</ol>
+<h3 id="代码同步"><a href="#代码同步" class="headerlink" title="代码同步"></a>代码同步</h3><p>同时推送到gitee和gitlab，不然无法用gitlab-runner</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hmy-666/p/17304317.html">git push origin master一次提交多个远程仓库 - 兜里还剩五块出头 - 博客园 (cnblogs.com)</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@minik8s-1:/mini-k8s# git remote -v</span><br><span class="line">origin  https://gitee.com/szy_0127/mini-k8s.git (fetch)</span><br><span class="line">origin  https://gitee.com/szy_0127/mini-k8s.git (push)</span><br><span class="line">origin  https://ipads.se.sjtu.edu.cn:2020/520021910933/minik8s.git (push)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1494,13 +1618,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">68k</span>
+    <span title="Word count total">80k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:09</span>
+    <span title="Reading time total">4:52</span>
   </span>
 </div>
 <div class="busuanzi-count">
