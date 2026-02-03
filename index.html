@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,99 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/03/virtualization/SEV%E6%BC%8F%E6%B4%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/03/virtualization/SEV%E6%BC%8F%E6%B4%9E/" class="post-title-link" itemprop="url">SEV漏洞</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-02-03 20:53:45" itemprop="dateCreated datePublished" datetime="2026-02-03T20:53:45+08:00">2026-02-03</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>331</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>1 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="SEV漏洞"><a href="#SEV漏洞" class="headerlink" title="SEV漏洞"></a>SEV漏洞</h1><h2 id="1-sev-io"><a href="#1-sev-io" class="headerlink" title="1. sev io"></a>1. sev io</h2><ol>
+<li>通过sshd特殊的二进制代码标记 识别到guest加载sshd 替换验证函数的5个字节 永远返回true</li>
+<li>构建解密数据库 当有数据从vm发出时host写guest的内存 然后可以从bouncebuffer拿到解密后的数据<br>任意c 得到m 可以破解任何加密数据3 构建解密数据库 给vm发数据 修改bounce buffer 再读guest内存<br>任意m 得到c</li>
+<li>可以往vm内存插任意数据和代码</li>
+</ol>
+<h2 id="2-SEVered"><a href="#2-SEVered" class="headerlink" title="2. SEVered"></a>2. SEVered</h2><p>如果guest的某个http接口提供一个服务 可以拿数据<br>先通过invalidate所有host page的方式找到某个resource的page列表 然后remap到自己想要解密的memory上 就可以让guest帮忙解密以后通过http发出来</p>
+<h2 id="3-crossline"><a href="#3-crossline" class="headerlink" title="3. crossline"></a>3. crossline</h2><p>attack vm的asid填入victim vm的 然后就有victim的key 通过修改页表指向victim获得victim vm内存数据</p>
+<h2 id="4-cipherleak"><a href="#4-cipherleak" class="headerlink" title="4. cipherleak"></a>4. cipherleak</h2><p>vmsa物理地址不变 观察rax密文 得到映射表用sev step 识别pattern 读rax得到某些结果 和应用程序有关<br>如cpuid指令 触发vc handler ghcb读真raxsnp并没有用rmp限制读对内存 观察变或不变 泄露key</p>
+<h2 id="5-cachewarp"><a href="#5-cachewarp" class="headerlink" title="5. cachewarp"></a>5. cachewarp</h2><p>invd指令</p>
+<h2 id="6-helker"><a href="#6-helker" class="headerlink" title="6. helker"></a>6. helker</h2><p>插入int 0x80中断</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -208,7 +301,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-02-03 20:38:46 / Modified: 20:38:53" itemprop="dateCreated datePublished" datetime="2026-02-03T20:38:46+08:00">2026-02-03</time>
+      <time title="Created: 2026-02-03 20:38:46 / Modified: 20:39:55" itemprop="dateCreated datePublished" datetime="2026-02-03T20:38:46+08:00">2026-02-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -216,7 +309,7 @@
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
         </span>
     </span>
 
@@ -2152,142 +2245,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">C++20高级编程</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>429</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="C-20高级编程"><a href="#C-20高级编程" class="headerlink" title="C++20高级编程"></a>C++20高级编程</h1><h2 id="类型与对象"><a href="#类型与对象" class="headerlink" title="类型与对象"></a>类型与对象</h2><ol>
-<li><pre><code class="c++">template&lt;typename F,typename...Args&gt;
-using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...))
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. `std::pair a&#123;1,2.3&#125;` 类模板自动推导</span><br><span class="line"></span><br><span class="line">3. 运行时多态 传统面向对象编程 subtype多态 用指针 虚函数</span><br><span class="line"></span><br><span class="line">   用`std::variant` `std::visit` ad-hoc多态 性能更高 </span><br><span class="line"></span><br><span class="line">   看不同设计模式的要求</span><br><span class="line"></span><br><span class="line">   ```c++</span><br><span class="line">   struct Circle&#123;&#125;;</span><br><span class="line">   struct Rectangle&#123;&#125;;</span><br><span class="line">   double getArea(const Circle &amp;c);</span><br><span class="line">   double getArea(const Rectangle &amp;r);</span><br><span class="line">   using Shape = std::variant&lt;Circle,Rectangle&gt;;</span><br><span class="line">   double getArea(const Shape &amp;s)&#123;</span><br><span class="line">   	return std::visit(</span><br><span class="line">   		[](const auto&amp;data)&#123;</span><br><span class="line">   			return getArea(data);</span><br><span class="line">   		&#125;,s</span><br><span class="line">   	)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</code></pre>
-</li>
-<li><p>查看类型-</p>
-<ul>
-<li><code>[[deprecated]]</code>表示弃用，可以通过编译器的警告来看</li>
-<li>编译器提供的宏 <code>_PRETTY_FUNCTION_</code></li>
-<li><a target="_blank" rel="noopener" href="https://cppinsights.io/">https://cppinsights.io</a></li>
-</ul>
-</li>
-</ol>
-<h2 id="编译时多态"><a href="#编译时多态" class="headerlink" title="编译时多态"></a>编译时多态</h2><ol start="5">
-<li><p>函数:</p>
-<ul>
-<li>名称查找：ADL规则 不在作用域内的也可见</li>
-<li>模板函数处理：推导 SFINAE  替换失败不会导致编译错误 只是放弃这个选择</li>
-<li>重载决议：参数最匹配 转换最少；非模板优于模板</li>
-</ul>
-</li>
-<li><p>type traits：输入类型 输出特征 变换类型</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="type">size_t</span> N&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci = fibonacci&lt;N<span class="number">-1</span>&gt; + fibonacci&lt;N<span class="number">-2</span>&gt;;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">0</span>&gt; = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">1</span>&gt; = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">static_assert</span>(fibonacci&lt;<span class="number">10</span>&gt; == <span class="number">55</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><code>[[no_unique_address]]</code>空基类优化成0字节</p>
-</li>
-<li><p><code>condition_t&lt;true,int,float&gt;</code> int</p>
-</li>
-<li><p>类型内省 通过模板偏特化拿到数组长度 函数参数类型等信息</p>
-</li>
-<li><p><code>enable_if</code>或标签分发 可用<code>if constexpr</code> 代替</p>
-</li>
-<li><p>奇异递归模板：把派生类作为基类的模板参数，让基类可用使用派生类提供的方法</p>
-<p>可实现多态，避免虚函数开销</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">static_cast</span>&lt;Derived&amp;&gt;(*<span class="keyword">this</span>).<span class="built_in">f_Impl</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&lt;Derived&gt;&#123;</span><br><span class="line">    <span class="keyword">friend</span> Base;<span class="comment">//struct可以不用</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">f_Impl</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>三路比较操作符<code>&lt;=&gt;</code> 默认强序 根据成员变量声明顺序比较</p>
-</li>
-<li><p><code>make_shared</code>比<code>new</code>效率高</p>
-</li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2311,13 +2268,13 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">80k</span>
+    <span title="Word count total">81k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:52</span>
+    <span title="Reading time total">4:53</span>
   </span>
 </div>
 <div class="busuanzi-count">
