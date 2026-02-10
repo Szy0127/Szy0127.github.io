@@ -19,27 +19,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="C++ Concurrency in ActionManaging threads std::thread 创建对象就会直接开始新线程。有默认构造函数 不会和任意线程绑定 需要通过move接受别的  必须使用join或者detach。 使用detach可成为守护线程，生命周期和程序一样长；为了避免exception导致没有join可以使用一个类，析构里join std::for_each(thre">
+    <meta name="description" content="PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption背景：  英伟达 GPU 也提供了机密计算 类似CPU侧的TDX SEV 提供一个host不可访问的enclave 避免被攻击偷数据 CVM中对private memory 也就是被CPU加密的私有内存调">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++ Concurrency in Action">
-<meta property="og:url" content="http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:title" content="PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/10/virtualization/PipeLLM%20Fast%20and%20Confidential%20Large%20Language%20Model%20Services%20with%20Speculative%20Pipelined%20Encryption/index.html">
 <meta property="og:site_name" content="S blog">
-<meta property="og:description" content="C++ Concurrency in ActionManaging threads std::thread 创建对象就会直接开始新线程。有默认构造函数 不会和任意线程绑定 需要通过move接受别的  必须使用join或者detach。 使用detach可成为守护线程，生命周期和程序一样长；为了避免exception导致没有join可以使用一个类，析构里join std::for_each(thre">
+<meta property="og:description" content="PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption背景：  英伟达 GPU 也提供了机密计算 类似CPU侧的TDX SEV 提供一个host不可访问的enclave 避免被攻击偷数据 CVM中对private memory 也就是被CPU加密的私有内存调">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2026-01-31T06:01:02.000Z">
-<meta property="article:modified_time" content="2026-01-31T06:22:58.764Z">
+<meta property="article:published_time" content="2026-02-10T07:37:04.101Z">
+<meta property="article:modified_time" content="2026-02-10T10:32:22.028Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/">
+<link rel="canonical" href="http://szy0127.github.io/2026/02/10/virtualization/PipeLLM%20Fast%20and%20Confidential%20Large%20Language%20Model%20Services%20with%20Speculative%20Pipelined%20Encryption/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/","path":"2026/01/31/cpp/c++并发编程实战/","title":"C++ Concurrency in Action"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/10/virtualization/PipeLLM%20Fast%20and%20Confidential%20Large%20Language%20Model%20Services%20with%20Speculative%20Pipelined%20Encryption/","path":"2026/02/10/virtualization/PipeLLM Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption/","title":"PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>C++ Concurrency in Action | S blog</title>
+<title>PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption | S blog</title>
   
 
 
@@ -138,7 +138,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-Concurrency-in-Action"><span class="nav-number">1.</span> <span class="nav-text">C++ Concurrency in Action</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Managing-threads"><span class="nav-number">1.1.</span> <span class="nav-text">Managing threads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sharing-data-between-threads"><span class="nav-number">1.2.</span> <span class="nav-text">Sharing data between threads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Synchronizing-concurrent-operations"><span class="nav-number">1.3.</span> <span class="nav-text">Synchronizing concurrent operations</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-C-memory-model-and-operations-on-atomic-types"><span class="nav-number">1.4.</span> <span class="nav-text">The C++ memory model and operations on atomic types</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PipeLLM-Fast-and-Confidential-Large-Language-Model-Services-with-Speculative-Pipelined-Encryption"><span class="nav-number">1.</span> <span class="nav-text">PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -184,7 +184,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/c++%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%AE%9E%E6%88%98/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/10/virtualization/PipeLLM%20Fast%20and%20Confidential%20Large%20Language%20Model%20Services%20with%20Speculative%20Pipelined%20Encryption/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,12 +197,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="C++ Concurrency in Action | S blog">
+      <meta itemprop="name" content="PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption | S blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          C++ Concurrency in Action
+          PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption
         </h1>
 
         <div class="post-meta-container">
@@ -214,16 +214,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
+      <time title="Created: 2026-02-10 15:37:04 / Modified: 18:32:22" itemprop="dateCreated datePublished" datetime="2026-02-10T15:37:04+08:00">2026-02-10</time>
     </span>
 
   
@@ -240,14 +231,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>847</span>
+      <span>469</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -257,83 +248,37 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="C-Concurrency-in-Action"><a href="#C-Concurrency-in-Action" class="headerlink" title="C++ Concurrency in Action"></a>C++ Concurrency in Action</h1><h2 id="Managing-threads"><a href="#Managing-threads" class="headerlink" title="Managing threads"></a>Managing threads</h2><ol>
-<li><p><code>std::thread</code> 创建对象就会直接开始新线程。有默认构造函数 不会和任意线程绑定 需要通过move接受别的</p>
-</li>
-<li><p>必须使用join或者detach。 使用detach可成为守护线程，生命周期和程序一样长；为了避免exception导致没有join可以使用一个类，析构里join</p>
-<p><code>std::for_each(threads.begin(),threads.end(),std::mem_fn(&amp;std::thread::join))</code></p>
-</li>
-<li><p><code>std::thread</code>默认copy参数，即使函数使用引用，如果要用引用需要手动加<code>std::ref</code></p>
-</li>
-<li><p>如果给的参数是创建线程的函数的临时变量，函数结束变量销毁可能导致线程的指针问题</p>
-</li>
-<li><p>如果需要用类的函数，语法为<code>std::thread(&amp;Object::f,&amp;object,a,b,c)</code> 类似<code>std::bind</code></p>
-</li>
-<li><p><code>std::thread</code>可以move不能copy 类似<code>std::ifstream</code> <code>std::unique_ptr</code></p>
-<p>通过move转义控制权到另一个<code>std::thread</code>对象</p>
-<p>当出现临时的<code>std::thread</code>对象时会隐式move</p>
-<p>可以放在<code>std::vector</code>中</p>
-</li>
-<li><p><code>std::this_thread::get_id()</code>拿到<code>std::thread::id</code> 支持比较操作</p>
-</li>
-<li><p><code>std::this_thread::yield()</code>不同于sleep等信号打断或睡眠固定时间，此操作让出time slice 供cpu调度</p>
-</li>
+    <div class="post-body" itemprop="articleBody"><h1 id="PipeLLM-Fast-and-Confidential-Large-Language-Model-Services-with-Speculative-Pipelined-Encryption"><a href="#PipeLLM-Fast-and-Confidential-Large-Language-Model-Services-with-Speculative-Pipelined-Encryption" class="headerlink" title="PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption"></a>PipeLLM: Fast and Confidential Large Language Model Services with Speculative Pipelined Encryption</h1><p>背景：</p>
+<ol>
+<li>英伟达 GPU 也提供了机密计算 类似CPU侧的TDX SEV 提供一个host不可访问的enclave 避免被攻击偷数据</li>
+<li>CVM中对private memory 也就是被CPU加密的私有内存调用cuda memcpy 会自动先出发CPU侧的AES加密 然后放到CVM shmem中 给GPU DMA 然后GPU解密。 加密用到的IV是两个硬件初始化的时候自动生成的 不需要每次通信。</li>
+<li>在大模型推理 训练服务中，CPU GPU数据传输过程中的加解密存在关键路径上，overhead很大（由于GPU内存比模型小，所以一定存在swap）</li>
 </ol>
-<h2 id="Sharing-data-between-threads"><a href="#Sharing-data-between-threads" class="headerlink" title="Sharing data between threads"></a>Sharing data between threads</h2><ol start="9">
-<li><p><code>std::mutex</code>有成员函数lock和unlock 但是不推荐使用 因为必须记得放锁</p>
-<p>最好配合lock_guard等离开作用域自动放锁的对象一起用</p>
-</li>
-<li><p><code>boost::shared_lock&lt;boost::shared_mutex&gt;</code>访问只读对象，此时互斥锁会等待</p>
-</li>
-<li><p><code>std::lock</code>同时锁多个 避免死锁</p>
-</li>
-</ol>
-<p><code>std::adopt_lock</code>作为参数不用等直接拿已经有的</p>
-<ol start="12">
-<li><p>不一定只有锁才会导致死锁，join或者wait都会，在设计时需要留意</p>
-</li>
-<li><p>一些避免死锁的guidelines  hierarchi  try_lock</p>
-</li>
-<li><p><code>std::unique_lock</code>可以用<code>std::defer_lock</code>作为第二个参数，先不拿锁，之后手动lock</p>
-</li>
-<li><p>锁的范围应该最小</p>
-</li>
-</ol>
-<p><code>std::once_flag</code>配合<code>std::call_once</code>在任意多的线程中只执行一次，进行初始化的操作</p>
-<ol start="16">
-<li>允许多个同时读，但不允许多个写或读写一起,c++不提供，可以使用boost</li>
-</ol>
-<p>   读：<code>boost::shared_lock&lt;boost::shared_mutex&gt;</code></p>
-<p>   写：<code>std::unique_lock&lt;boost::shared_mutex&gt;</code></p>
-<h2 id="Synchronizing-concurrent-operations"><a href="#Synchronizing-concurrent-operations" class="headerlink" title="Synchronizing concurrent operations"></a>Synchronizing concurrent operations</h2><ol start="17">
-<li><p><code>std::condition_variable</code> </p>
-<p>wait 接受一个锁和一个lambda表达式作为参数 防止先notify再wait</p>
-<p>notify_one&#x2F;notify_all 唤醒wait等待的线程</p>
-</li>
-<li><p><code>std::async</code>用法和<code>std::thread</code>用法一样，但不是返回线程，而是返回<code>std::future&lt;T&gt;</code></p>
-<p>可以通过get方法拿到最后的返回值</p>
-<p>可以增加参数 不立即执行 （实际上是否开线程不确定）</p>
-</li>
-<li><p><code>std::package_task&lt;&gt;</code> 接受函数作为参数，可以在适当的时候通过（）直接调用</p>
-<p>get_future可以拿到future</p>
-<p>想开线程执行一个函数 拿到返回值 可以先构造task 然后拿到future task传给thread执行，最后从future中拿出数据</p>
-<p>返回类型可用<code>std::result_of&lt;&gt;</code></p>
-</li>
-<li><p><code>std::promise&lt;T&gt;</code>get_future拿到<code>std::future&lt;T&gt;</code></p>
-<p>可以通过set_value在线程间传递数据</p>
-</li>
-<li><p>cv和future都可以wait_for&#x2F;wait_until设置timeout</p>
-<p>返回<code>std::future_status</code> 可以判断timeout ready等状态</p>
-</li>
-</ol>
-<h2 id="The-C-memory-model-and-operations-on-atomic-types"><a href="#The-C-memory-model-and-operations-on-atomic-types" class="headerlink" title="The C++ memory model and operations on atomic types"></a>The C++ memory model and operations on atomic types</h2><ol start="22">
-<li><p><code>std::atomic&lt;T&gt;</code> 原子类型 有load store exchange等原子操作</p>
-<p>is_lock_free判断是否需要锁保护</p>
-</li>
-<li><p>memory ordering 指定操作顺序 对于不同变量的操作可能是乱序的</p>
-</li>
-<li><p>通过原子操作可用不需要锁实现并发安全的数据结构</p>
-</li>
+<p>对于一次推理，目前的CC是CPU swap 同步加密 GPU等待 然后计算 然后CPU同步解密</p>
+<p>实际上CPU加解密和GPU计算是可以并行的</p>
+<p>需要预测GPU后续需要哪些数据 让CPU提前加密传输过去</p>
+<p>只关注模型参数卸载和kv cache swap</p>
+<p>如何预测后面要用哪个？（swap-in）</p>
+<p>app使用的pattern是固定的：</p>
+<ul>
+<li>大模型推理 FlexGen 需要卸载模型参数 pattern是重复的 layer1 layer2 layer3</li>
+<li>中等模型推理 vLLM 需要swap kv cache 使用FIFO和LIFO</li>
+<li>chunk大小一般大于128K 有明显特征</li>
+</ul>
+<p>具体实现</p>
+<p>cuda library中 cudaMemcpyAsync中</p>
+<p>判断if (enable_encrypt &amp;&amp; kind &#x3D;&#x3D; cudaMemcpyHostToDevice &amp;&amp; count &gt;&#x3D; encrypt_threshold_sz)  </p>
+<p>进行预测</p>
+<p>否则用原来的同步copy</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SJTU-IPADS/PipeLLM">https://github.com/SJTU-IPADS/PipeLLM</a></p>
+<p>预测基于每次cudaMemcpyAsync中记录的之前的record</p>
+<p>是一个tuple 分为src和size 判断重复只需要判断record是不是一样</p>
+<p>PipeLLM：</p>
+<ol>
+<li>修改cuda libaray 对用户透明</li>
+<li>cudaMemcpyAsync中 根据不同workload提前分析的pattern 把同步改为异步</li>
+<li>CPU异步加解密和GPU计算并行</li>
+<li>overhead可以从50%-80%降低到19%</li>
 </ol>
 
     </div>
@@ -348,14 +293,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/01/31/cpp/effectiveC++/" rel="prev" title="Effective C++">
-                  <i class="fa fa-angle-left"></i> Effective C++
+                <a href="/2026/02/03/virtualization/SEV%E6%BC%8F%E6%B4%9E/" rel="prev" title="SEV漏洞">
+                  <i class="fa fa-angle-left"></i> SEV漏洞
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/01/31/cpp/Effective%20Modern%20C++/" rel="next" title="Effective Modern C++">
-                  Effective Modern C++ <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
