@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,200 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2025/02/04/papers/Sabre/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/02/04/papers/Sabre/" class="post-title-link" itemprop="url">Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs </a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2025-02-04 20:44:14 / Modified: 20:53:17" itemprop="dateCreated datePublished" datetime="2025-02-04T20:44:14+08:00">2025-02-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Sabre-Hardware-Accelerated-Snapshot-Compression-for-Serverless-MicroVMs"><a href="#Sabre-Hardware-Accelerated-Snapshot-Compression-for-Serverless-MicroVMs" class="headerlink" title="Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs"></a>Sabre: Hardware-Accelerated Snapshot Compression for Serverless MicroVMs</h1><p>OSDI24</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MTNkYmUwZDlhYjFmN2RkMWZjY2EzMThhMzRmMGM0NDNfN3RIV0RvUkZZb1JvQTJzdk1IekhNam0wOWF2N3NWTGVfVG9rZW46QWpiZ2JBaVhIb0FLQnR4T0h3UGNzN0VRbjJlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>利用硬件加速器IAA压缩VM snapshot，优化serverless场景下microVM cold start慢的问题</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>问题：serverless场景下microVM冷启动 启动时间久</p>
+<ul>
+<li>解决方案：采用VM snapshot 把guest VM memory存到文件里 下次读文件恢复而不是从头启动</li>
+</ul>
+<p>问题：如果存了整个guest memory restore的时候全部load进去太大了</p>
+<ul>
+<li>解决方案: on-demand paging，触发page fault才映射 和传统进程&#x2F;VM 一样 （现有系统如firecracker采用的方式 baseline1）</li>
+</ul>
+<p>问题：page fault导致性能差</p>
+<ul>
+<li>解决方案：prefetch 预测工作集（working set）<ul>
+<li>REAP（record-and-replay）是asplops21加速snapshot的方案，提出用working set记录一次function call的pages prefetch这些page （SOTA方案 baseline2）</li>
+</ul>
+</li>
+</ul>
+<p>snapshot和WS file的大小很影响效率 越小性能越好 </p>
+<ul>
+<li>解决方案：压缩</li>
+</ul>
+<p>问题：解压缩占时间 且在cold start关键路径上</p>
+<h2 id="IAA"><a href="#IAA" class="headerlink" title="IAA"></a>IAA</h2><h3 id="IAA介绍"><a href="#IAA介绍" class="headerlink" title="IAA介绍"></a>IAA介绍</h3><p>Intel In-Memory Analytic Accelerator 集成在CPU SoC上的一个PCIe设备</p>
+<p>用户态应用向IAA工作队列提交请求</p>
+<p>目前主要用在数据库上</p>
+<p>IAA提供C接口 直接用intel提供的库</p>
+<p>相对于就是最简单的压缩的接口 源数据(uint8*)&lt;–&gt;压缩后的数据(uint8*)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">qpl_path_t</span> execution_path = qpl_path_software;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">source</span><span class="params">(source_size, <span class="number">5</span>)</span></span>;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">destination</span><span class="params">(source_size / <span class="number">2</span>, <span class="number">4</span>)</span></span>;</span><br><span class="line"><span class="function">std::vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">reference</span><span class="params">(source_size, <span class="number">7</span>)</span></span>;</span><br><span class="line">std::unique_ptr&lt;<span class="type">uint8_t</span>[]&gt; job_buffer;</span><br><span class="line"><span class="type">uint32_t</span>                   size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Job initialization</span></span><br><span class="line">qpl_status status = <span class="built_in">qpl_get_job_size</span>(execution_path, &amp;size);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during job size getting.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">job_buffer   = std::<span class="built_in">make_unique</span>&lt;<span class="type">uint8_t</span>[]&gt;(size);</span><br><span class="line">qpl_job* job = <span class="built_in">reinterpret_cast</span>&lt;qpl_job*&gt;(job_buffer.<span class="built_in">get</span>());</span><br><span class="line"></span><br><span class="line">status = <span class="built_in">qpl_init_job</span>(execution_path, job);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during job initializing.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Performing a compression operation</span></span><br><span class="line">job-&gt;op            = qpl_op_compress;</span><br><span class="line">job-&gt;level         = qpl_default_level;</span><br><span class="line">job-&gt;next_in_ptr   = source.<span class="built_in">data</span>();</span><br><span class="line">job-&gt;next_out_ptr  = destination.<span class="built_in">data</span>();</span><br><span class="line">job-&gt;available_in  = source_size;</span><br><span class="line">job-&gt;available_out = <span class="built_in">static_cast</span>&lt;<span class="type">uint32_t</span>&gt;(destination.<span class="built_in">size</span>());</span><br><span class="line">job-&gt;flags         = QPL_FLAG_FIRST | QPL_FLAG_LAST | QPL_FLAG_DYNAMIC_HUFFMAN | QPL_FLAG_OMIT_VERIFY;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Compression</span></span><br><span class="line">status = <span class="built_in">qpl_execute_job</span>(job);</span><br><span class="line"><span class="keyword">if</span> (status != QPL_STS_OK) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;An error &quot;</span> &lt;&lt; status &lt;&lt; <span class="string">&quot; acquired during compression.\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">uint32_t</span> compressed_size = job-&gt;total_out;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IAA能力探索"><a href="#IAA能力探索" class="headerlink" title="IAA能力探索"></a>IAA能力探索</h3><p>对比用IAA硬件压缩与软件压缩的性能：</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YWQwYjU3Mzk1NGM5YjFmMTg5YjkxNTkzZjgxZjUyZDRfYXd0QzNYTWlBdVRUTGVUaEEwVUV6V2wxRkxKTk1BTlNfVG9rZW46SGtnWmJLTVdDb1FrY3p4amwyd2N2eGZYbjViXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjQwYzQyNmIwYTBkNTZmMmI2OWFkZjQzM2FiMmQ3ZTBfZ0xLaHo1UXM3TUtZWlVFYlBlNU1IQzhDVUlpWW1maFFfVG9rZW46U2tyQ2JXWEMwb2Q0cTB4eWZRNWNnVnZybk5jXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>用硬件压缩比软件快（可以支持异步，不占用CPU cycle， 但是这个工作没用到）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDFkZDNkNTc2NDQzY2EyOWI1MTc1ZTRmMDQ4MmRjZmVfUG95aGpkdEdQMkxjMHRZODNLSTBHN0lMYmhzQVBWMEhfVG9rZW46VnUxQ2JqT3d0bzRmUml4SnpKTWNSOFRhbnZnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>可扩展性没问题</p>
+<p>后续测试仍用single thread single job完成</p>
+<p>PRS(<em>Page Request Service</em> ) IAA集成了处理page fault的功能</p>
+<p>不需要操作系统先把文件内容读到内存里，可以用mmap 然后硬件通过PRS拿到数据</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NGZmNjI0MGU5MDRhNzA1NmUwMzdmNTA3MGI1MjFhMTlfcnNDMDhWSVRoaERTekp0NHFTQ2F0MTM2cldHY0RaRmVfVG9rZW46THprcmJvZ0Iyb1Eyb014OWhYRGNiTXJsbktmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<ul>
+<li>Decompress比Disk Read要快，不会拖慢整体时间</li>
+<li>O_DIRECT是为了绕过page cache提高性能（REAP使用的优化方式之一）</li>
+<li>Disk Read与Disk Read+Decompress重合 -&gt; decompress和disk read overlap 是streaming的操作</li>
+</ul>
+<p>这里对IAA的测试和分析理论上提出了应用于microVM snapshot性能提升的可行性</p>
+<h2 id="sabre-design"><a href="#sabre-design" class="headerlink" title="sabre design"></a>sabre design</h2><p>扩展压缩&#x2F;解压一段数据的功能至：</p>
+<ol>
+<li>压缩&#x2F;解压多块内存区域</li>
+<li>压缩的数据存到文件，恢复时读取再解压</li>
+</ol>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTQ2MDEwY2M5ZGVmY2Q1NjY0MDUwM2NjN2E2ZjMwODRfSEV1aHI4cTExazVlM2w3S1RRM2FzMjN1Q1Y0cnpBVG1fVG9rZW46SUptYmI1emtNb1lhSER4dTBsdGNIS1RqbkZkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>snapshot保存memory之外还会保存memory partition压缩前后的位置信息</p>
+<p>snapshot和prefetch各提出了两种方案</p>
+<h3 id="snapshot"><a href="#snapshot" class="headerlink" title="snapshot"></a>snapshot</h3><ol>
+<li>每块不连续的内存先复制到一块连续的buffer上，然后压缩一次</li>
+<li>每块不连续的内存独立压缩，压缩后的数据连续存到磁盘里</li>
+</ol>
+<h3 id="prefetch"><a href="#prefetch" class="headerlink" title="prefetch"></a>prefetch</h3><ol>
+<li>解压一次，根据记录的信息恢复到不同的内存区域（通过userfaultfd，多一次memory copy 但是因为DMA连续 所以性能好）</li>
+<li>根据记录的信息解压多次</li>
+</ol>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="microbenchmark"><a href="#microbenchmark" class="headerlink" title="microbenchmark"></a>microbenchmark</h3><p>先和不压缩比，然后和软件压缩比</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWI1YjQxMjVkOGQ4ODI3MmQwNmM5Y2RkMjJjNDIyNzlfVFhKa0pESmFZVzgwbzVaR0ZWVkE4R0U2YlU0SnZ2ejFfVG9rZW46UFdGR2I3ZDRlb2pIT0Z4OEhhemNva0NablVnXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>passthrough表示读不压缩的snapshot(174.5MB)</p>
+<p>sparsity表示连续page大小 1表示每个page都被一个empty page隔开</p>
+<p>压缩率是2.2x 所以考虑到磁盘读，最大的加速比就是2.2 sabre是1.9</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2M1YmViNTQ0NGJmMzIyMjk0OGNkZDA0ZDE5MGFkM2NfdERBQXpqa2RMdmJlcWhVaWtKTDEzZDlQOTREeFo5N3lfVG9rZW46SU1aOGJYOEw5b20xTUl4WkFaN2NQSzBOblFkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>比较软件方案</p>
+<ul>
+<li>create：IAA最快</li>
+<li>restore-single：IAA最快</li>
+<li>restore-scattered: 稀疏性越弱IAA越快</li>
+</ul>
+<h3 id="end-to-end"><a href="#end-to-end" class="headerlink" title="end-to-end"></a>end-to-end</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Zjg5ZjM1NzY2NzhlNDc1YTNjM2RkYTZkNjllMDZkNzZfQ3IxVzlGMndEaW9HenRDaDlFeUdpUHNTMTBPakNSQUJfVG9rZW46SXZSWGJqMWJkb0dCaDF4bHE2TGNQWjhzbjFiXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>已经集成到firecracker中</p>
+<p>使用KVM提供的dirty pages Diff Snapshot</p>
+<p>数据大，粒度粗，选择用scattered（没有对比）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YzQ2OWFkY2JkYjEyOTI3OTE0Y2E1Mjc4YjQzNTU1MjdfcERyOE1qTzdUcUNQbWJDb2N3VUtzRzIzMVd6OHJDb01fVG9rZW46Tkd0Z2JKTVlObzdNcEd4eFdsMmN1cVlRbjFmXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>baseline是snapshot 不压缩 不prefetch</p>
+<ul>
+<li>baseline使用on-demand paging VM load的时候耗时少 但是函数调用会触发一系列page fault</li>
+<li>Sabre在VM load时需要恢复guest memory 耗时多 但是prefetch了内存 函数调用快</li>
+</ul>
+<p>最高64% cold start加速</p>
+<p>和SOTA方案REAP比</p>
+<p>REAP的working set记录的page比较分散 选择用single-chunk（没有对比）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NWM2MmE4YjM2NDU2Mjk5ODhhZWJjNWQzY2FlNTYwZjNfaWtvWlRhZ2lrcE01Q01JelFRMjNlemdzYjZleFVEYXRfVG9rZW46WE1GbmJoaHU2b0JJUWR4TWVvQ2NIRkVpbmhlXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<p>Working set对于一个固定的应用来说是不变的，sabre压缩了WS file 所以性能更好了</p>
+<p>以cnn-image-classification为例，压缩比为3.10 prefetch加速38.73% 又因为该场景中REAP prefetch耗时占比大 最终Sabre达到19.2%的优势</p>
+<p>对function invocation占比大的场景优势不明显（这个serverless函数本身启动耗时）</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MDBiYzUxYWE0NTg0ZmM3YjIxNDZjM2FjYjU0ZDdiMmFfYzc0Tm1abU9LbzhUSDdJbk96MnUyMmFsdU9ET0NkeGFfVG9rZW46RWc3VmJsbXFwb1JOM0h4aUdsbmNzQnVMbkdkXzE3Mzg2NzI5Nzc6MTczODY3NjU3N19WNA" alt="img"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>创新地提出把硬件加速器IAA应用于压缩VM snapshot，并通过合理的设计成功加速了microVM cold start</p>
+<h2 id="启发"><a href="#启发" class="headerlink" title="启发"></a>启发</h2><ol>
+<li>IAA加速压缩&#x2F;解压是否可以应用在其他场景中？ (有正在进行的VM migration的工作<a target="_blank" rel="noopener" href="https://lore.kernel.org/all/20240319164527.1873891-1-yuan1.liu@intel.com/T/%EF%BC%89">https://lore.kernel.org/all/20240319164527.1873891-1-yuan1.liu@intel.com/T/）</a></li>
+<li>探索新硬件提供的其他功能</li>
+</ol>
+<ul>
+<li>IAA：加密、CRC offload、data filtering等<a target="_blank" rel="noopener" href="https://www.intel.com/content/www/us/en/content-details/721858/intel-in-memory-analytics-accelerator-architecture-specification.html">https://www.intel.com/content/www/us/en/content-details/721858/intel-in-memory-analytics-accelerator-architecture-specification.html</a></li>
+<li>其他硬件 例如DLB<a target="_blank" rel="noopener" href="https://www.intel.cn/content/www/cn/zh/products/docs/processors/xeon-accelerated/4th-gen-xeon-scalable-processors-product-brief.html">https://www.intel.cn/content/www/cn/zh/products/docs/processors/xeon-accelerated/4th-gen-xeon-scalable-processors-product-brief.html</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -233,7 +427,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>7 mins.</span>
     </span>
 </div>
 
@@ -430,7 +624,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -619,7 +813,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>8 mins.</span>
     </span>
 </div>
 
@@ -816,7 +1010,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>17 mins.</span>
     </span>
 </div>
 
@@ -1071,7 +1265,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>11 mins.</span>
     </span>
 </div>
 
@@ -1284,7 +1478,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -1433,7 +1627,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>6 mins.</span>
     </span>
 </div>
 
@@ -1660,7 +1854,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>10 mins.</span>
     </span>
 </div>
 
@@ -1969,7 +2163,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>6 mins.</span>
     </span>
 </div>
 
@@ -2112,150 +2306,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/CacheWarp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/papers/CacheWarp/" class="post-title-link" itemprop="url">CacheWarp</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>733</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="CacheWarp"><a href="#CacheWarp" class="headerlink" title="CacheWarp"></a>CacheWarp</h1><p>snp用的是<a target="_blank" rel="noopener" href="https://github.com/sev-step/sev-step">sev-step&#x2F;sev-step: This repo tracks a compatible state of all sev step components and contains script to easily install everything required to setup a sev vm (github.com)</a></p>
-<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/kernel-patch/kernel.patch">CacheWarp&#x2F;kernel-patch&#x2F;kernel.patch at main · cispa&#x2F;CacheWarp (github.com)</a></p>
-<p>SEV_STEP_FLAG_BASE_PFN   sev_step_page_va  和user通信地址</p>
-<p>intr_interception 核心逻辑</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/userspace-controller/cachewarp/cachewarp.c">CacheWarp&#x2F;userspace-controller&#x2F;cachewarp&#x2F;cachewarp.c at main · cispa&#x2F;CacheWarp (github.com)</a></p>
-<p>sev_step_kernel_sync_addr_p 和step框架通信</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sev_step_kernel_sync_addr_p = libtea_map_physical_address_range(instance, KERNEL_SYNC_PA, <span class="number">4096</span>, PROT_READ | PROT_WRITE, <span class="literal">true</span>);</span><br><span class="line"><span class="built_in">memset</span>(sev_step_kernel_sync_addr_p, <span class="number">0</span>, <span class="number">4096</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> vec[<span class="number">100</span>] = &#123;<span class="number">44</span>, <span class="number">0</span>,<span class="number">8</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">8</span>,<span class="number">8</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">0</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span> ,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0x201</span>, <span class="number">1</span>,<span class="number">0x101</span>,<span class="number">0x101</span>,<span class="number">3</span>,<span class="number">0x11</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">0x41</span>,<span class="number">0x41</span>,<span class="number">0x5</span>, <span class="number">1</span>,<span class="number">0x11</span>,<span class="number">0x21</span>,<span class="number">0x20</span>,<span class="number">1</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>, <span class="number">0x21</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0x3000</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= vec[<span class="number">0</span>]; i++)</span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movw %1, (%0)\n\t&quot;</span>:: <span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p+<span class="number">16</span>+<span class="number">2</span>*i),<span class="string">&quot;r&quot;</span>(vec[i]):)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<p>vec攻击向量 和sudo的binary有关</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/tree/main/sudo">CacheWarp&#x2F;sudo at main · cispa&#x2F;CacheWarp (github.com)</a></p>
-<p>用到libtea 是usenix security22提供的一套框架 不用自己写一大堆难懂的汇编 并且屏蔽掉平台的差异</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/libtea/frameworks/blob/master/libtea/src/libtea_common.c">frameworks&#x2F;libtea&#x2F;src&#x2F;libtea_common.c at master · libtea&#x2F;frameworks (github.com)</a></p>
-<p>vec记录了一串数值 是step指令的序列</p>
-<p>vmsa layout 记录在手册中</p>
-<p><a target="_blank" rel="noopener" href="https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf">https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf</a></p>
-<p>Table B-4. VMSA Layout, State Save Area for SEV-ES</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vmsa_paddr = svm-&gt;vmcb-&gt;control.vmsa_pa;</span><br><span class="line"></span><br><span class="line">rsp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1d8</span>);</span><br><span class="line">rbp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x328</span>);</span><br><span class="line">rax = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1f8</span>);</span><br><span class="line">rcx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x308</span>);</span><br><span class="line">rdx_rbx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x310</span>);</span><br><span class="line">rsi_rdi = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x330</span>);</span><br><span class="line">r8_r9   = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x340</span>);</span><br><span class="line">r10_r11 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x350</span>);</span><br><span class="line">r12_r13 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x360</span>);</span><br><span class="line">r14_r15 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x370</span>);</span><br><span class="line">xmm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x470</span>);</span><br><span class="line">ymm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x570</span>);</span><br><span class="line">cs  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x10</span>);</span><br><span class="line">ss  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x20</span>);</span><br><span class="line">reg_vector = ((last_vmsa_rsp != rsp) &lt;&lt; <span class="number">0</span>) + ((last_vmsa_rbp != rbp) &lt;&lt; <span class="number">1</span>) + \</span><br><span class="line">						((last_vmsa_rax != rax) &lt;&lt; <span class="number">2</span>) 		   + ((last_vmsa_rcx != rcx) &lt;&lt; <span class="number">3</span>) + \</span><br><span class="line">						((last_vmsa_rdx_rbx != rdx_rbx) &lt;&lt; <span class="number">4</span>)  + ((last_vmsa_rsi_rdi != rsi_rdi) &lt;&lt; <span class="number">5</span>) + \</span><br><span class="line">						((last_vmsa_r8_r9 != r8_r9) &lt;&lt; <span class="number">6</span>) 	   + ((last_vmsa_r10_r11 != r10_r11) &lt;&lt; <span class="number">7</span>) + \</span><br><span class="line">						((last_vmsa_r12_r13 != r12_r13) &lt;&lt; <span class="number">8</span>)  + ((last_vmsa_r14_r15 != r14_r15) &lt;&lt; <span class="number">9</span>) + \</span><br><span class="line">						((last_vmsa_xmm != xmm) &lt;&lt; <span class="number">10</span>) 		   + ((last_vmsa_ymm != ymm) &lt;&lt; <span class="number">11</span>) + \</span><br><span class="line">						((last_vmsa_cs != cs) &lt;&lt; <span class="number">12</span>) 		   + ((last_vmsa_ss != ss) &lt;&lt; <span class="number">13</span>);</span><br><span class="line"><span class="keyword">if</span> (reg_vector != *((<span class="keyword">volatile</span> u16 *)(sev_step_page_va + PATH_OFFSET + path_index*<span class="number">2</span>))) &#123;</span><br><span class="line">						find_target = <span class="literal">false</span>;</span><br><span class="line">						printk(<span class="string">&quot;dismatch %dth Instr! the vector is 0x%x\n&quot;</span>, path_index, reg_vector);</span><br><span class="line">					&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-<p>user 先设置flag  kvm把所有页表present bit设为0 guest触发NPF</p>
-<p>kvm拿到gpa 设置APIC</p>
-<p>小于阈值 0step 大于阈值 &gt;&#x3D;1step</p>
-<p>观察RIP看是0还是非0</p>
-<p>snp增加了freshness 寄存器一样密文也会变 可以用sev-step的performance counter</p>
-<p>由于vmsa的cache 导致每次context switch时间不稳定 因此用MTRR标记为不可缓存 并且用wbinvd解决AMD CPU可能stale的问题</p>
-<p>NPF的作用是啥</p>
-<blockquote>
-<p>To ensure consistent conditions for every stepping, the hypervisor always clears the present bit of the last fault page when handling the APIC timer interrupt, i.e., an NPF is always triggered before the next APIC interrupt.  </p>
-</blockquote>
-<p>为了控制变量 保证时间稳定？感觉几乎没有用</p>
-<ol>
-<li>run的汇编每次固定apic timer 可以step</li>
-<li>sev-step没有提到page fault</li>
-</ol>
-<p>是否只是拿个gpa 方便找pattern？</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted, (u32*)(APIC_BASE + APIC_TMICT), apic_interval, wbnoinvd);</span><br><span class="line">SYM_FUNC_START(__svm_sev_es_vcpu_run)</span><br><span class="line">    movl %_ASM_ARG4L, (%_ASM_ARG3)</span><br></pre></td></tr></table></figure>
-
-<p>攻击触发点：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">ctrl_thread</span><span class="params">(<span class="type">void</span>* dummy)</span> &#123; </span><br><span class="line">	</span><br><span class="line">	pin_to_core(ASSIST_CORE);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// hook kvm_exit_handler in the kernel </span></span><br><span class="line">	<span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movq %1, (%0)\n&quot;</span>::<span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p),<span class="string">&quot;r&quot;</span>(flag):)</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Wait until the attack finishes */</span></span><br><span class="line">	<span class="keyword">while</span> (*(<span class="type">uint32_t</span>*)(sev_step_kernel_sync_addr_p)) &#123;sched_yield();&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">intr_interception</span><br><span class="line">    <span class="comment">/* Start */</span></span><br><span class="line">    <span class="keyword">if</span> (zero_stepping_time == <span class="number">0</span> &amp;&amp; non_zero_stepping_time == <span class="number">0</span>) &#123;</span><br><span class="line">        kvm_unpre_all(vcpu-&gt;kvm, svm-&gt;vmcb-&gt;control.asid);</span><br><span class="line">        svm_flush_tlb_current(vcpu);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Mark VMSA into UC will make `VMRUN` updates all vmsa state in cache */</span></span><br><span class="line">        <span class="keyword">if</span> (uc_vmsa) &#123;</span><br><span class="line">            mtrr_uc_page(vmsa_paddr, <span class="number">3</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Avoid to drop smth dirty data and freeze the system</span></span><br><span class="line"><span class="comment">			 * wbnoinvd is enough to make it reliable</span></span><br><span class="line"><span class="comment">			 * wbinvd also works, but it takes longer time</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">        <span class="keyword">if</span> (invd) &#123;</span><br><span class="line">            <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;wbnoinvd\n\t&quot;</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>ssh 怎么利用page fault一起找的？</p>
-<p>npf_interception intr_interception svm_vcpu_enter_exit三者关系是什么？</p>
-<p>exit之后不就是NPF或者INTR 为什么急着先处理？</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2285,7 +2335,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">1:15</span>
+    <span title="Reading time total">4:59</span>
   </span>
 </div>
 <div class="busuanzi-count">

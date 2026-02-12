@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,150 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/CacheWarp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/papers/CacheWarp/" class="post-title-link" itemprop="url">CacheWarp</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>733</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="CacheWarp"><a href="#CacheWarp" class="headerlink" title="CacheWarp"></a>CacheWarp</h1><p>snp用的是<a target="_blank" rel="noopener" href="https://github.com/sev-step/sev-step">sev-step&#x2F;sev-step: This repo tracks a compatible state of all sev step components and contains script to easily install everything required to setup a sev vm (github.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/kernel-patch/kernel.patch">CacheWarp&#x2F;kernel-patch&#x2F;kernel.patch at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>SEV_STEP_FLAG_BASE_PFN   sev_step_page_va  和user通信地址</p>
+<p>intr_interception 核心逻辑</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/blob/main/userspace-controller/cachewarp/cachewarp.c">CacheWarp&#x2F;userspace-controller&#x2F;cachewarp&#x2F;cachewarp.c at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>sev_step_kernel_sync_addr_p 和step框架通信</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sev_step_kernel_sync_addr_p = libtea_map_physical_address_range(instance, KERNEL_SYNC_PA, <span class="number">4096</span>, PROT_READ | PROT_WRITE, <span class="literal">true</span>);</span><br><span class="line"><span class="built_in">memset</span>(sev_step_kernel_sync_addr_p, <span class="number">0</span>, <span class="number">4096</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">uint16_t</span> vec[<span class="number">100</span>] = &#123;<span class="number">44</span>, <span class="number">0</span>,<span class="number">8</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">8</span>,<span class="number">8</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="number">0</span>,<span class="number">0x80</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span> ,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0x201</span>, <span class="number">1</span>,<span class="number">0x101</span>,<span class="number">0x101</span>,<span class="number">3</span>,<span class="number">0x11</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">0x41</span>,<span class="number">0x41</span>,<span class="number">0x5</span>, <span class="number">1</span>,<span class="number">0x11</span>,<span class="number">0x21</span>,<span class="number">0x20</span>,<span class="number">1</span>, <span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>, <span class="number">0x21</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0x3000</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= vec[<span class="number">0</span>]; i++)</span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movw %1, (%0)\n\t&quot;</span>:: <span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p+<span class="number">16</span>+<span class="number">2</span>*i),<span class="string">&quot;r&quot;</span>(vec[i]):)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>vec攻击向量 和sudo的binary有关</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/cispa/CacheWarp/tree/main/sudo">CacheWarp&#x2F;sudo at main · cispa&#x2F;CacheWarp (github.com)</a></p>
+<p>用到libtea 是usenix security22提供的一套框架 不用自己写一大堆难懂的汇编 并且屏蔽掉平台的差异</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/libtea/frameworks/blob/master/libtea/src/libtea_common.c">frameworks&#x2F;libtea&#x2F;src&#x2F;libtea_common.c at master · libtea&#x2F;frameworks (github.com)</a></p>
+<p>vec记录了一串数值 是step指令的序列</p>
+<p>vmsa layout 记录在手册中</p>
+<p><a target="_blank" rel="noopener" href="https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf">https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/programmer-references/24593.pdf</a></p>
+<p>Table B-4. VMSA Layout, State Save Area for SEV-ES</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">vmsa_paddr = svm-&gt;vmcb-&gt;control.vmsa_pa;</span><br><span class="line"></span><br><span class="line">rsp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1d8</span>);</span><br><span class="line">rbp = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x328</span>);</span><br><span class="line">rax = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x1f8</span>);</span><br><span class="line">rcx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x308</span>);</span><br><span class="line">rdx_rbx = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x310</span>);</span><br><span class="line">rsi_rdi = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x330</span>);</span><br><span class="line">r8_r9   = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x340</span>);</span><br><span class="line">r10_r11 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x350</span>);</span><br><span class="line">r12_r13 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x360</span>);</span><br><span class="line">r14_r15 = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x370</span>);</span><br><span class="line">xmm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x470</span>);</span><br><span class="line">ymm = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x570</span>);</span><br><span class="line">cs  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x10</span>);</span><br><span class="line">ss  = *(<span class="keyword">volatile</span> u64 *)(vmsa_vaddr+<span class="number">0x20</span>);</span><br><span class="line">reg_vector = ((last_vmsa_rsp != rsp) &lt;&lt; <span class="number">0</span>) + ((last_vmsa_rbp != rbp) &lt;&lt; <span class="number">1</span>) + \</span><br><span class="line">						((last_vmsa_rax != rax) &lt;&lt; <span class="number">2</span>) 		   + ((last_vmsa_rcx != rcx) &lt;&lt; <span class="number">3</span>) + \</span><br><span class="line">						((last_vmsa_rdx_rbx != rdx_rbx) &lt;&lt; <span class="number">4</span>)  + ((last_vmsa_rsi_rdi != rsi_rdi) &lt;&lt; <span class="number">5</span>) + \</span><br><span class="line">						((last_vmsa_r8_r9 != r8_r9) &lt;&lt; <span class="number">6</span>) 	   + ((last_vmsa_r10_r11 != r10_r11) &lt;&lt; <span class="number">7</span>) + \</span><br><span class="line">						((last_vmsa_r12_r13 != r12_r13) &lt;&lt; <span class="number">8</span>)  + ((last_vmsa_r14_r15 != r14_r15) &lt;&lt; <span class="number">9</span>) + \</span><br><span class="line">						((last_vmsa_xmm != xmm) &lt;&lt; <span class="number">10</span>) 		   + ((last_vmsa_ymm != ymm) &lt;&lt; <span class="number">11</span>) + \</span><br><span class="line">						((last_vmsa_cs != cs) &lt;&lt; <span class="number">12</span>) 		   + ((last_vmsa_ss != ss) &lt;&lt; <span class="number">13</span>);</span><br><span class="line"><span class="keyword">if</span> (reg_vector != *((<span class="keyword">volatile</span> u16 *)(sev_step_page_va + PATH_OFFSET + path_index*<span class="number">2</span>))) &#123;</span><br><span class="line">						find_target = <span class="literal">false</span>;</span><br><span class="line">						printk(<span class="string">&quot;dismatch %dth Instr! the vector is 0x%x\n&quot;</span>, path_index, reg_vector);</span><br><span class="line">					&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+<p>user 先设置flag  kvm把所有页表present bit设为0 guest触发NPF</p>
+<p>kvm拿到gpa 设置APIC</p>
+<p>小于阈值 0step 大于阈值 &gt;&#x3D;1step</p>
+<p>观察RIP看是0还是非0</p>
+<p>snp增加了freshness 寄存器一样密文也会变 可以用sev-step的performance counter</p>
+<p>由于vmsa的cache 导致每次context switch时间不稳定 因此用MTRR标记为不可缓存 并且用wbinvd解决AMD CPU可能stale的问题</p>
+<p>NPF的作用是啥</p>
+<blockquote>
+<p>To ensure consistent conditions for every stepping, the hypervisor always clears the present bit of the last fault page when handling the APIC timer interrupt, i.e., an NPF is always triggered before the next APIC interrupt.  </p>
+</blockquote>
+<p>为了控制变量 保证时间稳定？感觉几乎没有用</p>
+<ol>
+<li>run的汇编每次固定apic timer 可以step</li>
+<li>sev-step没有提到page fault</li>
+</ol>
+<p>是否只是拿个gpa 方便找pattern？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted, (u32*)(APIC_BASE + APIC_TMICT), apic_interval, wbnoinvd);</span><br><span class="line">SYM_FUNC_START(__svm_sev_es_vcpu_run)</span><br><span class="line">    movl %_ASM_ARG4L, (%_ASM_ARG3)</span><br></pre></td></tr></table></figure>
+
+<p>攻击触发点：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">ctrl_thread</span><span class="params">(<span class="type">void</span>* dummy)</span> &#123; </span><br><span class="line">	</span><br><span class="line">	pin_to_core(ASSIST_CORE);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// hook kvm_exit_handler in the kernel </span></span><br><span class="line">	<span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;movq %1, (%0)\n&quot;</span>::<span class="string">&quot;r&quot;</span>(sev_step_kernel_sync_addr_p),<span class="string">&quot;r&quot;</span>(flag):)</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Wait until the attack finishes */</span></span><br><span class="line">	<span class="keyword">while</span> (*(<span class="type">uint32_t</span>*)(sev_step_kernel_sync_addr_p)) &#123;sched_yield();&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">intr_interception</span><br><span class="line">    <span class="comment">/* Start */</span></span><br><span class="line">    <span class="keyword">if</span> (zero_stepping_time == <span class="number">0</span> &amp;&amp; non_zero_stepping_time == <span class="number">0</span>) &#123;</span><br><span class="line">        kvm_unpre_all(vcpu-&gt;kvm, svm-&gt;vmcb-&gt;control.asid);</span><br><span class="line">        svm_flush_tlb_current(vcpu);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Mark VMSA into UC will make `VMRUN` updates all vmsa state in cache */</span></span><br><span class="line">        <span class="keyword">if</span> (uc_vmsa) &#123;</span><br><span class="line">            mtrr_uc_page(vmsa_paddr, <span class="number">3</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Avoid to drop smth dirty data and freeze the system</span></span><br><span class="line"><span class="comment">			 * wbnoinvd is enough to make it reliable</span></span><br><span class="line"><span class="comment">			 * wbinvd also works, but it takes longer time</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">        <span class="keyword">if</span> (invd) &#123;</span><br><span class="line">            <span class="keyword">asm</span> <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;wbnoinvd\n\t&quot;</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>ssh 怎么利用page fault一起找的？</p>
+<p>npf_interception intr_interception svm_vcpu_enter_exit三者关系是什么？</p>
+<p>exit之后不就是NPF或者INTR 为什么急着先处理？</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -233,7 +377,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>4 mins.</span>
     </span>
 </div>
 
@@ -413,7 +557,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>11 mins.</span>
     </span>
 </div>
 
@@ -623,7 +767,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>9 mins.</span>
     </span>
 </div>
 
@@ -788,7 +932,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -912,7 +1056,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>14 mins.</span>
     </span>
 </div>
 
@@ -1071,7 +1215,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>8 mins.</span>
     </span>
 </div>
 
@@ -1176,7 +1320,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>8 mins.</span>
     </span>
 </div>
 
@@ -1444,7 +1588,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>6 mins.</span>
     </span>
 </div>
 
@@ -1668,7 +1812,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -1726,197 +1870,6 @@ npm ERR! &#125;
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/chcore/chcore/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/chcore/chcore/" class="post-title-link" itemprop="url">chcore</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2024-09-17 19:48:02 / Modified: 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:02+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.1k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="chcore"><a href="#chcore" class="headerlink" title="chcore"></a>chcore</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><ol>
-<li><p>start.S </p>
-<p><code>mpidr</code>拿到cpu核编号，其他核等待 主核设置<code>scr</code> <code>elr</code>(返回地址) <code>spsr</code>(异常状态) 切换到el1</p>
-<p>设置栈地址</p>
-</li>
-<li><p>init_c</p>
-<p>清理bss</p>
-<p>初始化uart</p>
-<p>初始化页表</p>
-<p>激活mmu</p>
-</li>
-<li><p>start_kernel</p>
-<p>重新设置栈(高地址)</p>
-<p>关掉对低地址(<code>ttbr0</code>)的翻译 flush tlb</p>
-</li>
-<li><p>main</p>
-<p>初始化锁</p>
-<p>初始化物理内存分配系统</p>
-<p><code>set_exception_vector</code> 初始化异常向量表 打开中断</p>
-<p>初始化调度策略（链表，idle线程）</p>
-<p>激活其他线程</p>
-<p>拿锁 根据指定配置创建root线程 这里<code>create_root_thread</code>会先创建root进程再创建线程</p>
-<p>调度 切换上下文 返回用户态</p>
-</li>
-</ol>
-<h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><p><code>cap_group</code>是进程的抽象，元数据包括其拥有的所有的内核对象，例如vmspace，Capability是访问某个内核对象的令牌</p>
-<p>进程只是获取资源和原理资源的对象，单独创建没有意义，需要填入创建线程需要的参数中然后创建线程。</p>
-<p>创建线程并加载用户文件有两个函数：</p>
-<ul>
-<li><p><code>load_binary</code> 解析elf 创建pmo，建立映射，复制数据，拿到pc并返回用于创建线程，在内核态创建root的线程的时候使用</p>
-</li>
-<li><p><code>launch_process</code>解析elf 通过系统调用创建pmo并映射 <code>spawn</code>之前的<code>parse_elf_from_binary</code>已经为每个段都拿到了pmo并复制，<code>launch_process</code>中只要为每个段建立映射即可</p>
-<p>libchore是额外提供的库，用户态程序，基本都是通过syscall和内核交互完成功能，提供<code>spawn</code>等函数</p>
-</li>
-</ul>
-<p>线程调度在内核态完成</p>
-<p>进程管理在用户态的procm server完成</p>
-<p>存在crt0的几个函数用汇编写入main外层的<code>_start</code>函数，并在main调用之后调用进程退出和线程退出函数</p>
-<p>猜测这个libchore的crt0函数会和用户程序一同编译</p>
-<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><p><code>0xffff_0000_0000_0000 + addr</code> 映射到 <code>addr</code></p>
-<p>树莓派规定<code>0x00000000</code>~&#96;0x3f000000&#96; 物理地址会去主存访问，再大的物理地址会去对应的外设访问，与型号有关。</p>
-<p>buddy system虽然是管理物理内存的，但是所有的操作都是针对虚拟地址的。由于之前已经进行过大块映射。所以一整块连续内存对内核来说是可以直接给buddy system使用的，把对应地址转为page*即可</p>
-<p>页表会从buddy system拿到页地址，但是存储再页表项中的地址必须转换为物理地址。</p>
-<p>pmo作为一个资源对象，记录了物理内存资源。用radix tree做索引，key是虚拟内存的page编号，value是对应的物理内存地址。</p>
-<h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><ol>
-<li><p><code>exception_entry</code> 保存上下文到栈中 这里使用的栈已经是内核栈了</p>
-</li>
-<li><p>进入对应的处理entry，esr寄存器可判断异常原因，传入后续c函数</p>
-</li>
-<li><p>如果是syscall，跳转到syscall_table的entry</p>
-<p>如果是其他，例如page fault，进入handle_entry.c 根据esr判断并处理</p>
-<p>如果是时钟中断，<code>sched_handle_timer_irq</code>会做和调度相关的事情</p>
-</li>
-</ol>
-<h2 id="锁与信号量"><a href="#锁与信号量" class="headerlink" title="锁与信号量"></a>锁与信号量</h2><p>chcore中存在以下不同的实现</p>
-<ol>
-<li><p>通过硬件提供的特殊load和store指令实现fetch_and_add 随后再实现ticket lock，一把大锁，一进内核就拿</p>
-</li>
-<li><p>信号量记录当前线程等待的线程信息，通过加入和移除调度队列实现 。waitpid通过信号量的wait和signal实现</p>
-</li>
-<li><p>用二元信号量可在用户态实现互斥锁</p>
-</li>
-<li><p>gcc有内置的api <code>__sync_fetch_and_add</code> <code>__sync_lock_test_and_set</code>  不需要任何头文件可以使用，用这个也能实现锁 但是这里依赖了已经存在的编译器，并不是从0写操作系统。</p>
-</li>
-</ol>
-<h2 id="进程间通信"><a href="#进程间通信" class="headerlink" title="进程间通信"></a>进程间通信</h2><h3 id="执行流"><a href="#执行流" class="headerlink" title="执行流"></a>执行流</h3><p>client先register_client，需要知道想要通信的服务端进程。</p>
-<p>创建连接会为服务端进程再创建一个线程，设置相同的vmspace (每个client都会在服务器进程创建一个线程作为单独的连接对象)</p>
-<p>client ipc_call时，不用sched，而是直接switch到target，将自己设置为waiting，不加入等待队列。需要设置参数和target为服务端的处理函数。</p>
-<p>server ipc_return时，设置client为running后直接switch到client，设置返回值</p>
-<p>由于ipc的操作都是进内核的，eret会直接返回到用户态，因此server返回到client时，执行ipc_call的下一条指令，切换到server的调用链直接被中止。由于ret addr不使用栈，因此也不会对内核栈产生很大的破坏。</p>
-<h3 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h3><p>每个connection会创建pmo，同时映射到client和server的地址空间</p>
-<p>client和server的thread是一对一的，但是即使是不同的thread也是服务在同一个写死的地址上，所以需要根据不同情况算偏移找不同的位置。</p>
-<ul>
-<li>server: 同一个dispatch会需要支持不同client访问，每次create_connection时会得到不同的连接，server对于IPC提供的缓冲区根据不同connection id找到偏移 服务不同客户</li>
-<li>client：同一个cilent会需要和不同的server通信，每次register client会拿到不同client id，client对于IPC提供的缓冲区根据不同的client id找到偏移，请求不同的服务</li>
-</ul>
-<p>每个client创建pmo，然后映射到服务端的地址都不会重复。buf和stack各需要一个pmo</p>
-<ul>
-<li><p><code>buf_addr</code>为A-stack client server共享内存 传递参数</p>
-</li>
-<li><p><code>stack_addr</code>为E-stack server thread执行用</p>
-</li>
-</ul>
-<h3 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h3><p>client通过<code>ipc_create_msg</code> 会把消息直接写入到共享内存的开头，在迁移线程时设置地址为服务端共享内存地址即可（两端虚拟地址不一样，但物理地址一样）</p>
-<p>共享内存首地址即为msg对象(元数据)，而紧接着msg对象的就是msg所带data </p>
-<p>可以自己为每种不同的IPC定义request结构体，然后直接进行类型转换</p>
-<p>以文件系统为例，共享内存布局如下</p>
-<p>msg元数据—fs_request元数据—文件数据</p>
-<h3 id="cap"><a href="#cap" class="headerlink" title="cap"></a>cap</h3><p>需要传递资源给server</p>
-<p>很多IPC的操作是被写在kernel里的，kernel的地址空间是共用的，因此即使是不同进程本地修改cap，在context switch到另一个进程时，修改仍有效</p>
-<h2 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h2><p>文件系统全是用户态程序</p>
-<p>File System Manager实现VFS抽象，在内存中维护一个链表，每个节点包含path和对应的文件系统server的结构体</p>
-<p>inode记录的block块号除了用连续的数组，还可用radix tree，key是page编号，value是page地址（block块号）</p>
-<h2 id="外设"><a href="#外设" class="headerlink" title="外设"></a>外设</h2><p>参考<a target="_blank" rel="noopener" href="https://github.com/s-matyukevich/raspberry-pi-os/blob/master/docs/lesson01/rpi-os.md">raspberry-pi-os&#x2F;rpi-os.md at master · s-matyukevich&#x2F;raspberry-pi-os · GitHub</a>及BCM2837树莓派外设手册可知，对于树莓派，硬件本身(MMU)规定了一段物理地址是专门用于访问外设的（BCM2837为0x30000000-0x3F000000）。由1.2节可知，当MMU第一次把虚拟地址翻译为物理地址后，还会通过另一个VC&#x2F;ARM MMU把物理地址翻译为总线地址。最后选择是访问主存还是外设。这里VC&#x2F;ARM MMU会把0x30000000的物理地址直接映射到0x7E000000。</p>
-<p>同时，第五章EMMC可知，EMMC寄存器基地址被规定为0x7E300000，也就是说，只要操作系统访问0x30300000的物理地址，就能做到和SD卡进行交互而非RAM。</p>
-<p>chcore先通过syscall创建pmo并映射，pmo对应的物理地址即是树莓派手册规定的用于访问外设+具体外设的地址。当访问这块物理内存时，树莓派会交由sd卡处理。同时，内存映射仍由操作系统管理，所以需要页表对应的PTE会被标记为device，使得这些页不进入缓存。</p>
-<p>进行读写等操作时，chcore会先通过mmio写一些寄存器，设置必要的参数(例如block号)，随后可以在指定内存位置进行读写(<code>EMMC_DATA</code>)。</p>
-<p>对MMIO地址使用的<code>read32</code> <code>write32</code>接口使用的地址均用<code>volatile</code>修饰，保证可以看到硬件提供的最真实的数据。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -1946,7 +1899,7 @@ npm ERR! &#125;
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">1:15</span>
+    <span title="Reading time total">4:59</span>
   </span>
 </div>
 <div class="busuanzi-count">

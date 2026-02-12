@@ -19,27 +19,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="C++20高级编程类型与对象 template&lt;typename F,typename...Args&gt; using result_of &#x3D; decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...)) 123456789101112131415161718192021222. &#96;std::pair a&#123;1,2">
+    <meta name="description" content="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from KernelUsenix Security 24 https:&#x2F;&#x2F;github.com&#x2F;casys-kaist&#x2F;BUDAlloc&#x2F;tree&#x2F;main 背景UAF： 123p1 &#x3D; malloc(64);free(p1);p2 &#x3D;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++20高级编程">
-<meta property="og:url" content="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:title" content="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/12/papers/BUDAlloc%20Defeating%20Use-After-Free%20Bugs%20by%20Decoupling%20Virtual%20Address%20Management%20from%20Kernel/index.html">
 <meta property="og:site_name" content="S blog">
-<meta property="og:description" content="C++20高级编程类型与对象 template&lt;typename F,typename...Args&gt; using result_of &#x3D; decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...)) 123456789101112131415161718192021222. &#96;std::pair a&#123;1,2">
+<meta property="og:description" content="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from KernelUsenix Security 24 https:&#x2F;&#x2F;github.com&#x2F;casys-kaist&#x2F;BUDAlloc&#x2F;tree&#x2F;main 背景UAF： 123p1 &#x3D; malloc(64);free(p1);p2 &#x3D;">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2026-01-31T06:01:02.000Z">
-<meta property="article:modified_time" content="2026-01-31T06:22:58.763Z">
+<meta property="article:published_time" content="2026-02-12T05:54:53.261Z">
+<meta property="article:modified_time" content="2026-02-12T08:13:19.205Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/">
+<link rel="canonical" href="http://szy0127.github.io/2026/02/12/papers/BUDAlloc%20Defeating%20Use-After-Free%20Bugs%20by%20Decoupling%20Virtual%20Address%20Management%20from%20Kernel/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/","path":"2026/01/31/cpp/C++20高级编程/","title":"C++20高级编程"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/12/papers/BUDAlloc%20Defeating%20Use-After-Free%20Bugs%20by%20Decoupling%20Virtual%20Address%20Management%20from%20Kernel/","path":"2026/02/12/papers/BUDAlloc Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel/","title":"BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>C++20高级编程 | S blog</title>
+<title>BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel | S blog</title>
   
 
 
@@ -138,7 +138,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">C++20高级编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.1.</span> <span class="nav-text">类型与对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%97%B6%E5%A4%9A%E6%80%81"><span class="nav-number">1.2.</span> <span class="nav-text">编译时多态</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BUDAlloc-Defeating-Use-After-Free-Bugs-by-Decoupling-Virtual-Address-Management-from-Kernel"><span class="nav-number">1.</span> <span class="nav-text">BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BUDAlloc%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">BUDAlloc设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evaluation"><span class="nav-number">1.3.</span> <span class="nav-text">Evaluation</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -184,7 +184,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/C++20%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/12/papers/BUDAlloc%20Defeating%20Use-After-Free%20Bugs%20by%20Decoupling%20Virtual%20Address%20Management%20from%20Kernel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,12 +197,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="C++20高级编程 | S blog">
+      <meta itemprop="name" content="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel | S blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          C++20高级编程
+          BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel
         </h1>
 
         <div class="post-meta-container">
@@ -214,16 +214,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
-        </span>
+      <time title="Created: 2026-02-12 13:54:53 / Modified: 16:13:19" itemprop="dateCreated datePublished" datetime="2026-02-12T13:54:53+08:00">2026-02-12</time>
     </span>
 
   
@@ -240,14 +231,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>429</span>
+      <span>733</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>3 mins.</span>
     </span>
 </div>
 
@@ -257,48 +248,78 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="C-20高级编程"><a href="#C-20高级编程" class="headerlink" title="C++20高级编程"></a>C++20高级编程</h1><h2 id="类型与对象"><a href="#类型与对象" class="headerlink" title="类型与对象"></a>类型与对象</h2><ol>
-<li><pre><code class="c++">template&lt;typename F,typename...Args&gt;
-using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...))
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">2. `std::pair a&#123;1,2.3&#125;` 类模板自动推导</span><br><span class="line"></span><br><span class="line">3. 运行时多态 传统面向对象编程 subtype多态 用指针 虚函数</span><br><span class="line"></span><br><span class="line">   用`std::variant` `std::visit` ad-hoc多态 性能更高 </span><br><span class="line"></span><br><span class="line">   看不同设计模式的要求</span><br><span class="line"></span><br><span class="line">   ```c++</span><br><span class="line">   struct Circle&#123;&#125;;</span><br><span class="line">   struct Rectangle&#123;&#125;;</span><br><span class="line">   double getArea(const Circle &amp;c);</span><br><span class="line">   double getArea(const Rectangle &amp;r);</span><br><span class="line">   using Shape = std::variant&lt;Circle,Rectangle&gt;;</span><br><span class="line">   double getArea(const Shape &amp;s)&#123;</span><br><span class="line">   	return std::visit(</span><br><span class="line">   		[](const auto&amp;data)&#123;</span><br><span class="line">   			return getArea(data);</span><br><span class="line">   		&#125;,s</span><br><span class="line">   	)</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-</code></pre>
-</li>
-<li><p>查看类型-</p>
-<ul>
-<li><code>[[deprecated]]</code>表示弃用，可以通过编译器的警告来看</li>
-<li>编译器提供的宏 <code>_PRETTY_FUNCTION_</code></li>
-<li><a target="_blank" rel="noopener" href="https://cppinsights.io/">https://cppinsights.io</a></li>
-</ul>
-</li>
-</ol>
-<h2 id="编译时多态"><a href="#编译时多态" class="headerlink" title="编译时多态"></a>编译时多态</h2><ol start="5">
-<li><p>函数:</p>
-<ul>
-<li>名称查找：ADL规则 不在作用域内的也可见</li>
-<li>模板函数处理：推导 SFINAE  替换失败不会导致编译错误 只是放弃这个选择</li>
-<li>重载决议：参数最匹配 转换最少；非模板优于模板</li>
-</ul>
-</li>
-<li><p>type traits：输入类型 输出特征 变换类型</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="type">size_t</span> N&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci = fibonacci&lt;N<span class="number">-1</span>&gt; + fibonacci&lt;N<span class="number">-2</span>&gt;;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">0</span>&gt; = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">template</span>&lt;&gt;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="type">size_t</span> fibonacci&lt;<span class="number">1</span>&gt; = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">static_assert</span>(fibonacci&lt;<span class="number">10</span>&gt; == <span class="number">55</span>);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><code>[[no_unique_address]]</code>空基类优化成0字节</p>
-</li>
-<li><p><code>condition_t&lt;true,int,float&gt;</code> int</p>
-</li>
-<li><p>类型内省 通过模板偏特化拿到数组长度 函数参数类型等信息</p>
-</li>
-<li><p><code>enable_if</code>或标签分发 可用<code>if constexpr</code> 代替</p>
-</li>
-<li><p>奇异递归模板：把派生类作为基类的模板参数，让基类可用使用派生类提供的方法</p>
-<p>可实现多态，避免虚函数开销</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="built_in">static_cast</span>&lt;Derived&amp;&gt;(*<span class="keyword">this</span>).<span class="built_in">f_Impl</span>();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Derived</span>: <span class="keyword">public</span> Base&lt;Derived&gt;&#123;</span><br><span class="line">    <span class="keyword">friend</span> Base;<span class="comment">//struct可以不用</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">f_Impl</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><h1 id="BUDAlloc-Defeating-Use-After-Free-Bugs-by-Decoupling-Virtual-Address-Management-from-Kernel"><a href="#BUDAlloc-Defeating-Use-After-Free-Bugs-by-Decoupling-Virtual-Address-Management-from-Kernel" class="headerlink" title="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel"></a>BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel</h1><p>Usenix Security 24</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/casys-kaist/BUDAlloc/tree/main">https://github.com/casys-kaist/BUDAlloc/tree/main</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>UAF：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">p1 = <span class="built_in">malloc</span>(<span class="number">64</span>);</span><br><span class="line"><span class="built_in">free</span>(p1);</span><br><span class="line">p2 = <span class="built_in">malloc</span>(<span class="number">64</span>);</span><br></pre></td></tr></table></figure>
 
-<p>三路比较操作符<code>&lt;=&gt;</code> 默认强序 根据成员变量声明顺序比较</p>
-</li>
-<li><p><code>make_shared</code>比<code>new</code>效率高</p>
-</li>
-<li></li>
+<p>p1 p2是不同模块 使用的内存是同一块，所以仍然可以通过p1访问p2 修改内核关键数据结构提权</p>
+<p>解决方案：OTA</p>
+<blockquote>
+<p>In a basic OTA implementation, each object is allocated on a separate page, which is unmapped when the object is freed</p>
+</blockquote>
+<p>p1 free以后 在操作系统上没有限制 理论上应该立即unmap 这样访问p1就会被page fault拦截</p>
+<p>但是malloc粒度小，unmap必须4K粒度</p>
+<p>解决方案：virtual alias</p>
+<p>VA PA中 分配的object仍然是连续的</p>
+<p>但是会在VA中为每个object开辟单独的内存页 返回alias地址给用户用 实际上映射的还是PA</p>
+<p>但是这个每个object单独的页就可以被方便地unmap</p>
+<p>举例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">p1 = <span class="built_in">malloc</span>(<span class="number">8</span>);</span><br><span class="line">p2 = <span class="built_in">malloc</span>(<span class="number">8</span>);</span><br><span class="line">p3 = <span class="built_in">malloc</span>(<span class="number">8</span>);</span><br></pre></td></tr></table></figure>
+
+<p>VA中 p1 p2 p3的object分别为0xf000 0xf008 0xf010</p>
+<p>PA中 分别为0x1000 0x1008 0x1010</p>
+<p>创建三个别名</p>
+<p>VA1 &#x3D; 0xf1 0000</p>
+<p>VA2 &#x3D; 0xf2 0000</p>
+<p>VA3 &#x3D; 0xf3 0000</p>
+<p>建立映射</p>
+<p>VA 0xf000 - PA 0x1000</p>
+<p>VA1 0xf1 0000 - PA 0x1000</p>
+<p>VA2 0xf2 0000 - PA 0x1000</p>
+<p>VA3 0xf3 0000 - PA 0x1000</p>
+<p>p1 &#x3D; VA1</p>
+<p>p2 &#x3D; VA2 + 0x8</p>
+<p>p3 &#x3D; VA3 + 0x10</p>
+<p>达到很好的效果：</p>
+<ul>
+<li>物理地址是不影响 不浪费的 不会有碎片</li>
+<li>虚拟地址空间需要很大 但是本身是虚拟地址所以无所谓</li>
+<li>每个小object被free后都可以立即unmap</li>
+</ul>
+<p>存在的问题：</p>
+<ol>
+<li>malloc的时候需要syscall一次 不然没法传递给内核map的信息</li>
+<li>free的时候需要syscall一次 立即unmap防止UAF</li>
+<li>map&#x2F;unmap涉及到内核的锁 串行化</li>
+</ol>
+<p>导致性能差</p>
+<h2 id="BUDAlloc设计"><a href="#BUDAlloc设计" class="headerlink" title="BUDAlloc设计"></a>BUDAlloc设计</h2><ol>
+<li>用户态用一个trie树记录alias的映射，不立即mremap，而是等一次page fault。page fault时 内核从共享的trie树中找地址。实际上可以prefault 一次page fault handler中根据metadata把之后的都补上映射</li>
+<li>延迟unmap。每次free后只是记录metadata，等到下一次page fault再batch处理。 一定无法保证正确性，但实践中发现，这个window非常小，已经可以保护几乎所有CVE的UAF场景。</li>
+<li>用eBPF提供page fault handler</li>
+<li>用户态决定一个伪PA，kernel再把伪PA翻译成真PA，这里把并发的锁控制从内核的buddy system等转移到了用户态，用户态可以有更多的语义信息和并发控制算法，提高可扩展性</li>
+</ol>
+<p>天然具有的兼容性：</p>
+<ol>
+<li>On demand paging</li>
+<li>Copy on write</li>
+<li>proc file system</li>
+</ol>
+<p>兼容性存在问题的地方：</p>
+<ol>
+<li>reverse map</li>
+<li>PTE ref count</li>
+</ol>
+<p>（工程型问题，都解决了）</p>
+<p><strong>对应用程序透明，可执行二进制文件是不需要修改的</strong></p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p>关注如下几点：</p>
+<ol>
+<li>UAF CVE是否完全防御</li>
+<li>性能</li>
+<li>多核性能 可扩展性</li>
+<li>memory overhead</li>
+<li>程序兼容性</li>
 </ol>
 
     </div>
@@ -313,14 +334,11 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/01/31/cpp/C++1114%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B/" rel="prev" title="C++11/14高级编程">
-                  <i class="fa fa-angle-left"></i> C++11/14高级编程
+                <a href="/2026/02/11/papers/PrometheusMigrate%20Efficient%20Live%20Migration%20of%20Confidential%20Virtual%20Machine%20with%20Software%20Abstraction/" rel="prev" title="PrometheusMigrate: Efficient Live Migration of Confidential Virtual Machine with Software Abstraction">
+                  <i class="fa fa-angle-left"></i> PrometheusMigrate: Efficient Live Migration of Confidential Virtual Machine with Software Abstraction
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/01/31/virtualization/NPU/" rel="next" title="NPU">
-                  NPU <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
