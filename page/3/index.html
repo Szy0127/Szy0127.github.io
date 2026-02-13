@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,188 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2025/02/04/papers/FetchBPF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/02/04/papers/FetchBPF/" class="post-title-link" itemprop="url">FetchBPF: Customizable Prefetching Policies in Linux with eBPF</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2025-02-04 20:45:13 / Modified: 20:53:17" itemprop="dateCreated datePublished" datetime="2025-02-04T20:45:13+08:00">2025-02-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>8 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="FetchBPF-Customizable-Prefetching-Policies-in-Linux-with-eBPF"><a href="#FetchBPF-Customizable-Prefetching-Policies-in-Linux-with-eBPF" class="headerlink" title="FetchBPF: Customizable Prefetching Policies in Linux with eBPF"></a>FetchBPF: Customizable Prefetching Policies in Linux with eBPF</h1><p>ATC’24</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Mjg4YWYzNDI2Y2E2ZGNjZDliMDRhNTgwNTU1ZmZlMDJfWDFTczE1UVBzYkswT2dlQ3Y4ekdHUlhPUmp1MVpzNXJfVG9rZW46SFJSbGJyeEpBb2F1aVR4YzlEcWMzOHhabnJnXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>基于eBPF设计了一个框架，使得用户可以定制自己的memory prefetch策略</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>linux的某些策略平均表现很好，但是很难在特定的情况下取得最好的性能。</p>
+<h3 id="Memory-prefetching"><a href="#Memory-prefetching" class="headerlink" title="Memory prefetching"></a>Memory prefetching</h3><p>内存压力大时，内存页会被swap out，之后需要用时，swap in会很慢</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjZmOWIyOWFhNDg0NTRhMDhlNTZhZGRlMTIyM2M5N2RfODdJWE95ZW02M0dDaGdEREJSTzg5TzhYSHBicTFzRHJfVG9rZW46UXA2R2JhdzVEb2VjYkx4cTMzdWNvc0ZBblFoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>为了提高性能，操作系统会预测哪些swapped out的pages可能会被用到，prefetch这些pages</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjJkNGY3OGUzZDMyNDY4NDVlYTE4ZTc4OGE5MTIxNjhfZERmWmI3S001RXpLem5QdGFPVXRaUmtvU0NkMXNKckFfVG9rZW46R3RYcGJxNXFub2N2MGZ4alNxY2NJYlhKbnJmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>一个好的prefetch策略需要兼顾Accuracy与Coverage：</p>
+<ul>
+<li>Coverage：cache hits &#x2F; (cache hits + cache misses) 尽可能让之后可能发生的page fault的pages都被prefetch到</li>
+<li>Accuracy：cache hits &#x2F; prefetch pages 需要保证不能prefetch太多没用的page 反而拖慢了性能</li>
+</ul>
+<h4 id="Linux-default-prefetch-policy"><a href="#Linux-default-prefetch-policy" class="headerlink" title="Linux default prefetch policy"></a>Linux default prefetch policy</h4><ul>
+<li>只考虑sequantial pattern</li>
+<li>只看过去2个page fault，如果连续，则prefetch连续的后几个pages</li>
+</ul>
+<h4 id="SOTA-prefetch-policy"><a href="#SOTA-prefetch-policy" class="headerlink" title="SOTA prefetch policy"></a>SOTA prefetch policy</h4><ul>
+<li>LEAP：ATC‘20</li>
+<li>HoPP：HPCA‘23</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MWQ4M2EzZGE2MjU0Njc5NWY0MDRhOGFkMWVhNDg1NTJfRTVNY2dFZ241M3Z0Q2FIWmlIY2ljNWpaZlM3UDhVaDBfVG9rZW46T2lLbWJwa2VOb2FXQWR4Y0VmTWNxZkZSbnZiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=N2Y4NDdlZmJlMjI5Y2E0NzY4ZGZlOTJjMDU5ZmQ1NWFfZGl5cGF1MXB2WmVqbUdNcElWTjVQUGJNeEJub290N3BfVG9rZW46QXVlM2JDdnZZbzNHSzB4NlVOOWNZSllLblFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><p>不同allocation pattern和不同access pattern下 各个memory prefetch policy的性能表现</p>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MmI4MjIyYjk4ZjI5Yjc5YTRkMTE1NzJiY2JiOGFiYTJfUklQWFZpUkFJVjZmOXNNOVVrdWFDV3dkcEViQXhzdUhfVG9rZW46QWo3QmJaZGQ2b0hVZTl4YXVJS2N6Ykg0bkpoXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<p>结论：没有一个policy会在任何条件下比其他的policy都好。需要最适合某个application，必须为这个application定制policy</p>
+<h3 id="eBPF"><a href="#eBPF" class="headerlink" title="eBPF"></a>eBPF</h3><blockquote>
+<p>eBPF 是一项革命性的技术，起源于 Linux 内核，它可以在特权上下文中（如操作系统内核）运行沙盒程序。它用于安全有效地扩展内核的功能，而无需通过更改内核源代码或加载内核模块的方式来实现。</p>
+</blockquote>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MzdhY2I4MzY3NTUwZGM1YjI1MDNjYjBlOTk3MjRmOTNfUlhRWnNGMnQyWGNnOFVPMWZ1a3hnY1EyMEplSWZLMFpfVG9rZW46VTU1Y2IzQVpHb0lTaUR4QlFMT2NDVXR0bjJjXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h2 id="Strawman-design"><a href="#Strawman-design" class="headerlink" title="Strawman design"></a>Strawman design</h2><p>改linux 实现多种prefetch policy ，根据历史的memory access pattern进行动态切换</p>
+<p>问题</p>
+<ol>
+<li>难以支持任意数量的policy</li>
+<li>很难存在一个特定的policy集合 可以适应所有的access pattern</li>
+<li>在linux中实现工程量大</li>
+<li>需要说服linux上游接受 需要耗费更多精力和时间</li>
+</ol>
+<h2 id="Design-and-implementation"><a href="#Design-and-implementation" class="headerlink" title="Design and implementation"></a>Design and implementation</h2><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MjFmMTBhNDY2NWIxOGUyNGQ3MjUxMmMwM2ZlOWI2YjNfU3NrQ3ptdTI5MjhoQW96RVBtWXZkNVBmY3h3dTZmVXVfVG9rZW46U3BmTmJzRjFXb2N5cDF4MkNPZmNBWFpmbkplXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h3 id="eBPF-Hook"><a href="#eBPF-Hook" class="headerlink" title="eBPF Hook"></a>eBPF Hook</h3><ul>
+<li>(A)prefetch_stats：page fault时触发，用于记录fault pages的历史信息，便于policy找到access pattern</li>
+<li>(B)prefetch_policy：执行prefetch policy时触发，需要根据算法找到需要prefetch的pages并且请求prefetch 这些pages</li>
+</ul>
+<h3 id="Helper-Functions"><a href="#Helper-Functions" class="headerlink" title="Helper Functions"></a>Helper Functions</h3><ul>
+<li>(1)bpf_prefetch_physical_page：根据物理地址发出I&#x2F;O请求</li>
+<li>(2)bpf_prefetch_virtual_page：根据虚拟地址发出I&#x2F;O请求</li>
+<li>(3)bpf_&lt;start&#x2F;stop&gt;_block_plug：选择性batch上两个接口发出的I&#x2F;O请求</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=OTc4MDBhYTVlODYyZGE3N2ZkYzVmZjkyYjljNDNlYmRfN0xlQ3pFZE1JTWo2Mk9kZ1RGTnJhcmFGZTZYcE9xN1RfVG9rZW46TTA4UmJ1WlJZb2xIU0F4ZVdURmNqczRPblRmXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<h3 id="Policy-example-LEAP"><a href="#Policy-example-LEAP" class="headerlink" title="Policy example(LEAP)"></a>Policy example(LEAP)</h3><ul>
+<li>eBPF map: 存储memory access history</li>
+<li>prefetch_stats: 在map中存入page fault地址以及与前一个page fault地址的差</li>
+<li>prefetch_policy：用Boyer-Moore识别出majority stride，调用bpf_prefetch_physical_page进行prefetch</li>
+</ul>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p>分配5GB array</p>
+<p>Allocation patterns：</p>
+<ul>
+<li>Sequential allocation（sqn）</li>
+<li>Random allocation（random）：模拟多个线程同时alloc pages （这种情况使用virtual address会比physical address好）</li>
+</ul>
+<p>Access patterns：</p>
+<ul>
+<li>Sequential（sqn）</li>
+<li>stride（stride）：相隔3 pages</li>
+<li>ladder（ladder）：increasing stride</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDY1N2ExNWVmOWI1MDE3OWViZjgzZWI2YjE1MjU5ZWRfTVNNZ0Q5SHdYNlNkSGYzaldUNnpkUk9TbGRFbm5vM0ZfVG9rZW46SDFBMmJpRWREb0VCR1R4TGtsZ2Nwd1hFbnZlXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>Accuracy、Coverage： eBPF实现版本与linux kernel版本几乎完全一致</li>
+<li>Execution time：eBPF带来的overhead可以忽略不计</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YjZkY2UzZTNiZDgzZTM0Yjg2MTIwNjA4OWM4MmVjODJfcUE2Z3NCQW5PVTBXV2t3dkY4WmFnZ1NwVVF3aTNTOWpfVG9rZW46QWRFbmJzblRib2UyTm14eUhVemNkSWVVbmFiXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>latency大部分的开销在page retrieval （I&#x2F;O）</li>
+<li>eBPF程序被JIT编译为机器指令，性能与kernel functions差别不大</li>
+</ul>
+<h3 id="Macrobenchmarks"><a href="#Macrobenchmarks" class="headerlink" title="Macrobenchmarks"></a>Macrobenchmarks</h3><ul>
+<li>VoltDB上运行TPC-C</li>
+<li>Redis’ memtier benchmark</li>
+<li>Twitter dataset上运行PageRank与betweeness centrality</li>
+</ul>
+<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDc4NDQzYWNhMTExYzVjN2I3NjdjYWFlNjU4ZWRhOGNfbVl2U0ZpaVpNWG9JRU52ZzNNUXhHMmF0ZThuVEo1YUtfVG9rZW46TmZkZ2JhWWg1bzBINll4UFNsaGM2YzU4bmdwXzE3Mzg2NzMwODk6MTczODY3NjY4OV9WNA" alt="img"></p>
+<ul>
+<li>对比policy及与之对应的eBPF版本，仍然没有明显的性能差别</li>
+<li>好的policy在可用内存少时优势更明显</li>
+</ul>
+<p>关于VMA policy作者的解释：这些对性能要求极高的程序耗费了大量的时间为linux的prefetch policy做了优化</p>
+<p>FetchBPF希望改变这种方式，设计policy去适配application，而不是优化application的访存模式去适配policy</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>本文基于eBPF设计了框架FetchBPF，使得用户可以根据程序的访存模式自定义内存预取策略来达到最优的性能。FetchBPF框架可以在几乎没有额外性能开销的情况下达到一致的内存预取功能。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -234,7 +416,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>15 mins.</span>
     </span>
 </div>
 
@@ -427,7 +609,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>29 mins.</span>
     </span>
 </div>
 
@@ -624,7 +806,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>20 mins.</span>
     </span>
 </div>
 
@@ -813,7 +995,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
+      <span>35 mins.</span>
     </span>
 </div>
 
@@ -1010,7 +1192,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>26 mins.</span>
+      <span>1:43</span>
     </span>
 </div>
 
@@ -1265,7 +1447,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>13 mins.</span>
+      <span>51 mins.</span>
     </span>
 </div>
 
@@ -1478,7 +1660,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>13 mins.</span>
     </span>
 </div>
 
@@ -1627,7 +1809,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>17 mins.</span>
     </span>
 </div>
 
@@ -1854,7 +2036,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>27 mins.</span>
     </span>
 </div>
 
@@ -2100,212 +2282,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/cipherH/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/papers/cipherH/" class="post-title-link" itemprop="url">CipherH</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>6.1k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>6 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="CipherH"><a href="#CipherH" class="headerlink" title="CipherH"></a>CipherH</h1><p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/tree/master">Sen-Deng&#x2F;CipherH at master (github.com)</a></p>
-<blockquote>
-<p>Recent works have illustrated the feasibility of launching ciphertext side-channel attacks against cryptographic libraries using the aforementioned threat model [33]. However, they primarily target manually identified program vulnerabilities. This work presents CIPHERH, a thorough and fully automated framework for identifying such vulnerabilities in production cryptographic libraries.  </p>
-</blockquote>
-<h2 id="攻击"><a href="#攻击" class="headerlink" title="攻击"></a>攻击</h2><p><strong>CIPHERLEAKS: Breaking Constant-time Cryptography on AMD SEV via the Ciphertext Side Channel</strong></p>
-<p><strong>A Systematic Look at Ciphertext Side Channels</strong></p>
-<p>VMSA page 物理地址不变  XEX</p>
-<ol>
-<li>建立寄存器密文&lt;-&gt;明文的映射 ：控制OVMF 的一个PEIM  触发NAE VC handler 同时观察rax明文和密文   需要可读</li>
-<li>得到需要攻击的代码页地址：清空所有page 的P bit  NPF的errorcode会知道是否是代码页 再根据寄存器是否变化判断是否是目标代码页</li>
-<li>以Open SSL rsa为例，bn_get_bits5的NPF可以正好从rax读到key的5bit 循环可以得到整个key</li>
-</ol>
-<p>缓解：</p>
-<ol>
-<li>减少会触发NAE导致建立映射的函数 但是治标不治本</li>
-<li>函数返回值rax高位加随机数</li>
-<li>用栈传递返回值或者其他寄存器</li>
-<li>函数不在一个新的page开始</li>
-</ol>
-<p>光防VMSA没用 任意memory都可以观察</p>
-<p>constant time swap可以防一些microarchitecture的side channel攻击 但是防不了比较密文</p>
-<p>例如nginx  先发http请求 触发 然后清空Pbit触发NPF  然后用single-step技术</p>
-<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><p>硬件防开销大</p>
-<p>cipherH 软件框架 为了让加密库开发者写完代码以后自己检查一遍</p>
-<blockquote>
-<p>As will be introduced in §5, CIPHERH explores a hybrid approach by using dynamic taint analysis (which is scalable and rapid) to collect functions tainted on an execution trace. Then, it performs static symbolic execution toward each tainted function, covering paths that are not on the dynamic trace.  </p>
-</blockquote>
-<p><strong>设计并不是很难 主要用了两个工具  2.3k代码</strong></p>
-<p>key是taint 访问的过程中 不可以有一块内存可以推断key是否变化 因为都是bit操作 或者n-bit操作 减少了熵</p>
-<ul>
-<li>DFSan  llvm</li>
-<li>angr SSP’16 二进制文件反编译  得到更多的寄存器访存信息  <a target="_blank" rel="noopener" href="https://trevorsaudi.com/posts/symbolic_execution_angr_part1/">Symbolic Execution with Angr - part 1 · Trevor Saudi</a></li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://www.usenix.org/system/files/conference/ase18/ase18-paper_springer.pdf">ase18-paper_springer.pdf (usenix.org)</a></p>
-<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/DataFlowSanitizer.html">DataFlowSanitizer — Clang 19.0.0git documentation (llvm.org)</a></p>
-<p>编译优化等级开相同  根据函数名可以方便找到对应关系</p>
-<p>但还是有些信息不匹配的  所以第二阶段用保守方法处理</p>
-<h3 id="taint-analysis"><a href="#taint-analysis" class="headerlink" title="taint analysis"></a>taint analysis</h3><p>DFSan需要用他的API加到代码里 然后编译</p>
-<p>追踪数学运算、逻辑、内存访问 包括implicit</p>
-<p>手动识别secret并调API  hook每个函数调用 内存访问</p>
-<p>实际上secret就是RSA的一个私钥  传入最外层的函数之后 之后全可以通过自动分析得到 并不需要对算法库有修改</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/apps/wolfssl_case_study/test.c">CipherH&#x2F;src&#x2F;apps&#x2F;wolfssl_case_study&#x2F;test.c at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
-<p>这个阶段输出一系列函数   </p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">get_digit_count:3</span><br><span class="line">mp_rand:65</span><br><span class="line">fp_invmod:1</span><br><span class="line">fp_div_2:1</span><br><span class="line">fp_exptmod:1</span><br><span class="line">_fp_exptmod_ct:33</span><br><span class="line">fp_montgomery_reduce:33</span><br><span class="line">wc_RsaUnPad_ex:67</span><br><span class="line">RsaUnPad:67</span><br></pre></td></tr></table></figure>
-
-
-
-<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/tainted_func.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;tainted_func.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
-<p>猜测最后的结果记录了函数名和对应的taint位置 包括6个参数寄存器、返回值、从内存加载</p>
-<ol>
-<li>任何输入 都是taint的</li>
-<li>返回值是taint</li>
-<li>从memory load了taint data</li>
-</ol>
-<p>对密码学算法库来说不需要构造很多覆盖面广的input  很多input其实涉及到的逻辑都一样</p>
-<p>不过其实筛掉大部分的function  然后留下function name和taint symbol name就可以了</p>
-<h3 id="符号执行"><a href="#符号执行" class="headerlink" title="符号执行"></a>符号执行</h3><p>符号执行阶段 从第一阶段拿到足够的信息以后 可以对每个function单独进行符号执行 if生成约束  然后根据taint信息生成一个表达式 求解</p>
-<p>因为这边不加混淆 所以代码应该比较容易被逆向 比如$0x10(rsp) 就可以认为是同一个指针</p>
-<p>syntactical equivalence   和angr现有的一样 保证效率</p>
-<h4 id="intra"><a href="#intra" class="headerlink" title="intra"></a>intra</h4><p>遇到if 加约束</p>
-<p>遇到call 直接用symbol  根据taint analysis的结果可以知道这里的symbol用普通的s还是taint的k</p>
-<p>M 中的元组a,v 表示symbol v写到地址a</p>
-<p>W中的元组a,v,i表示指令i把数据v写到地址a</p>
-<ol>
-<li>检查v是否包含key</li>
-<li>是否存在a1&#x3D;a 且v1也包含key</li>
-<li>放入Eq4看看是否可满足 (带上之前if导致的一系列条件)</li>
-<li>SMT solver返回是否可满足 并给出例子 留给user后续手动分析</li>
-</ol>
-<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/run.py">CipherH&#x2F;src&#x2F;run.py at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
-<p>hook了每次内存读写的操作  回调的时候有当前所有的状态 包括这句内存读写操作的AST</p>
-<p>AST中包括symbol的表达式</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">initial_state.inspect.b(<span class="string">&#x27;instruction&#x27;</span>, action=track_instr)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_write&#x27;</span>, when=angr.BP_BEFORE,action=track_write_mem_before)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_read&#x27;</span>, when=angr.BP_BEFORE, action=track_read_mem_before)</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> fun_name <span class="keyword">in</span> tainted_func:</span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">128</span> == <span class="number">128</span>:</span><br><span class="line">    initial_state.regs.rdi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">64</span> == <span class="number">64</span>:</span><br><span class="line">    initial_state.regs.rsi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">32</span> == <span class="number">32</span>:</span><br><span class="line">    initial_state.regs.rdx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)           </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">16</span> == <span class="number">16</span>:</span><br><span class="line"></span><br><span class="line">    initial_state.regs.rcx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">8</span> == <span class="number">8</span>:</span><br><span class="line">    initial_state.regs.r8 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">4</span> == <span class="number">4</span>:</span><br><span class="line">    initial_state.regs.r9 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">l = <span class="built_in">len</span>(state.ch.chain)//<span class="number">4</span></span><br><span class="line"><span class="keyword">while</span> l &gt;= <span class="number">1</span>:</span><br><span class="line">    l = l - <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> state.ch.chain[<span class="number">4</span>*l+<span class="number">1</span>] <span class="keyword">is</span> state.inspect.mem_write_address:</span><br></pre></td></tr></table></figure>
-
-<p>四个一组 循环找 所以chain就是论文中的W和M</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/level5uiharu/p/16932453.html">欢迎回来(。・∀・)ノ (cnblogs.com)</a></p>
-<p>这里chain和expr应该都是AST key要么在arg0要么在arg1 </p>
-<p>第一个条件是判断是否相等 第二个条件是判断换一个变量是否可以不等(把key换成另一个symbol)</p>
-<p>这里虽然名字都是sol 但实际上都是两个不同的symbol 比如sol_22 sol_23</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>  temp1 == <span class="string">&#x27;__add__&#x27;</span> <span class="keyword">and</span> temp2 ==  <span class="string">&#x27;__add__&#x27;</span> :</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>]):</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))                                       </span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.inspect.mem_write_expr.args[<span class="number">0</span>]):</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">if</span> state.solver.satisfiable(extra_constraints=[state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] == state.inspect.mem_write_expr, temp3 != temp4]):</span><br><span class="line">    	<span class="built_in">print</span>(<span class="string">&quot;bug in &#123;&#125; for &#123;:x&#125; and &#123;:x&#125;&quot;</span>.<span class="built_in">format</span>(fun_name, state.ch.chain[<span class="number">4</span>*l], state.inspect.instruction), file=f_result)                     </span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>这里等号的含义是，是否存在某一组symbol的组合(k1 k2 k3 k4) 使得取值可以相等(64bit整数)</p>
-<p>W1 W2应该表示连续两次读 (i变i+1 或f前和f后)</p>
-<p><strong>ch.chain和inspect.mem_write_expr</strong>是什么？  好像后者就是前者的4l+2?</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">state.ch.chain = state.ch.chain + [state.inspect.instruction]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_address]</span><br><span class="line">a = <span class="built_in">str</span>(state.inspect.mem_write_expr)</span><br><span class="line">b = a[<span class="number">3</span>:<span class="number">5</span>]</span><br><span class="line">state.ch.chain = state.ch.chain + [b]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_expr]</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/symbolic_exec/result.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;symbolic_exec&#x2F;result.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
-<p>这个地址应该就是二进制文件里面的地址 非常精确 供之后手动分析</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bug in fp_rshb for 41cc2a and 41cc2a</span><br><span class="line">bug in fp_rshb for 41cc63 and 41cc63</span><br><span class="line"></span><br><span class="line">bug in _fp_exptmod_ct for 41ee25 and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41ee4b and 41ee4b</span><br><span class="line">bug in _fp_exptmod_ct for 41ee5c and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41f04b and 41f04b</span><br></pre></td></tr></table></figure>
-
-<h4 id="inter"><a href="#inter" class="headerlink" title="inter"></a>inter</h4><p>同一块内存会在函数调用间被写</p>
-<ul>
-<li>频繁调用</li>
-<li>callee至少一个参数是tainted</li>
-</ul>
-<p>没有加约束求解 所以可能带来false positives</p>
-<blockquote>
-<p>In all, during our intra-procedural analysis, we use symbolic execution to traverse each path of a tainted function Fc. During the traversal, we search for every encountered callee function and decide if any callee function F meets the aforementioned patterns. If so, we will proceed further to launch intra-procedural symbolic execution toward F, and decide if F has memory write instructions whose content is derived from its tainted parameters. If so, we would conclude that F enables ciphertext side channels, assuming multiple runs of F from Fc write secrets into the same memory address.  </p>
-</blockquote>
-<p>只要callee F用taint 写了内存就认为会带来side channel</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2329,13 +2305,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">408k</span>
+    <span title="Word count total">410k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">6:11</span>
+    <span title="Reading time total">24:50</span>
   </span>
 </div>
 <div class="busuanzi-count">

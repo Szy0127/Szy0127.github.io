@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attackswithin the Linux KernelUsenix Security‘24 https:&#x2F;&#x2F;github.com&#x2F;isec-tugraz&#x2F;SLUBStick&#x2F;tree&#x2F;main 背景 传统的内存漏洞，比如UAF DF OOB 都需">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/12/papers/SLUBStick%20Arbitrary%20Memory%20Writes%20through%20Practical%20Software%20Cross-Cache%20Attackswithin%20the%20Linux%20Kernel/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attackswithin the Linux KernelUsenix Security‘24 https:&#x2F;&#x2F;github.com&#x2F;isec-tugraz&#x2F;SLUBStick&#x2F;tree&#x2F;main 背景 传统的内存漏洞，比如UAF DF OOB 都需">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-02-12T13:43:37.029Z">
+<meta property="article:modified_time" content="2026-02-13T12:23:51.109Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/02/12/papers/SLUBStick%20Arbitrary%20Memory%20Writes%20through%20Practical%20Software%20Cross-Cache%20Attackswithin%20the%20Linux%20Kernel/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/12/papers/SLUBStick%20Arbitrary%20Memory%20Writes%20through%20Practical%20Software%20Cross-Cache%20Attackswithin%20the%20Linux%20Kernel/","path":"2026/02/12/papers/SLUBStick Arbitrary Memory Writes through Practical Software Cross-Cache Attackswithin the Linux Kernel/","title":"SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SLUBStick-Arbitrary-Memory-Writes-through-Practical-Software-Cross-Cache-Attacks"><span class="nav-number">1.</span> <span class="nav-text">SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">设计</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/12/papers/SLUBStick%20Arbitrary%20Memory%20Writes%20through%20Practical%20Software%20Cross-Cache%20Attackswithin%20the%20Linux%20Kernel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-02-12 21:43:37" itemprop="dateCreated datePublished" datetime="2026-02-12T21:43:37+08:00">2026-02-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2026-02-13 20:23:51" itemprop="dateModified" datetime="2026-02-13T20:23:51+08:00">2026-02-13</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.8k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>7 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="SLUBStick-Arbitrary-Memory-Writes-through-Practical-Software-Cross-Cache-Attacks"><a href="#SLUBStick-Arbitrary-Memory-Writes-through-Practical-Software-Cross-Cache-Attacks" class="headerlink" title="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks"></a>SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks</h1><p>within the Linux Kernel<br>Usenix Security‘24</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/isec-tugraz/SLUBStick/tree/main">https://github.com/isec-tugraz/SLUBStick/tree/main</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ol>
+<li>传统的内存漏洞，比如UAF DF OOB 都需要依赖更进一步的方式完成利用（提权）。利用成功率不高，然后很容易被修复（对高版本linux无效）</li>
+<li>slab分配器，会在空闲对象过多的时候 把这块完整的内存页还给buddy system</li>
+</ol>
+<p>补充：DF double free 指对同一块内存free两次 会导致freelist中存在两个同一块内存的对象，之后分配给不同的object用 那么写一个不重要的object会同时修改另一个权限敏感的object</p>
+<p>检测不简单，因为</p>
+<ol>
+<li>没有元数据记录是否free （刚分配后 认为是free的元数据也可被认为是合法数据）</li>
+<li>遍历list判断太慢</li>
+</ol>
+<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><p>整体利用思路：</p>
+<ol>
+<li>用传统内存漏洞构造一个可以写内存对象的primitive</li>
+<li>释放所在的slab 直到还给buddysystem</li>
+<li>让这个可被写的对象所在内存页重新分配为用户态页表页</li>
+<li>修改用户态页表页 完成任意地址映射</li>
+</ol>
+<p>挑战：</p>
+<ol>
+<li><p>如何稳定回收并复用这个page</p>
+</li>
+<li><p>OOB和UAF怎么转为DF</p>
+</li>
+<li><p>内核地址随机化 怎么改映射达成任意地址读写</p>
+</li>
+<li><p>free某个object 如何做到这个object所在的page会还给buddy system？</p>
+</li>
+</ol>
+<ul>
+<li>拥有这个object所在的slab上的其他所有object，同时释放其他所有object</li>
+</ul>
+<ol start="2">
+<li>如何拥有一个victim object所在slab上的其他所有object？</li>
+</ol>
+<ul>
+<li>通过open(‘&#x2F;dev&#x2F;xxx’)反复申请并占用 阅读源码可以找到不同size的都有</li>
+</ul>
+<ol start="3">
+<li>如何判断这些从内核拿到的object会和victim object在一个slab上？</li>
+</ol>
+<ul>
+<li>通过add_key这个系统调用测量时间，当一个slab消耗完以后，从buddy system再拿新的slab会明显变慢。add_key故意失败 会一次malloc+一次free 可重入，没有其他时间干扰 噪声小。因此一次add_key+一次open就可以得知open拿到的内核object是否和上一次在同一个slab上</li>
+</ul>
+<ol start="4">
+<li>victim object所在page还给buddy system后 如何再次分配这个页面？</li>
+</ol>
+<ul>
+<li>buddy system是LIFO的，再次申请这个大小即可。</li>
+</ul>
+<ol start="5">
+<li>如何找到修改页表的位置，达到访问任意物理内存的效果？</li>
+</ol>
+<ul>
+<li>两个关键变量，arb_pt指向arb_page所在VA翻译过后的PTE。 arb_pt可配置为任意pfn的PTE，对应的arb_page可通过虚拟地址访问到任意物理地址。</li>
+<li></li>
+</ul>
+<ol start="6">
+<li>修改页表，如何确定&#x2F;etc&#x2F;passwd所在物理内存？</li>
+</ol>
+<ul>
+<li>&#x2F;etc&#x2F;passwd权限是可读的，读了以后存在在内核的page cache。page cache都是完整的页，直接比较前若干的字符即可</li>
+<li>遍历pfn 16G内存可以全部遍历比较，循环总体时间在可接受范围内(16G&#x2F;4K&#x3D;4M  4M*1us&#x3D;4s) 总体可控制在分钟量级</li>
+<li>最后达到的效果其实是，可改页表映射整个地址范围，然后任意物理地址读</li>
+</ul>
+<p>先根据漏洞的存在double free的object的size 找到对应的内核对象</p>
+<ol>
+<li>alloc vuln</li>
+<li>free vuln</li>
+<li>open 此时从slab中拿到vuln所在地址给另一个内核对象</li>
+<li>free vuln</li>
+<li>free 整个slab给buddy system</li>
+</ol>
+<p>此时达到效果：拥有一个内核对象可以通过ioctl交互 并且这个内核对象所在的地址已经被释放到buddy system中</p>
+<p>下一次ioctl copy_from_user会copy到页表上</p>
+<p>这么看 操作这个page 还是得通过ioctl 用户态没法操作 需要内核copy from user 那么为什么最后用户态可以改</p>
+<p>因为立即复制了一份假的PUD页表页 512项 每项指向一个1G大页，从4G开始 （这一步已经可以通过va访问512G内存了 直接遍历猜passwd不是一样吗？）实际上内核不会存在这么好用的情况 实际上可能只能写入部分byte 导致控制的内存范围比较小 并且由于内核的限制不能遍历范围反复尝试 只能触发一次 如果只写了8byte 那么相当于只能控制1G的内存空间 所以后续要基于这个1G的空间来做</p>
+<p>也就是说 不论如何翻译 只要用的是这个PUD 那么就能翻译到4G开始共512G的真实物理地址空间</p>
+<p>这解释了为什么后续data明明只mmap了一个页，但是可以访问PGD 因为mmap+memset以后 补全了一个PUD页表页 而这个被补全的PUD页表页来自刻意释放到buddy system 后续通过悬挂指针copy from user制造的假的PUD pte信息。（实际上不是修改512G 而是某个1G 所以需要捕获异常）</p>
+<p>然后遍历地址空间 再找到PUD页表页的地址</p>
+<p>之前这个页还是内核控制 用户态无法访问 但是现在已经改了页表 用户态可以直接读写了</p>
+<p>先随便找个地址mmap 拿到一个虚拟地址，此时memset触发PUD分配，然后之后用这个虚拟地址就可以访问全部的物理地址了。</p>
+<p>current_addr记录的是用于访问PUD的va</p>
+<p>直接硬猜，遍历每个4K页的开头 如果发现格式是PTE 那就认为这个page 是最后一级page table</p>
+<p>某个ioctl+内部的copy from user 实际上实现的是替换了PUD页表页中的某个pude 让进程可以访问某个1G的物理地址空间 对应图8b</p>
+<p>然后需要找一下 是哪个1G被映射上 可以被访问了</p>
+<p>mmap是映射了PGD 512G 然后1G 1G看 没有映射上的就会被错误处理然后跳过 映射上的就可以访问 记录为current_addr 这是访问这1G的起始地址</p>
+<p>遍历这个1G 4K粒度看第一个8byte是不是PTE格式</p>
+<p>然后找个最大的地址 1&lt;&lt;46 生成大量页表页</p>
+<p>然后再遍历这个1G 如果发现原来不是PTE 现在是PTE 那么说明这个1G中存在一个页表页 我们可以读写这1G 就可以读写这个PTE</p>
+<ol>
+<li>有一个有漏洞的内核驱动，和一个正常提供服务的内核模块，两个object的size一样。</li>
+<li>alloc A free A alloc B freeA 把B所在的object还给slab了</li>
+<li>获得该slab上的其他所有对象 全free掉 B所在的页还给buddysystem</li>
+<li>addr&#x3D;mmap+memset 使得刚换给buddy system的页变为PUD页</li>
+<li>通过ioctl访问B的服务 copy_from_user准备一份假的PUD数据，包含512个大页PTE，预期可以正常映射1页。</li>
+<li>此时进行获得了访问1G物理地址的能力，这个物理地址是通过addr访问的，遍历可以找出来</li>
+<li>在大地址下，再次mmap+memset，再次分配大量页表页，在addr可控的1G内根据PTE格式寻找页表页</li>
+<li>修改页表页的PTE，指向任意物理地址</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/02/12/papers/BUDAlloc%20Defeating%20Use-After-Free%20Bugs%20by%20Decoupling%20Virtual%20Address%20Management%20from%20Kernel/" rel="prev" title="BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel">
+                  <i class="fa fa-angle-left"></i> BUDAlloc: Defeating Use-After-Free Bugs by Decoupling Virtual Address Management from Kernel
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">410k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">24:50</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

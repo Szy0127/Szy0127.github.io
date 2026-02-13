@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,212 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/cipherH/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/papers/cipherH/" class="post-title-link" itemprop="url">CipherH</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>6.1k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>22 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="CipherH"><a href="#CipherH" class="headerlink" title="CipherH"></a>CipherH</h1><p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/tree/master">Sen-Deng&#x2F;CipherH at master (github.com)</a></p>
+<blockquote>
+<p>Recent works have illustrated the feasibility of launching ciphertext side-channel attacks against cryptographic libraries using the aforementioned threat model [33]. However, they primarily target manually identified program vulnerabilities. This work presents CIPHERH, a thorough and fully automated framework for identifying such vulnerabilities in production cryptographic libraries.  </p>
+</blockquote>
+<h2 id="攻击"><a href="#攻击" class="headerlink" title="攻击"></a>攻击</h2><p><strong>CIPHERLEAKS: Breaking Constant-time Cryptography on AMD SEV via the Ciphertext Side Channel</strong></p>
+<p><strong>A Systematic Look at Ciphertext Side Channels</strong></p>
+<p>VMSA page 物理地址不变  XEX</p>
+<ol>
+<li>建立寄存器密文&lt;-&gt;明文的映射 ：控制OVMF 的一个PEIM  触发NAE VC handler 同时观察rax明文和密文   需要可读</li>
+<li>得到需要攻击的代码页地址：清空所有page 的P bit  NPF的errorcode会知道是否是代码页 再根据寄存器是否变化判断是否是目标代码页</li>
+<li>以Open SSL rsa为例，bn_get_bits5的NPF可以正好从rax读到key的5bit 循环可以得到整个key</li>
+</ol>
+<p>缓解：</p>
+<ol>
+<li>减少会触发NAE导致建立映射的函数 但是治标不治本</li>
+<li>函数返回值rax高位加随机数</li>
+<li>用栈传递返回值或者其他寄存器</li>
+<li>函数不在一个新的page开始</li>
+</ol>
+<p>光防VMSA没用 任意memory都可以观察</p>
+<p>constant time swap可以防一些microarchitecture的side channel攻击 但是防不了比较密文</p>
+<p>例如nginx  先发http请求 触发 然后清空Pbit触发NPF  然后用single-step技术</p>
+<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><p>硬件防开销大</p>
+<p>cipherH 软件框架 为了让加密库开发者写完代码以后自己检查一遍</p>
+<blockquote>
+<p>As will be introduced in §5, CIPHERH explores a hybrid approach by using dynamic taint analysis (which is scalable and rapid) to collect functions tainted on an execution trace. Then, it performs static symbolic execution toward each tainted function, covering paths that are not on the dynamic trace.  </p>
+</blockquote>
+<p><strong>设计并不是很难 主要用了两个工具  2.3k代码</strong></p>
+<p>key是taint 访问的过程中 不可以有一块内存可以推断key是否变化 因为都是bit操作 或者n-bit操作 减少了熵</p>
+<ul>
+<li>DFSan  llvm</li>
+<li>angr SSP’16 二进制文件反编译  得到更多的寄存器访存信息  <a target="_blank" rel="noopener" href="https://trevorsaudi.com/posts/symbolic_execution_angr_part1/">Symbolic Execution with Angr - part 1 · Trevor Saudi</a></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.usenix.org/system/files/conference/ase18/ase18-paper_springer.pdf">ase18-paper_springer.pdf (usenix.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://clang.llvm.org/docs/DataFlowSanitizer.html">DataFlowSanitizer — Clang 19.0.0git documentation (llvm.org)</a></p>
+<p>编译优化等级开相同  根据函数名可以方便找到对应关系</p>
+<p>但还是有些信息不匹配的  所以第二阶段用保守方法处理</p>
+<h3 id="taint-analysis"><a href="#taint-analysis" class="headerlink" title="taint analysis"></a>taint analysis</h3><p>DFSan需要用他的API加到代码里 然后编译</p>
+<p>追踪数学运算、逻辑、内存访问 包括implicit</p>
+<p>手动识别secret并调API  hook每个函数调用 内存访问</p>
+<p>实际上secret就是RSA的一个私钥  传入最外层的函数之后 之后全可以通过自动分析得到 并不需要对算法库有修改</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/apps/wolfssl_case_study/test.c">CipherH&#x2F;src&#x2F;apps&#x2F;wolfssl_case_study&#x2F;test.c at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>这个阶段输出一系列函数   </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">get_digit_count:3</span><br><span class="line">mp_rand:65</span><br><span class="line">fp_invmod:1</span><br><span class="line">fp_div_2:1</span><br><span class="line">fp_exptmod:1</span><br><span class="line">_fp_exptmod_ct:33</span><br><span class="line">fp_montgomery_reduce:33</span><br><span class="line">wc_RsaUnPad_ex:67</span><br><span class="line">RsaUnPad:67</span><br></pre></td></tr></table></figure>
+
+
+
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/tainted_func.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;tainted_func.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>猜测最后的结果记录了函数名和对应的taint位置 包括6个参数寄存器、返回值、从内存加载</p>
+<ol>
+<li>任何输入 都是taint的</li>
+<li>返回值是taint</li>
+<li>从memory load了taint data</li>
+</ol>
+<p>对密码学算法库来说不需要构造很多覆盖面广的input  很多input其实涉及到的逻辑都一样</p>
+<p>不过其实筛掉大部分的function  然后留下function name和taint symbol name就可以了</p>
+<h3 id="符号执行"><a href="#符号执行" class="headerlink" title="符号执行"></a>符号执行</h3><p>符号执行阶段 从第一阶段拿到足够的信息以后 可以对每个function单独进行符号执行 if生成约束  然后根据taint信息生成一个表达式 求解</p>
+<p>因为这边不加混淆 所以代码应该比较容易被逆向 比如$0x10(rsp) 就可以认为是同一个指针</p>
+<p>syntactical equivalence   和angr现有的一样 保证效率</p>
+<h4 id="intra"><a href="#intra" class="headerlink" title="intra"></a>intra</h4><p>遇到if 加约束</p>
+<p>遇到call 直接用symbol  根据taint analysis的结果可以知道这里的symbol用普通的s还是taint的k</p>
+<p>M 中的元组a,v 表示symbol v写到地址a</p>
+<p>W中的元组a,v,i表示指令i把数据v写到地址a</p>
+<ol>
+<li>检查v是否包含key</li>
+<li>是否存在a1&#x3D;a 且v1也包含key</li>
+<li>放入Eq4看看是否可满足 (带上之前if导致的一系列条件)</li>
+<li>SMT solver返回是否可满足 并给出例子 留给user后续手动分析</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/src/run.py">CipherH&#x2F;src&#x2F;run.py at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>hook了每次内存读写的操作  回调的时候有当前所有的状态 包括这句内存读写操作的AST</p>
+<p>AST中包括symbol的表达式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">initial_state.inspect.b(<span class="string">&#x27;instruction&#x27;</span>, action=track_instr)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_write&#x27;</span>, when=angr.BP_BEFORE,action=track_write_mem_before)</span><br><span class="line">initial_state.inspect.b(<span class="string">&#x27;mem_read&#x27;</span>, when=angr.BP_BEFORE, action=track_read_mem_before)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> fun_name <span class="keyword">in</span> tainted_func:</span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">128</span> == <span class="number">128</span>:</span><br><span class="line">    initial_state.regs.rdi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">64</span> == <span class="number">64</span>:</span><br><span class="line">    initial_state.regs.rsi = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">32</span> == <span class="number">32</span>:</span><br><span class="line">    initial_state.regs.rdx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>)           </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">16</span> == <span class="number">16</span>:</span><br><span class="line"></span><br><span class="line">    initial_state.regs.rcx = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">8</span> == <span class="number">8</span>:</span><br><span class="line">    initial_state.regs.r8 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> tainted_func[fun_name] &amp; <span class="number">4</span> == <span class="number">4</span>:</span><br><span class="line">    initial_state.regs.r9 = initial_state.solver.BVS(<span class="string">&quot;k&quot;</span>, <span class="number">64</span>) </span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">l = <span class="built_in">len</span>(state.ch.chain)//<span class="number">4</span></span><br><span class="line"><span class="keyword">while</span> l &gt;= <span class="number">1</span>:</span><br><span class="line">    l = l - <span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> state.ch.chain[<span class="number">4</span>*l+<span class="number">1</span>] <span class="keyword">is</span> state.inspect.mem_write_address:</span><br></pre></td></tr></table></figure>
+
+<p>四个一组 循环找 所以chain就是论文中的W和M</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/level5uiharu/p/16932453.html">欢迎回来(。・∀・)ノ (cnblogs.com)</a></p>
+<p>这里chain和expr应该都是AST key要么在arg0要么在arg1 </p>
+<p>第一个条件是判断是否相等 第二个条件是判断换一个变量是否可以不等(把key换成另一个symbol)</p>
+<p>这里虽然名字都是sol 但实际上都是两个不同的symbol 比如sol_22 sol_23</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>  temp1 == <span class="string">&#x27;__add__&#x27;</span> <span class="keyword">and</span> temp2 ==  <span class="string">&#x27;__add__&#x27;</span> :</span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>]):</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp3 = state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] - state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>].args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))                                       </span><br><span class="line">    <span class="keyword">if</span> <span class="string">&#x27;k&#x27;</span> <span class="keyword">in</span> <span class="built_in">str</span>(state.inspect.mem_write_expr.args[<span class="number">0</span>]):</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">0</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	temp4 = state.inspect.mem_write_expr - state.inspect.mem_write_expr.args[<span class="number">1</span>] + state.solver.BVS(<span class="string">&quot;sol&quot;</span>,  <span class="built_in">int</span>(b))</span><br><span class="line">    <span class="keyword">if</span> state.solver.satisfiable(extra_constraints=[state.ch.chain[<span class="number">4</span>*l+<span class="number">3</span>] == state.inspect.mem_write_expr, temp3 != temp4]):</span><br><span class="line">    	<span class="built_in">print</span>(<span class="string">&quot;bug in &#123;&#125; for &#123;:x&#125; and &#123;:x&#125;&quot;</span>.<span class="built_in">format</span>(fun_name, state.ch.chain[<span class="number">4</span>*l], state.inspect.instruction), file=f_result)                     </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里等号的含义是，是否存在某一组symbol的组合(k1 k2 k3 k4) 使得取值可以相等(64bit整数)</p>
+<p>W1 W2应该表示连续两次读 (i变i+1 或f前和f后)</p>
+<p><strong>ch.chain和inspect.mem_write_expr</strong>是什么？  好像后者就是前者的4l+2?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">state.ch.chain = state.ch.chain + [state.inspect.instruction]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_address]</span><br><span class="line">a = <span class="built_in">str</span>(state.inspect.mem_write_expr)</span><br><span class="line">b = a[<span class="number">3</span>:<span class="number">5</span>]</span><br><span class="line">state.ch.chain = state.ch.chain + [b]</span><br><span class="line">state.ch.chain = state.ch.chain + [state.inspect.mem_write_expr]</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a target="_blank" rel="noopener" href="https://github.com/Sen-Deng/CipherH/blob/master/evaluation_result/wolfssl_rsa_o0/symbolic_exec/result.txt">CipherH&#x2F;evaluation_result&#x2F;wolfssl_rsa_o0&#x2F;symbolic_exec&#x2F;result.txt at master · Sen-Deng&#x2F;CipherH (github.com)</a></p>
+<p>这个地址应该就是二进制文件里面的地址 非常精确 供之后手动分析</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bug in fp_rshb for 41cc2a and 41cc2a</span><br><span class="line">bug in fp_rshb for 41cc63 and 41cc63</span><br><span class="line"></span><br><span class="line">bug in _fp_exptmod_ct for 41ee25 and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41ee4b and 41ee4b</span><br><span class="line">bug in _fp_exptmod_ct for 41ee5c and 41ee5c</span><br><span class="line">bug in _fp_exptmod_ct for 41f04b and 41f04b</span><br></pre></td></tr></table></figure>
+
+<h4 id="inter"><a href="#inter" class="headerlink" title="inter"></a>inter</h4><p>同一块内存会在函数调用间被写</p>
+<ul>
+<li>频繁调用</li>
+<li>callee至少一个参数是tainted</li>
+</ul>
+<p>没有加约束求解 所以可能带来false positives</p>
+<blockquote>
+<p>In all, during our intra-procedural analysis, we use symbolic execution to traverse each path of a tainted function Fc. During the traversal, we search for every encountered callee function and decide if any callee function F meets the aforementioned patterns. If so, we will proceed further to launch intra-procedural symbolic execution toward F, and decide if F has memory write instructions whose content is derived from its tainted parameters. If so, we would conclude that F enables ciphertext side channels, assuming multiple runs of F from Fc write secrets into the same memory address.  </p>
+</blockquote>
+<p>只要callee F用taint 写了内存就认为会带来side channel</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -233,7 +439,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>16 mins.</span>
     </span>
 </div>
 
@@ -377,7 +583,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>13 mins.</span>
     </span>
 </div>
 
@@ -557,7 +763,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>6 mins.</span>
+      <span>25 mins.</span>
     </span>
 </div>
 
@@ -767,7 +973,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>12 mins.</span>
+      <span>50 mins.</span>
     </span>
 </div>
 
@@ -932,7 +1138,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>5 mins.</span>
     </span>
 </div>
 
@@ -1056,7 +1262,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>36 mins.</span>
+      <span>2:23</span>
     </span>
 </div>
 
@@ -1215,7 +1421,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>25 mins.</span>
+      <span>1:38</span>
     </span>
 </div>
 
@@ -1320,7 +1526,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>29 mins.</span>
     </span>
 </div>
 
@@ -1588,7 +1794,7 @@ npm ERR! &#125;
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>9 mins.</span>
     </span>
 </div>
 
@@ -1749,127 +1955,6 @@ npm ERR! &#125;
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/chcore/IPC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/chcore/IPC/" class="post-title-link" itemprop="url">IPC</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>9.6k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="IPC"><a href="#IPC" class="headerlink" title="IPC"></a>IPC</h1><h2 id="code"><a href="#code" class="headerlink" title="code"></a>code</h2><h3 id="server"><a href="#server" class="headerlink" title="server"></a>server</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> cap;</span><br><span class="line"></span><br><span class="line">        cap = chcore_thread_create(routine, <span class="number">0</span>, <span class="number">0</span>, TYPE_USER);</span><br><span class="line">        chcore_bug_on(cap &lt; <span class="number">0</span>);</span><br><span class="line">        __chcore_set_procm_cap(cap);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> *<span class="title function_">routine</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret, cap;</span><br><span class="line"></span><br><span class="line">        spawn(<span class="string">&quot;/user.bin&quot;</span>, &amp;cap); <span class="comment">/* Test spawn function */</span></span><br><span class="line">        ipc_register_server(lab4_test_ipc_dispatch);</span><br><span class="line">        spawn(<span class="string">&quot;/ipc_client.bin&quot;</span>, &amp;cap); <span class="comment">/* Test IPC */</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ipc_register_server</span><span class="params">(server_handler server_handler)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span>;</span></span><br><span class="line">        vm_config.buf_base_addr = SERVER_BUF_BASE;</span><br><span class="line">        vm_config.buf_size = SERVER_BUF_SIZE;</span><br><span class="line">        vm_config.stack_base_addr = SERVER_STACK_BASE;</span><br><span class="line">        vm_config.stack_size = SERVER_STACK_SIZE;</span><br><span class="line">        ret = __chcore_sys_register_server(</span><br><span class="line">                (u64)server_handler, MAX_CLIENT, (u64)&amp;vm_config);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">u64 <span class="title function_">sys_register_server</span><span class="params">(u64 callback, u64 max_client, u64 vm_config_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">server</span> =</span> current_thread;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">server_ipc_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> *<span class="title">vm_config</span>;</span></span><br><span class="line">        <span class="type">int</span> r;</span><br><span class="line">        server_ipc_config = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> server_ipc_config));</span><br><span class="line">        server_ipc_config-&gt;callback = callback;</span><br><span class="line">        server_ipc_config-&gt;max_client = max_client;</span><br><span class="line">        server_ipc_config-&gt;conn_bmp =</span><br><span class="line">                kzalloc(BITS_TO_LONGS(max_client) * <span class="keyword">sizeof</span>(<span class="type">long</span>));</span><br><span class="line">        vm_config = &amp;server_ipc_config-&gt;vm_config;</span><br><span class="line">        r = copy_from_user(</span><br><span class="line">                (<span class="type">char</span> *)vm_config, (<span class="type">char</span> *)vm_config_ptr, <span class="keyword">sizeof</span>(*vm_config));</span><br><span class="line">        server-&gt;general_ipc_config = server_ipc_config;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">lab4_test_ipc_dispatch</span><span class="params">(<span class="keyword">struct</span> ipc_msg *ipc_msg, u64 client_pid)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> ret_cap, write_val;</span><br><span class="line">        <span class="type">bool</span> ret_with_cap = <span class="literal">false</span>;</span><br><span class="line">        <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> len = ipc_msg-&gt;data_len;</span><br><span class="line">        <span class="keyword">while</span> ((i * <span class="number">4</span>) &lt; len) &#123;</span><br><span class="line">            ret += ((<span class="type">int</span> *)ipc_get_msg_data(ipc_msg))[i];</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (ret_with_cap)</span><br><span class="line">                ipc_return_with_cap(ipc_msg, ret);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                ipc_return(ipc_msg, ret);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">sys_ipc_return</span><span class="params">(u64 ret, u64 cap_num)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> current_thread-&gt;active_conn;</span><br><span class="line">        <span class="keyword">if</span> (cap_num != <span class="number">0</span>) &#123;</span><br><span class="line">                ipc_send_cap_to_client(conn, cap_num);</span><br><span class="line">        &#125;</span><br><span class="line">        conn-&gt;source-&gt;thread_ctx-&gt;state = TS_RUNNING;</span><br><span class="line">        conn-&gt;source-&gt;thread_ctx-&gt;sc = current_thread-&gt;thread_ctx-&gt;sc;</span><br><span class="line">        thread_migrate_to_client(conn, ret);</span><br><span class="line">     	BUG(<span class="string">&quot;This function should never\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">thread_migrate_to_client</span><span class="params">(<span class="keyword">struct</span> ipc_connection *conn, u64 ret_value)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">source</span> =</span> conn-&gt;source;</span><br><span class="line">        current_thread-&gt;active_conn = <span class="literal">NULL</span>;</span><br><span class="line">        arch_set_thread_return(source, ret_value);</span><br><span class="line">        switch_to_thread(source);</span><br><span class="line">        eret_to_thread(switch_context());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="client"><a href="#client" class="headerlink" title="client"></a>client</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[], <span class="type">char</span> *envp[])</span></span><br><span class="line">&#123;</span><br><span class="line">        test_ipc_routine(__chcore_get_procm_cap());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">test_ipc_routine</span><span class="params">(<span class="type">int</span> server_cap)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_struct</span> *<span class="title">client_ipc_struct</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_msg</span> *<span class="title">ipc_msg</span>;</span></span><br><span class="line">        <span class="type">int</span> shared_page_pmo_cap, shared_msg;</span><br><span class="line">        <span class="type">int</span> ret, i;</span><br><span class="line">        client_ipc_struct = ipc_register_client(server_cap);</span><br><span class="line"></span><br><span class="line">       ipc_msg = ipc_create_msg(client_ipc_struct, <span class="number">4</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; IPC_TEST_NUM; i++) &#123;</span><br><span class="line">                ipc_set_msg_data(ipc_msg, (<span class="type">char</span> *)&amp;i, <span class="number">0</span>, <span class="number">4</span>);</span><br><span class="line">                ret = ipc_call(client_ipc_struct, ipc_msg);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> ipc_struct *<span class="title function_">ipc_register_client</span><span class="params">(<span class="type">int</span> server_thread_cap)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="type">int</span> conn_cap, retry_times = RETRY_UPPER_BOUND;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_struct</span> *<span class="title">ipc_struct</span> =</span> <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ipc_struct));</span><br><span class="line">        <span class="type">int</span> client_id = __sync_fetch_and_add(&amp;client_ipc_num, <span class="number">1</span>);</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span>;</span></span><br><span class="line">        vm_config.buf_base_addr = CLIENT_BUF_BASE + client_id * CLIENT_BUF_SIZE;</span><br><span class="line">        vm_config.buf_size = CLIENT_BUF_SIZE;</span><br><span class="line">        conn_cap = __chcore_sys_register_client((u32)server_thread_cap,(u64)&amp;vm_config);</span><br><span class="line">        ipc_struct-&gt;shared_buf = vm_config.buf_base_addr;</span><br><span class="line">        ipc_struct-&gt;shared_buf_len = vm_config.buf_size;</span><br><span class="line">        ipc_struct-&gt;conn_cap = conn_cap;</span><br><span class="line">        spinlock_init(&amp;ipc_struct-&gt;ipc_lock);</span><br><span class="line">        <span class="keyword">return</span> ipc_struct;</span><br><span class="line">&#125;</span><br><span class="line">u32 <span class="title function_">sys_register_client</span><span class="params">(u32 server_cap, u64 vm_config_ptr)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">client</span> =</span> current_thread;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">server</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> <span class="title">vm_config</span> =</span> &#123;<span class="number">0</span>&#125;;</span><br><span class="line">        u64 client_buf_size;</span><br><span class="line">        <span class="type">int</span> conn_cap = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> r = <span class="number">0</span>;</span><br><span class="line">        r = copy_from_user(</span><br><span class="line">                (<span class="type">char</span> *)&amp;vm_config, (<span class="type">char</span> *)vm_config_ptr, <span class="keyword">sizeof</span>(vm_config));</span><br><span class="line">        server = obj_get(current_cap_group, server_cap, TYPE_THREAD);</span><br><span class="line">        client_buf_size = vm_config.buf_size;</span><br><span class="line">        conn_cap = create_connection(client, server, &amp;vm_config);</span><br><span class="line">        conn = obj_get(current_cap_group, conn_cap, TYPE_CONNECTION);</span><br><span class="line">        <span class="keyword">if</span> (client_buf_size != vm_config.buf_size) &#123;</span><br><span class="line">                r = copy_to_user((<span class="type">char</span> *)vm_config_ptr,</span><br><span class="line">                                 (<span class="type">char</span> *)&amp;vm_config,</span><br><span class="line">                                 <span class="keyword">sizeof</span>(vm_config));</span><br><span class="line">        &#125;</span><br><span class="line">        r = conn_cap;</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">create_connection</span><span class="params">(<span class="keyword">struct</span> thread *source, <span class="keyword">struct</span> thread *target,</span></span><br><span class="line"><span class="params">                             <span class="keyword">struct</span> ipc_vm_config *client_vm_config)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> conn_cap = <span class="number">0</span>, server_conn_cap = <span class="number">0</span>;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">pmobject</span> *<span class="title">stack_pmo</span>, *<span class="title">buf_pmo</span>;</span></span><br><span class="line">        <span class="type">int</span> conn_idx;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">server_ipc_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_vm_config</span> *<span class="title">vm_config</span>;</span></span><br><span class="line">        u64 server_stack_base, server_buf_base, client_buf_base;</span><br><span class="line">        u64 stack_size, buf_size;</span><br><span class="line">        conn = obj_alloc(TYPE_CONNECTION, <span class="keyword">sizeof</span>(*conn));</span><br><span class="line">        conn-&gt;target = create_server_thread(target);</span><br><span class="line">        server_ipc_config = target-&gt;general_ipc_config;</span><br><span class="line">        vm_config = &amp;server_ipc_config-&gt;vm_config;</span><br><span class="line">        conn_idx = find_next_zero_bit(</span><br><span class="line">                server_ipc_config-&gt;conn_bmp, server_ipc_config-&gt;max_client, <span class="number">0</span>);</span><br><span class="line">        set_bit(conn_idx, server_ipc_config-&gt;conn_bmp);</span><br><span class="line">        server_stack_base = vm_config-&gt;stack_base_addr + conn_idx * vm_config-&gt;stack_size;</span><br><span class="line"></span><br><span class="line">        stack_size = vm_config-&gt;stack_size;</span><br><span class="line">        stack_pmo = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pmobject));</span><br><span class="line">        pmo_init(stack_pmo, PMO_DATA, stack_size, <span class="number">0</span>);</span><br><span class="line">        vmspace_map_range(target-&gt;vmspace,</span><br><span class="line">                          server_stack_base,</span><br><span class="line">                          stack_size,</span><br><span class="line">                          VMR_READ | VMR_WRITE,</span><br><span class="line">                          stack_pmo);</span><br><span class="line">        conn-&gt;server_stack_top = server_stack_base + stack_size;</span><br><span class="line">        server_buf_base = vm_config-&gt;buf_base_addr + conn_idx * vm_config-&gt;buf_size;</span><br><span class="line">        client_buf_base = client_vm_config-&gt;buf_base_addr;</span><br><span class="line">        buf_size = MIN(vm_config-&gt;buf_size, client_vm_config-&gt;buf_size);</span><br><span class="line">        client_vm_config-&gt;buf_size = buf_size;</span><br><span class="line">        buf_pmo = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> pmobject));</span><br><span class="line">        pmo_init(buf_pmo, PMO_DATA, buf_size, <span class="number">0</span>);</span><br><span class="line">        vmspace_map_range(current_thread-&gt;vmspace, client_buf_base, buf_size, VMR_READ | VMR_WRITE, buf_pmo);</span><br><span class="line">        vmspace_map_range(target-&gt;vmspace, server_buf_base, buf_size, VMR_READ | VMR_WRITE, buf_pmo);</span><br><span class="line">        conn-&gt;buf.client_user_addr = client_buf_base;</span><br><span class="line">        conn-&gt;buf.server_user_addr = server_buf_base;</span><br><span class="line">        conn_cap = cap_alloc(current_cap_group, conn, <span class="number">0</span>);</span><br><span class="line">        server_conn_cap =</span><br><span class="line">                cap_copy(current_cap_group, target-&gt;cap_group, conn_cap);</span><br><span class="line">        conn-&gt;server_conn_cap = server_conn_cap;</span><br><span class="line">        <span class="keyword">return</span> conn_cap;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="keyword">struct</span> thread *<span class="title function_">create_server_thread</span><span class="params">(<span class="keyword">struct</span> thread *src)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">new</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">new_config</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">src_config</span>;</span></span><br><span class="line">        new = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> thread));</span><br><span class="line">        new-&gt;vmspace = obj_get(src-&gt;cap_group, VMSPACE_OBJ_ID, TYPE_VMSPACE);</span><br><span class="line">        new-&gt;thread_ctx = create_thread_ctx(TYPE_SHADOW);</span><br><span class="line">        <span class="built_in">memcpy</span>((<span class="type">char</span> *)&amp;(new-&gt;thread_ctx-&gt;ec),</span><br><span class="line">               (<span class="type">const</span> <span class="type">char</span> *)&amp;(src-&gt;thread_ctx-&gt;ec),</span><br><span class="line">               <span class="keyword">sizeof</span>(<span class="type">arch_exec_cont_t</span>));</span><br><span class="line">        new-&gt;thread_ctx-&gt;prio = MAX_PRIO - <span class="number">1</span>;</span><br><span class="line">        new-&gt;thread_ctx-&gt;state = TS_INIT;</span><br><span class="line">        new-&gt;thread_ctx-&gt;affinity = NO_AFF;</span><br><span class="line">        new-&gt;thread_ctx-&gt;type = TYPE_SHADOW;</span><br><span class="line">        src_config = (<span class="keyword">struct</span> server_ipc_config *)src-&gt;general_ipc_config;</span><br><span class="line">        new_config = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> server_ipc_config));</span><br><span class="line">        new_config-&gt;callback = src_config-&gt;callback;</span><br><span class="line">        new_config-&gt;vm_config = src_config-&gt;vm_config;</span><br><span class="line">        new-&gt;general_ipc_config = new_config;</span><br><span class="line">        new-&gt;cap_group = src-&gt;cap_group;</span><br><span class="line">        obj_put(new-&gt;vmspace);</span><br><span class="line">        <span class="keyword">return</span> new;</span><br><span class="line">&#125;</span><br><span class="line">u64 <span class="title function_">sys_ipc_call</span><span class="params">(u32 conn_cap, <span class="keyword">struct</span> ipc_msg *ipc_msg, u64 cap_num)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">ipc_connection</span> *<span class="title">conn</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">        u64 arg;</span><br><span class="line">        <span class="type">int</span> r = <span class="number">0</span>;</span><br><span class="line">        conn = obj_get(current_thread-&gt;cap_group, conn_cap, TYPE_CONNECTION);</span><br><span class="line">        conn-&gt;ipc_msg = ipc_msg;</span><br><span class="line">        <span class="keyword">if</span> (cap_num &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                r = ipc_send_cap(conn);</span><br><span class="line">        &#125;</span><br><span class="line">        arg = conn-&gt;buf.server_user_addr;</span><br><span class="line">        thread_migrate_to_server(conn, arg);</span><br><span class="line">   		BUG(<span class="string">&quot;This function should never\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> u64 <span class="title function_">thread_migrate_to_server</span><span class="params">(<span class="keyword">struct</span> ipc_connection *conn, u64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">thread</span> *<span class="title">target</span> =</span> conn-&gt;target;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">server_ipc_config</span> *<span class="title">target_ipc_config</span> =</span></span><br><span class="line">                (<span class="keyword">struct</span> server_ipc_config *)(target-&gt;general_ipc_config);</span><br><span class="line">        u64 callback = target_ipc_config-&gt;callback;</span><br><span class="line">        conn-&gt;source = current_thread;</span><br><span class="line">        current_thread-&gt;thread_ctx-&gt;state = TS_WAITING;</span><br><span class="line">        target-&gt;active_conn = conn;</span><br><span class="line">        obj_put(conn);</span><br><span class="line">        arch_set_thread_stack(target, conn-&gt;server_stack_top);</span><br><span class="line">        arch_set_thread_next_ip(target, callback);</span><br><span class="line">        arch_set_thread_arg0(target, arg);</span><br><span class="line">        arch_set_thread_arg1(target, current_thread-&gt;cap_group-&gt;pid);</span><br><span class="line">        target-&gt;thread_ctx-&gt;sc = current_thread-&gt;thread_ctx-&gt;sc;</span><br><span class="line">        switch_to_thread(target);</span><br><span class="line">        eret_to_thread(switch_context());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="执行流"><a href="#执行流" class="headerlink" title="执行流"></a>执行流</h2><p>client先register_client，需要知道想要通信的服务端进程。</p>
-<p>创建连接会为服务端进程再创建一个线程，设置相同的vmspace (每个client都会在服务器进程创建一个线程作为单独的连接对象)</p>
-<p>client ipc_call时，不用sched，而是直接switch到target，将自己设置为waiting，不加入等待队列。需要设置参数和target为服务端的处理函数。</p>
-<p>server ipc_return时，设置client为running后直接switch到client，设置返回值</p>
-<p>由于ipc的操作都是进内核的，eret会直接返回到用户态，因此server返回到client时，执行ipc_call的下一条指令，切换到server的调用链直接被中止。由于ret addr不使用栈，因此也不会对内核栈产生很大的破坏。</p>
-<h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><p>每个connection会创建pmo，同时映射到client和server的地址空间</p>
-<p>client和server的thread是一对一的，但是即使是不同的thread也是服务在同一个写死的地址上，所以需要根据不同情况算偏移找不同的位置。</p>
-<ul>
-<li>server: 同一个dispatch会需要支持不同client访问，每次create_connection时会得到不同的连接，server对于IPC提供的缓冲区根据不同connection id找到偏移 服务不同客户</li>
-<li>client：同一个cilent会需要和不同的server通信，每次register client会拿到不同client id，client对于IPC提供的缓冲区根据不同的client id找到偏移，请求不同的服务</li>
-</ul>
-<p>每个client创建pmo，然后映射到服务端的地址都不会重复。buf和stack各需要一个pmo</p>
-<ul>
-<li><p><code>buf_addr</code>为A-stack client server共享内存 传递参数</p>
-</li>
-<li><p><code>stack_addr</code>为E-stack server thread执行用</p>
-</li>
-</ul>
-<h2 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h2><p>client通过<code>ipc_create_msg</code> 会把消息直接写入到共享内存的开头，在迁移线程时设置地址为服务端共享内存地址即可（两端虚拟地址不一样，但物理地址一样）</p>
-<p>共享内存首地址即为msg对象(元数据)，而紧接着msg对象的就是msg所带data </p>
-<p>可以自己为每种不同的IPC定义request结构体，然后直接进行类型转换</p>
-<p>以文件系统为例，共享内存布局如下</p>
-<p>msg元数据—fs_request元数据—文件数据</p>
-<h2 id="cap"><a href="#cap" class="headerlink" title="cap"></a>cap</h2><p>需要传递资源给server</p>
-<p>很多IPC的操作是被写在kernel里的，kernel的地址空间是共用的，因此即使是不同进程本地修改cap，在context switch到另一个进程时，修改仍有效</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -1893,13 +1978,13 @@ npm ERR! &#125;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">408k</span>
+    <span title="Word count total">410k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">6:11</span>
+    <span title="Reading time total">24:50</span>
   </span>
 </div>
 <div class="busuanzi-count">
