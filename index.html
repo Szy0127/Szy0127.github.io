@@ -214,7 +214,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2026-02-14 12:34:51" itemprop="dateModified" datetime="2026-02-14T12:34:51+08:00">2026-02-14</time>
+      <time title="Modified: 2026-02-14 12:39:49" itemprop="dateModified" datetime="2026-02-14T12:39:49+08:00">2026-02-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -266,14 +266,12 @@
 </ol>
 <p>挑战：</p>
 <ol>
-<li><p>如何稳定回收并复用这个page</p>
-</li>
-<li><p>怎么把准备好的数据通过悬垂指针写到这个page上</p>
-</li>
-<li><p>怎么改映射达成任意地址读写</p>
-</li>
-<li><p>free某个object 如何做到这个object所在的page会还给buddy system？</p>
-</li>
+<li>如何稳定回收并复用这个page</li>
+<li>怎么把准备好的数据通过悬垂指针写到这个page上</li>
+<li>怎么改映射达成任意地址读写</li>
+</ol>
+<h2 id="利用过程详细解释"><a href="#利用过程详细解释" class="headerlink" title="利用过程详细解释"></a>利用过程详细解释</h2><ol>
+<li>free某个object 如何做到这个object所在的page会还给buddy system？</li>
 </ol>
 <ul>
 <li>拥有这个object所在的slab上的其他所有object，同时释放其他所有object</li>
