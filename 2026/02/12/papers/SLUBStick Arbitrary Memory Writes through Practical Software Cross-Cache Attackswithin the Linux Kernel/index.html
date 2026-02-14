@@ -27,7 +27,7 @@
 <meta property="og:description" content="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attackswithin the Linux KernelUsenix Security‘24 https:&#x2F;&#x2F;github.com&#x2F;isec-tugraz&#x2F;SLUBStick&#x2F;tree&#x2F;main 背景 传统的内存漏洞，比如UAF DF OOB 都需">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-02-12T13:43:37.029Z">
-<meta property="article:modified_time" content="2026-02-13T12:23:51.109Z">
+<meta property="article:modified_time" content="2026-02-14T04:30:17.568Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
 
@@ -220,7 +220,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2026-02-13 20:23:51" itemprop="dateModified" datetime="2026-02-13T20:23:51+08:00">2026-02-13</time>
+      <time title="Modified: 2026-02-14 12:30:17" itemprop="dateModified" datetime="2026-02-14T12:30:17+08:00">2026-02-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
     </span>
 
   
@@ -237,14 +246,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.8k</span>
+      <span>2.1k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>8 mins.</span>
     </span>
 </div>
 
@@ -257,18 +266,12 @@
     <div class="post-body" itemprop="articleBody"><h1 id="SLUBStick-Arbitrary-Memory-Writes-through-Practical-Software-Cross-Cache-Attacks"><a href="#SLUBStick-Arbitrary-Memory-Writes-through-Practical-Software-Cross-Cache-Attacks" class="headerlink" title="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks"></a>SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks</h1><p>within the Linux Kernel<br>Usenix Security‘24</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/isec-tugraz/SLUBStick/tree/main">https://github.com/isec-tugraz/SLUBStick/tree/main</a></p>
 <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ol>
-<li>传统的内存漏洞，比如UAF DF OOB 都需要依赖更进一步的方式完成利用（提权）。利用成功率不高，然后很容易被修复（对高版本linux无效）</li>
+<li>传统的内存漏洞，比如UAF DF OOB 都需要依赖更进一步的方式完成利用（提权）。需要依赖Linux slab、buddy system分配内存的模式，利用成功率不高，然后很容易被修复（对高版本linux无效）</li>
 <li>slab分配器，会在空闲对象过多的时候 把这块完整的内存页还给buddy system</li>
-</ol>
-<p>补充：DF double free 指对同一块内存free两次 会导致freelist中存在两个同一块内存的对象，之后分配给不同的object用 那么写一个不重要的object会同时修改另一个权限敏感的object</p>
-<p>检测不简单，因为</p>
-<ol>
-<li>没有元数据记录是否free （刚分配后 认为是free的元数据也可被认为是合法数据）</li>
-<li>遍历list判断太慢</li>
 </ol>
 <h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><p>整体利用思路：</p>
 <ol>
-<li>用传统内存漏洞构造一个可以写内存对象的primitive</li>
+<li>用传统内存漏洞构造一个悬挂指针的情况（所在内存页已经归还 但是仍然可以写数据）</li>
 <li>释放所在的slab 直到还给buddysystem</li>
 <li>让这个可被写的对象所在内存页重新分配为用户态页表页</li>
 <li>修改用户态页表页 完成任意地址映射</li>
@@ -277,9 +280,9 @@
 <ol>
 <li><p>如何稳定回收并复用这个page</p>
 </li>
-<li><p>OOB和UAF怎么转为DF</p>
+<li><p>怎么把准备好的数据通过悬垂指针写到这个page上</p>
 </li>
-<li><p>内核地址随机化 怎么改映射达成任意地址读写</p>
+<li><p>怎么改映射达成任意地址读写</p>
 </li>
 <li><p>free某个object 如何做到这个object所在的page会还给buddy system？</p>
 </li>
@@ -303,16 +306,27 @@
 <li>victim object所在page还给buddy system后 如何再次分配这个页面？</li>
 </ol>
 <ul>
-<li>buddy system是LIFO的，再次申请这个大小即可。</li>
+<li>buddy system是LIFO的，再次申请这个大小即可。使用mmap+memset 这个page会被分配为PUD页表页</li>
 </ul>
 <ol start="5">
-<li>如何找到修改页表的位置，达到访问任意物理内存的效果？</li>
+<li>如何修改页表？</li>
 </ol>
 <ul>
-<li>两个关键变量，arb_pt指向arb_page所在VA翻译过后的PTE。 arb_pt可配置为任意pfn的PTE，对应的arb_page可通过虚拟地址访问到任意物理地址。</li>
-<li></li>
+<li>利用悬垂指针。用有漏洞的内核模块和正常的内核模块构造出正常内核object所在内存页被free但是仍然可以通过ioctl访问服务的情况，在服务中copy一份伪造的PUD页表页数据。</li>
 </ul>
 <ol start="6">
+<li>利用悬垂指针修改页表需要利用内核本身提供的服务，限制多，需要保证两个时间窗口的满足。1 kmalloc到copy_from_user之间，需要free所有slab到buddy system完成 否则PUD页不一定是悬垂指针指向的页。 2 完成服务到free obejct时间需要足够长 否则没有完成后续的攻击 这个PUD页就被回收 修改数据了。</li>
+</ol>
+<ul>
+<li>使用FUSE，自己写fuse 在fuse_read中加入sleep，然后挂载到某个文件夹，copy_from_user传入文件fd读数据，在发生读的时候会到用户态FUSE控制。</li>
+</ul>
+<ol start="7">
+<li>伪造的PUD可能只有8byte，也就是一个PTE有效，只能访问1G物理内存，且不可重入。</li>
+</ol>
+<ul>
+<li>再次大范围mmap+memset，然后检查这1G物理内存的内存数据，如果发现之前不是PTE但之后是PTE，说明这个page变成了最后一级页表页，修改这个PTE即可完成对容易物理地址的映射。</li>
+</ul>
+<ol start="8">
 <li>修改页表，如何确定&#x2F;etc&#x2F;passwd所在物理内存？</li>
 </ol>
 <ul>
@@ -320,6 +334,7 @@
 <li>遍历pfn 16G内存可以全部遍历比较，循环总体时间在可接受范围内(16G&#x2F;4K&#x3D;4M  4M*1us&#x3D;4s) 总体可控制在分钟量级</li>
 <li>最后达到的效果其实是，可改页表映射整个地址范围，然后任意物理地址读</li>
 </ul>
+<p>一些细节：</p>
 <p>先根据漏洞的存在double free的object的size 找到对应的内核对象</p>
 <ol>
 <li>alloc vuln</li>
@@ -330,9 +345,7 @@
 </ol>
 <p>此时达到效果：拥有一个内核对象可以通过ioctl交互 并且这个内核对象所在的地址已经被释放到buddy system中</p>
 <p>下一次ioctl copy_from_user会copy到页表上</p>
-<p>这么看 操作这个page 还是得通过ioctl 用户态没法操作 需要内核copy from user 那么为什么最后用户态可以改</p>
-<p>因为立即复制了一份假的PUD页表页 512项 每项指向一个1G大页，从4G开始 （这一步已经可以通过va访问512G内存了 直接遍历猜passwd不是一样吗？）实际上内核不会存在这么好用的情况 实际上可能只能写入部分byte 导致控制的内存范围比较小 并且由于内核的限制不能遍历范围反复尝试 只能触发一次 如果只写了8byte 那么相当于只能控制1G的内存空间 所以后续要基于这个1G的空间来做</p>
-<p>也就是说 不论如何翻译 只要用的是这个PUD 那么就能翻译到4G开始共512G的真实物理地址空间</p>
+<p>立即复制了一份假的PUD页表页 512项 每项指向一个1G大页，从4G开始 （这一步已经可以通过va访问512G内存了 直接遍历猜passwd不是一样吗？）实际上内核不会存在这么好用的情况 实际上可能只能写入部分byte 导致控制的内存范围比较小 并且由于内核的限制不能遍历范围反复尝试 只能触发一次 如果只写了8byte 那么相当于只能控制1G的内存空间 所以后续要基于这个1G的空间来做</p>
 <p>这解释了为什么后续data明明只mmap了一个页，但是可以访问PGD 因为mmap+memset以后 补全了一个PUD页表页 而这个被补全的PUD页表页来自刻意释放到buddy system 后续通过悬挂指针copy from user制造的假的PUD pte信息。（实际上不是修改512G 而是某个1G 所以需要捕获异常）</p>
 <p>然后遍历地址空间 再找到PUD页表页的地址</p>
 <p>之前这个页还是内核控制 用户态无法访问 但是现在已经改了页表 用户态可以直接读写了</p>
@@ -345,6 +358,16 @@
 <p>遍历这个1G 4K粒度看第一个8byte是不是PTE格式</p>
 <p>然后找个最大的地址 1&lt;&lt;46 生成大量页表页</p>
 <p>然后再遍历这个1G 如果发现原来不是PTE 现在是PTE 那么说明这个1G中存在一个页表页 我们可以读写这1G 就可以读写这个PTE</p>
+<p>keyctl_pkey_verify 调用memdup_user</p>
+<p>先kmalloc然后copy_from_user size和src由用户态提供 提供伪造的PUD数据</p>
+<p>保证两个时间窗口</p>
+<ol>
+<li>kmalloc以后 copy之前 需要已经被分配为页表页 否则元数据会被覆盖</li>
+<li>成功修改页表以后 需要延迟释放kernel object 否则后续漏洞利用没有时间完成</li>
+</ol>
+<p>使用fuse 用户态 不需要特权</p>
+<p>自己写一个fuse_read 然后挂在到某个目录下 之后open这个目录下的文件 内核copy_from_user会到fuse_read处理，此时直接sleep即可</p>
+<p>总体利用顺序：</p>
 <ol>
 <li>有一个有漏洞的内核驱动，和一个正常提供服务的内核模块，两个object的size一样。</li>
 <li>alloc A free A alloc B freeA 把B所在的object还给slab了</li>
@@ -409,7 +432,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24:50</span>
+    <span title="Reading time total">24:51</span>
   </span>
 </div>
 <div class="busuanzi-count">
