@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,230 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/chcore/notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/09/17/chcore/notes/" class="post-title-link" itemprop="url">chcore-misc</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/chcore/" itemprop="url" rel="index"><span itemprop="name">chcore</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="chcore-misc"><a href="#chcore-misc" class="headerlink" title="chcore-misc"></a>chcore-misc</h1><h2 id="arm架构"><a href="#arm架构" class="headerlink" title="arm架构"></a>arm架构</h2><p><code>xxx_elk</code> k&#x3D;0 1 2 3 寄存器表示这个寄存器只能在elk的特权等级访问</p>
+<ul>
+<li>el0 用户进程</li>
+<li>el1 操作系统</li>
+<li>el2 虚拟化</li>
+<li>el3 trustzone</li>
+</ul>
+<p>call指令为bl 不使用栈 而是用寄存器<code>x29</code>作为link register <code>ret</code>时从LR中取返回地址</p>
+<p><code>SP_EL0</code> <code>SP_EL1</code> 不同特权等级用不同的栈寄存器 所以不需要放到栈中进行保存和恢复</p>
+<p><code>svc</code>进入内核</p>
+<p><code>eret</code>从当前特权等级k返回 返回地址在ELR_EL3  可以从el1到el0 也可以从el3到el1</p>
+<h2 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h2><p>树莓派启动</p>
+<ol>
+<li>通过树莓派厂商写死的GPU来初始化CPU</li>
+<li>firmware</li>
+<li>运行kernel.img  cpu从0x80000处执行第一行代码</li>
+</ol>
+<p>对于笔记本 用BIOS (basic input output system)  嵌入式设备（手机）不用BIOS</p>
+<p>将可启动设备(磁盘 MBR 0柱面0磁头0扇区 主引导扇区)512字节加载到0x7c00 然后执行 即bootloader</p>
+<p>x86 cpu reset后指向0xffff0地址 即bios物理地址</p>
+<h2 id="ChCore启动"><a href="#ChCore启动" class="headerlink" title="ChCore启动"></a>ChCore启动</h2><p>编译生成elf时需要排序所有.o 并且设置第一行指令在地址0x80000</p>
+<ol>
+<li><p>从elX切换到el1</p>
+</li>
+<li><p>初始化栈  栈实际上是c编译后的elf文件一个已经分配好的空间(4k) 只要把sp设置好就行</p>
+<p>由于arm架构使用link register保存返回地址 所以之前的函数调用没有嵌套 可以不需要栈</p>
+<p>对于c函数的编译器，并不认为这段c程序是内核初始化，所以仍会一样编译。即使不需要把返回地址压栈，也需要进行传参、寄存器保护等用栈的操作，所以一定要在调用c程序之前初始化好栈。</p>
+<p>当初始化好栈之后，完全可以用c语言而非汇编来编程，除非需要用到msr等系统isa指令</p>
+</li>
+<li><p>页表初始化</p>
+<p>ttbr：x86下的cr3  translation table base register</p>
+<p>只用48bit     0000+48bit ttbr0翻译；ffff+48bit ttbr1翻译  cpu根据虚拟地址前缀判断使用哪个翻译</p>
+<p>ttbr0和ttbr1都是_el1</p>
+<p>多级页表 ttbr0_el1_l0 指向ttbr0_el1_l1 指向ttbr0_el1_l2  都是数组 共512个entry 是下一级页表地址或物理地址 用一个bit记录</p>
+<p>4级页表  并不是只能最后一级指向物理地址，可以使用大页。这里初始化使用2M大页 之后会拆成4K</p>
+<p>虚拟内存最大256T</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>PTE</th>
+<th>指向物理内存大小</th>
+<th>index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L0</td>
+<td>L1地址</td>
+<td>512G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L1</td>
+<td>L2地址</td>
+<td>1G</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>L3地址</td>
+<td>2M</td>
+<td>9bit</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>物理内存地址</td>
+<td>4k</td>
+<td>9bit</td>
+</tr>
+</tbody></table>
+<p>最后12bit是页偏移 VA与PA相同</p>
+<p>0-1G是物理地址，1G-4G是设备地址，设备地址的值随时会变化 所以不允许缓存 PTE64bit 除了记录物理地址的36bit(12bit偏移不需要) 其他bit可用作记录页信息 比如不同特权等级的读写权限</p>
+<p>将ttbr1与ttbr0的最后一级页表记录的物理地址范围设置成相同（0G到4G 每个entry2M）这样低地址与高地址的虚拟地址翻译会映射到同一块物理地址，执行相同的代码</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VA</th>
+<th>PA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ttbr0</td>
+<td>0G-1G</td>
+<td>0G-1G</td>
+</tr>
+<tr>
+<td>ttbr1</td>
+<td>0xffffff0000000000 ,1G</td>
+<td>0G-1G</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>开启mmu （设置<code>sctlr_el1</code>寄存器的某些bit）从下一条指令开始cpu会自动做地址翻译</p>
+<p>应用程序跑在低地址 操作系统跑在高地址 start_kernal从0xffffff0000000000开始</p>
+<p>内核高地址 由ttbr1翻译 得到相同PA</p>
+<p>应用程序低地址 由ttbr0翻译 得到不同PA</p>
+</li>
+<li><p>初始化异常向量表 每一项对应一个函数地址(汇编)</p>
+<p>对于syscall这个同步异常，构建syscall table 每个系统调用号对应一个函数(void*)</p>
+</li>
+</ol>
+<h2 id="VA"><a href="#VA" class="headerlink" title="VA"></a>VA</h2><p>天然隔离性好</p>
+<p>每个CPU核有一个TLB 作为页表的缓存</p>
+<ul>
+<li><p>进程切换 刷TLB</p>
+<p>ASID TLB与页表同时记录 这样就不需要每次刷</p>
+</li>
+<li><p>修改页表映射 刷TLB (修改页表映射操作的内存使用的缓存并不是TLB TLB是缓存查找PA)</p>
+</li>
+<li><p>如果其他核也运行了当前进程 则其他核TLB也需要刷</p>
+</li>
+</ul>
+<h2 id="PA"><a href="#PA" class="headerlink" title="PA"></a>PA</h2><p>开启地址翻译后，物理地址实际上也不可见 不可管理了</p>
+<p>内核映射到高地址段，通过分配高地址段的虚拟空间来管理实际的物理内存</p>
+<p>buddy system存在于内核的虚拟空间中 但映射到真实的物理内存 从而进行管理</p>
+<p>用户态需要的虚拟空间经过buddy system分配 所以物理内存上的每个page可能会对应两个虚拟地址，但是内核自己只负责管理，是不会修改的，如果出bug了修改用户空间 称为踩内存</p>
+<p>buddy system实际上占用的内存只有metadata，每个物理页会对应一个page数据结构  记录物理页实际大小，需要访存修改的只有metadata 而操作的物理页地址实际上是虚拟地址，并且只需要根据虚拟地址找到metadata和buddy 并不需要访问内容，所以即使内核的start_addr指向的虚拟空间部分并没有映射到真实物理空间也没有关系。</p>
+<h2 id="page-table"><a href="#page-table" class="headerlink" title="page table"></a>page table</h2><p>所有page都是通过buddy_system拿到的，都是虚拟地址，存PTE时需要转换成物理地址</p>
+<p>PTE需要按给定格式存，最后一位是valid，硬件通过这个bit判断是否缺页(异常，给内核处理)</p>
+<p>如果需要换页，只要valid为0触发缺页，其他bit全自己定义即可，与硬件无关</p>
+<p>mmu访问时会改pte的access bit 方便换页策略</p>
+<p>换页需要有反向映射 修改所有映射到被换出的物理页的虚拟页的PTE</p>
+<h2 id="programe"><a href="#programe" class="headerlink" title="programe"></a>programe</h2><p><code>create_root_thread</code>创建进程 同时创建线程</p>
+<ul>
+<li>进程：创建pmo，加载二进制文件，地址映射</li>
+<li>线程：线程上下文，加入调度队列</li>
+</ul>
+<p>对于spawn创建线程，自己加载好二进制，通过各种系统调用拿到pmo，地址映射，创建线程</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>进程的地址空间，包含共享的堆，不同线程的内核栈和线程栈（用户态）</p>
+<p>chcore中，内核栈地址即为kmalloc拿到的thread结构体的地址，访问thread结构体的成员正好是在内存中栈的对应位置</p>
+<p>而线程栈是用户在发出创建线程时手动指定的。内核中的代码sp均为内核栈地址，用户态地址在指定后存在sp_el0中，上下文切换时保存恢复，eret后sp为此地址</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -233,7 +457,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>35 mins.</span>
+      <span>9 mins.</span>
     </span>
 </div>
 
@@ -355,7 +579,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>13 mins.</span>
+      <span>3 mins.</span>
     </span>
 </div>
 
@@ -552,7 +776,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1:11</span>
+      <span>18 mins.</span>
     </span>
 </div>
 
@@ -738,13 +962,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">410k</span>
+    <span title="Word count total">413k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24:52</span>
+    <span title="Reading time total">6:15</span>
   </span>
 </div>
 <div class="busuanzi-count">

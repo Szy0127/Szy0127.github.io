@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,296 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/" class="post-title-link" itemprop="url">SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-02-14 14:23:42 / Modified: 22:46:23" itemprop="dateCreated datePublished" datetime="2026-02-14T14:23:42+08:00">2026-02-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="SCAVY-Automated-Discovery-of-Memory-Corruption-Targets-in-Linux-Kernel-for-Privilege-Escalation"><a href="#SCAVY-Automated-Discovery-of-Memory-Corruption-Targets-in-Linux-Kernel-for-Privilege-Escalation" class="headerlink" title="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation"></a>SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation</h1><p>Usenix Security‘24</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/BadDataLab/SCAVY">https://github.com/BadDataLab/SCAVY</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/19324">https://xz.aliyun.com/news/19324</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ol>
+<li>CVE提出的内存漏洞，例如UAF等，都太小，不足以完成一次提升权限的利用</li>
+<li>一些利用方法 受到传统保护机制 例如SMEP的影响 成功率不高</li>
+<li>因为没有端到端的严重威胁 所以某些CVE并不会受到重视 立即被开发者修复</li>
+</ol>
+<p>本文找内核关键数据结构 可以被CVE利用达到权限提升的目的</p>
+<p>linux漏洞利用思路</p>
+<ol>
+<li>fuzz 找一些内存越界、UAF等导致的crash场景</li>
+<li>找一些这个内存corrupt进一步可拥有的capability</li>
+<li>组合多个POC 完成权限提升</li>
+<li>提高稳定性（触发概率）与能力（绕过更多的安全措施）</li>
+</ol>
+<p>本文目标找到更多的memory target可以给2 3用，不参与1 4</p>
+<p>一个例子：vm_area_struct</p>
+<ol>
+<li>mmap映射&#x2F;etc&#x2F;passwd和另一个普通文件，内核分配两个vm_area_struct</li>
+<li>通过一个已经存在的CVE泄漏&#x2F;etc&#x2F;passwd对应的vm_area_struct的地址，覆盖普通文件的vm_area_struct的值</li>
+<li>msync写回，此时文件是&#x2F;etc&#x2F;passwd 但权限变为可写</li>
+<li>su提权</li>
+</ol>
+<p>千问对于本文工作的解释：</p>
+<hr>
+<h3 id="🎯-核心目标"><a href="#🎯-核心目标" class="headerlink" title="🎯 核心目标"></a>🎯 核心目标</h3><blockquote>
+<p><strong>自动找出内核中哪些内存区域被破坏后，能让普通用户获得 root 权限。</strong></p>
+</blockquote>
+<p>这比传统模糊测试（fuzzing）更进一步——不仅要找崩溃（crash），还要判断这个崩溃是否“有用”（即能否提权）。</p>
+<hr>
+<h2 id="一、为什么传统方法不够？"><a href="#一、为什么传统方法不够？" class="headerlink" title="一、为什么传统方法不够？"></a>一、为什么传统方法不够？</h2><ul>
+<li>像 <strong>Syzkaller</strong> 这样的模糊测试器擅长触发各种代码路径（高覆盖率），但不关心“破坏哪个字段才有用”。</li>
+<li>像 <strong>KOOBE &#x2F; FUZE</strong> 能检测内存越界或破坏，但无法判断破坏后是否能提权。</li>
+<li>手动分析崩溃是否可利用非常耗时。</li>
+</ul>
+<p>👉 <strong>SCAVY 的创新点：把整个利用过程拆成三个阶段，每个阶段用不同的策略精准打击。</strong></p>
+<hr>
+<h2 id="二、漏洞利用的“三阶段模型”"><a href="#二、漏洞利用的“三阶段模型”" class="headerlink" title="二、漏洞利用的“三阶段模型”"></a>二、漏洞利用的“三阶段模型”</h2><p>SCAVY 观察到真实提权漏洞通常分三步：</p>
+<table>
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">目标</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>1. 分配目标对象</strong></td>
+<td align="left">找到内核中可被控制分配的结构体</td>
+<td align="left">创建文件 → 分配 <code>struct file</code></td>
+</tr>
+<tr>
+<td align="left"><strong>2. 破坏关键字段</strong></td>
+<td align="left">修改该结构体中的某个字段（如权限、指针）</td>
+<td align="left">把 <code>file-&gt;f_cred-&gt;uid</code> 改成 0（root）</td>
+</tr>
+<tr>
+<td align="left"><strong>3. 触发提权行为</strong></td>
+<td align="left">使用被破坏的对象执行特权操作</td>
+<td align="left">用被篡改的文件句柄写 <code>/etc/passwd</code></td>
+</tr>
+</tbody></table>
+<p>SCAVY 就围绕这三个阶段设计了对应的自动化技术。</p>
+<hr>
+<h2 id="三、关键技术详解"><a href="#三、关键技术详解" class="headerlink" title="三、关键技术详解"></a>三、关键技术详解</h2><h3 id="🔧-阶段-1：找到“可分配的内核结构体”（Allocator-Discovery）"><a href="#🔧-阶段-1：找到“可分配的内核结构体”（Allocator-Discovery）" class="headerlink" title="🔧 阶段 1：找到“可分配的内核结构体”（Allocator Discovery）"></a>🔧 阶段 1：找到“可分配的内核结构体”（Allocator Discovery）</h3><p><strong>问题</strong>：内核有成千上万个结构体，哪些能被用户通过系统调用分配？</p>
+<p><strong>SCAVY 的做法</strong>：</p>
+<ul>
+<li>在内核中插桩（instrument）所有内存分配函数（如 <code>kmalloc</code>）；</li>
+<li>同时记录<strong>类型转换</strong>（比如 <code>(struct task_struct *)kmalloc(...)</code>），从而知道“这块内存是什么类型”；</li>
+<li>用 <strong>Kprobe</strong> 把分配地址 + 类型信息传到用户空间；</li>
+<li>模糊测试器遍历系统调用，收集所有“用户能触发分配的结构体”。</li>
+</ul>
+<p>✅ <strong>优势</strong>：不用污点分析，轻量高效，可扩展到百万级测试用例。</p>
+<hr>
+<h3 id="🔍-阶段-2：找出“可被破坏的关键字段”（Field-Discovery）"><a href="#🔍-阶段-2：找出“可被破坏的关键字段”（Field-Discovery）" class="headerlink" title="🔍 阶段 2：找出“可被破坏的关键字段”（Field Discovery）"></a>🔍 阶段 2：找出“可被破坏的关键字段”（Field Discovery）</h3><p><strong>问题</strong>：一个结构体有几十个字段，破坏哪个才有用？</p>
+<p><strong>SCAVY 的做法</strong>：</p>
+<ul>
+<li>对每个字段（4~8 字节）注入随机值；</li>
+<li>用 <strong>硬件观察点（watchpoint）</strong> 监控：这个字段是否被读取？</li>
+<li>如果被读了 → 说明它“可能影响程序逻辑” → 标记为潜在目标。</li>
+</ul>
+<p>💡 <strong>为什么有效</strong>？<br>因为如果字段从未被使用，破坏它毫无意义；一旦被读，就可能改变控制流或权限判断。</p>
+<hr>
+<h3 id="⚔️-阶段-3：验证“破坏后能否提权”（Privilege-Escalation-Detection）"><a href="#⚔️-阶段-3：验证“破坏后能否提权”（Privilege-Escalation-Detection）" class="headerlink" title="⚔️ 阶段 3：验证“破坏后能否提权”（Privilege Escalation Detection）"></a>⚔️ 阶段 3：验证“破坏后能否提权”（Privilege Escalation Detection）</h3><p>这是最核心的创新！</p>
+<h4 id="挑战："><a href="#挑战：" class="headerlink" title="挑战："></a>挑战：</h4><ul>
+<li>很多破坏会导致立即崩溃（“过早崩溃”），来不及执行提权操作；</li>
+<li>如何判断“这次崩溃真的能提权”？</li>
+</ul>
+<h4 id="SCAVY-的解决方案：三次对比执行（Differential-Analysis）"><a href="#SCAVY-的解决方案：三次对比执行（Differential-Analysis）" class="headerlink" title="SCAVY 的解决方案：三次对比执行（Differential Analysis）"></a>SCAVY 的解决方案：<strong>三次对比执行（Differential Analysis）</strong></h4><p>对同一个测试用例，运行三次：</p>
+<table>
+<thead>
+<tr>
+<th align="left">运行</th>
+<th align="left">内存状态</th>
+<th align="left">目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Run A</strong></td>
+<td align="left">正常（无破坏）</td>
+<td align="left">基线：所有特权操作应失败</td>
+</tr>
+<tr>
+<td align="left"><strong>Run B</strong></td>
+<td align="left">注入<strong>随机值</strong>破坏</td>
+<td align="left">测试是否产生异常行为</td>
+</tr>
+<tr>
+<td align="left"><strong>Run C</strong></td>
+<td align="left">注入<strong>从 root 进程复制的有效值</strong></td>
+<td align="left">模拟“完美伪造”，看能否成功提权</td>
+</tr>
+</tbody></table>
+<p>然后比较三者的：</p>
+<ul>
+<li>系统调用返回值（如 <code>write()</code> 是否成功）</li>
+<li>输出数据（如读到的文件内容）</li>
+<li>访问被破坏内存的指令</li>
+<li>代码覆盖率（用 Jaccard 相似度 &gt;0.9 判同）</li>
+</ul>
+<p>✅ <strong>如果 Run C 和 Run A 行为不同（比如原本失败的 <code>write</code> 成功了）→ 判定为可提权！</strong></p>
+<blockquote>
+<p>举个例子： </p>
+<ul>
+<li>正常时写 <code>/etc/passwd</code> 失败（权限拒绝）； </li>
+<li>破坏 <code>file-&gt;f_cred</code> 后，写成功了 → 说明获得了 root 权限！</li>
+</ul>
+</blockquote>
+<hr>
+<p>核心就是替换某个kernel object的某个field为root所在进程的对应值，看权限是否发生变化</p>
+<p>传统方案只能检测crash，或者监测到能利用的比较少，本文的方法能检测到的可利用位置更多</p>
+<p>本文自动化检测出的位置，仍然需要人工验证</p>
+<ol>
+<li>某个object的某个field 的确能导致权限提升。（实际上存在false positive）</li>
+<li>进一步，利用真实的CVE，完成对于某个object的某个field的覆盖和利用，真正达到提权的效果</li>
+</ol>
+<p>人工验证后的成果：</p>
+<table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>CWE</th>
+<th>Exploited Struct&#x2F;Field</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2017-7308</td>
+<td>Type Conversion</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2017-7184</td>
+<td>Input Validation</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2010-2959</td>
+<td>Int Overflow</td>
+<td><code>kioctx::internal_pages</code></td>
+</tr>
+<tr>
+<td>2016-0728</td>
+<td>Use-After-Free</td>
+<td><code>key::description</code></td>
+</tr>
+<tr>
+<td>2022-27666*</td>
+<td>OOB Write</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2022-27666*</td>
+<td>OOB Write</td>
+<td><code>file::f_mapping</code></td>
+</tr>
+<tr>
+<td>2009-3547</td>
+<td>nullptr deref.</td>
+<td><code>pipe_inode_info::bufs</code></td>
+</tr>
+<tr>
+<td>2014-3153</td>
+<td>Input Validation</td>
+<td><code>cred::euid</code></td>
+</tr>
+<tr>
+<td>2017-11176</td>
+<td>Use-After-Free</td>
+<td><code>task_struct::cred</code></td>
+</tr>
+<tr>
+<td>2004-1235</td>
+<td>Race condition</td>
+<td><code>file_struct::fops</code></td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -240,7 +530,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>8 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -453,7 +743,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -625,7 +915,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -737,7 +1027,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>4 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -862,7 +1152,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -965,7 +1255,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5:47</span>
+      <span>1:27</span>
     </span>
 </div>
 
@@ -1332,7 +1622,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -1540,7 +1830,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -1717,7 +2007,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>8 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -1838,204 +2128,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/" class="post-title-link" itemprop="url">ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-02-02 00:56:47 / Modified: 00:57:22" itemprop="dateCreated datePublished" datetime="2026-02-02T00:56:47+08:00">2026-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
-<p><img src="/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png" title="image"></p>
-<p>针对端侧 DNN 模型的隔离环境</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN 模型隐私保护</p>
-<ul>
-<li>保护知识产权</li>
-<li>保护训练数据信息</li>
-</ul>
-<p>现有 TEE 方案（TrustZone）的缺陷：</p>
-<ul>
-<li>内存有限</li>
-<li>无法安全访问加速器（部分卸载到 REE 则会容易被攻击，加密或混淆则开销大）</li>
-<li>需要 TEE-OS，与加速器软件栈不兼容</li>
-</ul>
-<p><img src="/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png" title="image"></p>
-<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出 ASGARD：</p>
-<ul>
-<li>虚拟化隔离（pkvm）</li>
-<li>加速器直通给虚拟机 （VFIO）</li>
-<li>改 EL2 不改 EL3</li>
-<li>Guest 用 Linux 加速器驱动不需要改</li>
-</ul>
-<p>问题和挑战：</p>
-<ol>
-<li>基于虚拟化的 TEE 方案没有安全 IO 直通的方案</li>
-<li>IOMMU 驱动和依赖都在 TCB</li>
-<li>虚拟化给推理带来性能影响</li>
-</ol>
-<p><img src="/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png" title="image"></p>
-<ol>
-<li>启动平台 验证（pkvm）</li>
-<li>启动 enclave  （pkvm）</li>
-<li>DNN 模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
-<li>加速器分配 （配置 MMU 与 IOMMU 页表）</li>
-<li>DNN 推理服务 （通过 vsock 和共享内存通信）</li>
-</ol>
-<p><img src="/images/CN2sb3Rafon5VbxyKqrcEduonFb.png" title="image"></p>
-<p>EL2 的 TEEvisor 保证：</p>
-<ol>
-<li>对于 NPU 的访问必须经过授权，未经授权的 Host 无法直接通过 NPU 接口来窃取数据。</li>
-<li>NPU 对 enclave memory 的访问必须经过授权，当 Host 占有 NPU 时无法通过 IOMMU 访问 enclave 内存</li>
-</ol>
-<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
-<li>RK3588S （Armv8.2-A SoC  RockchipNPU）</li>
-<li>PKVM</li>
-</ul>
-<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
-<ul>
-<li>有且仅有 TEEVisor 对敏感接口有控制权</li>
-<li>加速器任何时刻只分给一个 enclave</li>
-<li>enclave 使用完后，加速器无残留状态和数据</li>
-</ul>
-<p>TEEvisor 保证控制：</p>
-<ul>
-<li>stage2 MMU</li>
-<li>所有 IOMMU 的寄存器地址范围</li>
-<li>加速器敏感接口</li>
-</ul>
-<p>Guest 需要用或者释放 NPU 的时候 hypercall 到 pkvm EL2 会执行 flush iotlb 等操作</p>
-<p>加速器使用过程：</p>
-<ul>
-<li>初始化：配置所有 IOMMU，只有加速器的 IOMMU 可以访问 enclave 内存；enclave 访问加速器 MMIO 区域</li>
-<li>切换：重新配置 MMU IOMMU  需要刷 tlb  iotlb。需要加速器设备支持 reset 接口</li>
-<li>回收：REE 可以任意时候回收，TEE 清除数据 改 enclave stage2 页表 IOMMU 页表</li>
-</ul>
-<p>切换开销：</p>
-<p><img src="/images/SJB1bh04lomsKvxQueHcckHWnth.png" title="image"></p>
-<p>推理 latency（224x224 图像分类任务）</p>
-<p><img src="/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png" title="image"></p>
-<ul>
-<li>TrustZone 方案需要混淆，性能差</li>
-<li>ASGARD 对 REE 方案 overhead 只有 2.01%</li>
-</ul>
-<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
-<li>IOMMU 电源 时钟管理给 REEVisor。当 REE 关闭 IOMMU 对应的设备自动关了 不会绕过</li>
-<li>不需要 guest kernel 中的其他进程间隔离方案，禁用 Seccomp SELinux</li>
-<li>去掉没用的 kernel features 定制 rootfs ，大部份 busybox 的可执行文件是不需要的</li>
-</ul>
-<p><img src="/images/Fnrobkqato9TGhxykq8czlBsnab.png" title="image"></p>
-<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt;  vmexit 很慢</p>
-<p><img src="/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png" title="image"></p>
-<p>优化方案：分析计算图 把不存在依赖的需要 fallback 的算子集中到一起 用一个 vm exit</p>
-<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要 fallback 的 要么全是需要 fallback 的 这样一个子图只需要 fallback 一次</p>
-<p><img src="/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png" title="image"></p>
-<p>多个 fallback 算子没有依赖，但是由于默认 DFS 执行的顺序，会先后执行。可以切分子图，把这些没有依赖的 fallback 划分到一个子图里</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
-
-<p>具体实现上：</p>
-<p>rknn 的编译器和 runtime 都是闭源的，所以计算图是静态划分的，分成多个.rknn model 文件</p>
-<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据</p>
-<ul>
-<li>NPU 调 rknn_run</li>
-<li>CPU 调 TensorFlow Lite runtime</li>
-</ul>
-<p><img src="/images/LBTNbklO3oNOnKxY596cgpufn3r.png" title="image"></p>
-<p>input：16 tokens，执行一次生成过程，统计 latency</p>
-<p><img src="/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png" title="image"></p>
-<p>对 REE 来说，一次推理需要 1ms，遇到 38 次 fallback 中断。</p>
-<p>对 ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
-<p><img src="/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png" title="image"></p>
-<p>观察内存的使用，exit-coalescing 的优化并不会对内存占用产生负面影响（峰值相同）</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
-<li>提出 NPU 安全直通方案，主要是由 TEEvisor 进行 MMIOregion 和页表的切换</li>
-<li>识别出 DNN 推理过程中虚拟化带来的开销来源（CPU-fallback 算子导致的 vm-exit），并通过划分计算子图的方式进行优化。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2059,13 +2151,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">410k</span>
+    <span title="Word count total">413k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24:52</span>
+    <span title="Reading time total">6:15</span>
   </span>
 </div>
 <div class="busuanzi-count">

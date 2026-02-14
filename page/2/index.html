@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,204 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/02/papers/ASGARD%20Protecting%20On-Device%20Deep%20Neural%20Networks%20with%20Virtualization-Based%20Trusted%20Execution%20Environments/" class="post-title-link" itemprop="url">ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-02-02 00:56:47 / Modified: 00:57:22" itemprop="dateCreated datePublished" datetime="2026-02-02T00:56:47+08:00">2026-02-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments"><a href="#ASGARD-Protecting-On-Device-Deep-Neural-Networks-with-Virtualization-Based-Trusted-Execution-Environments" class="headerlink" title="ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments"></a>ASGARD Protecting On-Device Deep Neural Networks with Virtualization-Based Trusted Execution Environments</h1><p>NDSS’25</p>
+<p><img src="/images/Lw9ibvD97odiC0xCDuXc2lGanG7.png" title="image"></p>
+<p>针对端侧 DNN 模型的隔离环境</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>DNN 模型隐私保护</p>
+<ul>
+<li>保护知识产权</li>
+<li>保护训练数据信息</li>
+</ul>
+<p>现有 TEE 方案（TrustZone）的缺陷：</p>
+<ul>
+<li>内存有限</li>
+<li>无法安全访问加速器（部分卸载到 REE 则会容易被攻击，加密或混淆则开销大）</li>
+<li>需要 TEE-OS，与加速器软件栈不兼容</li>
+</ul>
+<p><img src="/images/MZNUbBMoOojtGIxJhFTcqPMDnqc.png" title="image"></p>
+<h2 id="Design-Goal"><a href="#Design-Goal" class="headerlink" title="Design Goal"></a>Design Goal</h2><p>本工作提出 ASGARD：</p>
+<ul>
+<li>虚拟化隔离（pkvm）</li>
+<li>加速器直通给虚拟机 （VFIO）</li>
+<li>改 EL2 不改 EL3</li>
+<li>Guest 用 Linux 加速器驱动不需要改</li>
+</ul>
+<p>问题和挑战：</p>
+<ol>
+<li>基于虚拟化的 TEE 方案没有安全 IO 直通的方案</li>
+<li>IOMMU 驱动和依赖都在 TCB</li>
+<li>虚拟化给推理带来性能影响</li>
+</ol>
+<p><img src="/images/Hje7bPCx7oJ7SJxulvncH4XTnig.png" title="image"></p>
+<ol>
+<li>启动平台 验证（pkvm）</li>
+<li>启动 enclave  （pkvm）</li>
+<li>DNN 模型配置 （理论上需要加解密 但是本工作没有涉及）</li>
+<li>加速器分配 （配置 MMU 与 IOMMU 页表）</li>
+<li>DNN 推理服务 （通过 vsock 和共享内存通信）</li>
+</ol>
+<p><img src="/images/CN2sb3Rafon5VbxyKqrcEduonFb.png" title="image"></p>
+<p>EL2 的 TEEvisor 保证：</p>
+<ol>
+<li>对于 NPU 的访问必须经过授权，未经授权的 Host 无法直接通过 NPU 接口来窃取数据。</li>
+<li>NPU 对 enclave memory 的访问必须经过授权，当 Host 占有 NPU 时无法通过 IOMMU 访问 enclave 内存</li>
+</ol>
+<h2 id="Design-Details-Evaluation"><a href="#Design-Details-Evaluation" class="headerlink" title="Design Details &amp; Evaluation"></a>Design Details &amp; Evaluation</h2><ul>
+<li>RK3588S （Armv8.2-A SoC  RockchipNPU）</li>
+<li>PKVM</li>
+</ul>
+<h3 id="Secure-Accelerator-I-O-Passthrough"><a href="#Secure-Accelerator-I-O-Passthrough" class="headerlink" title="Secure Accelerator I&#x2F;O Passthrough"></a>Secure Accelerator I&#x2F;O Passthrough</h3><p>安全保证：</p>
+<ul>
+<li>有且仅有 TEEVisor 对敏感接口有控制权</li>
+<li>加速器任何时刻只分给一个 enclave</li>
+<li>enclave 使用完后，加速器无残留状态和数据</li>
+</ul>
+<p>TEEvisor 保证控制：</p>
+<ul>
+<li>stage2 MMU</li>
+<li>所有 IOMMU 的寄存器地址范围</li>
+<li>加速器敏感接口</li>
+</ul>
+<p>Guest 需要用或者释放 NPU 的时候 hypercall 到 pkvm EL2 会执行 flush iotlb 等操作</p>
+<p>加速器使用过程：</p>
+<ul>
+<li>初始化：配置所有 IOMMU，只有加速器的 IOMMU 可以访问 enclave 内存；enclave 访问加速器 MMIO 区域</li>
+<li>切换：重新配置 MMU IOMMU  需要刷 tlb  iotlb。需要加速器设备支持 reset 接口</li>
+<li>回收：REE 可以任意时候回收，TEE 清除数据 改 enclave stage2 页表 IOMMU 页表</li>
+</ul>
+<p>切换开销：</p>
+<p><img src="/images/SJB1bh04lomsKvxQueHcckHWnth.png" title="image"></p>
+<p>推理 latency（224x224 图像分类任务）</p>
+<p><img src="/images/DXJjb5Sejo5TauxPlbvcnSKknIc.png" title="image"></p>
+<ul>
+<li>TrustZone 方案需要混淆，性能差</li>
+<li>ASGARD 对 REE 方案 overhead 只有 2.01%</li>
+</ul>
+<h3 id="TCB-and-Attack-Surface-Reduction"><a href="#TCB-and-Attack-Surface-Reduction" class="headerlink" title="TCB and Attack Surface Reduction"></a>TCB and Attack Surface Reduction</h3><ul>
+<li>IOMMU 电源 时钟管理给 REEVisor。当 REE 关闭 IOMMU 对应的设备自动关了 不会绕过</li>
+<li>不需要 guest kernel 中的其他进程间隔离方案，禁用 Seccomp SELinux</li>
+<li>去掉没用的 kernel features 定制 rootfs ，大部份 busybox 的可执行文件是不需要的</li>
+</ul>
+<p><img src="/images/Fnrobkqato9TGhxykq8czlBsnab.png" title="image"></p>
+<h3 id="DNN-Inference-Latency-Optimization"><a href="#DNN-Inference-Latency-Optimization" class="headerlink" title="DNN Inference Latency Optimization"></a>DNN Inference Latency Optimization</h3><p>CPU-fallback operations 当加速器不支持此算子 会通过触发中断 -&gt;  vmexit 很慢</p>
+<p><img src="/images/X52EblqVAoZ2TWxgCVYcW7Zznde.png" title="image"></p>
+<p>优化方案：分析计算图 把不存在依赖的需要 fallback 的算子集中到一起 用一个 vm exit</p>
+<p>把原来的计算图拆成一个个子图 每个子图要么全是不需要 fallback 的 要么全是需要 fallback 的 这样一个子图只需要 fallback 一次</p>
+<p><img src="/images/LUCrb5EHYoUe0FxE13Vcj5rtnIc.png" title="image"></p>
+<p>多个 fallback 算子没有依赖，但是由于默认 DFS 执行的顺序，会先后执行。可以切分子图，把这些没有依赖的 fallback 划分到一个子图里</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">searchflag = no-fallback<span class="comment"># fallback</span></span><br><span class="line">G1 = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> G:</span><br><span class="line">    P = &#123;&#125;</span><br><span class="line">    <span class="keyword">while</span> V = G(indegree=<span class="number">0</span>,fallback=searchflag):</span><br><span class="line">        p += V</span><br><span class="line">        G = G \ V</span><br><span class="line">    G1 += P</span><br><span class="line">    searchflag = !searchflag</span><br></pre></td></tr></table></figure>
+
+<p>具体实现上：</p>
+<p>rknn 的编译器和 runtime 都是闭源的，所以计算图是静态划分的，分成多个.rknn model 文件</p>
+<p>需要在推理框架中手动初始化各个模型文件 并且分开推理 然后整合中间数据</p>
+<ul>
+<li>NPU 调 rknn_run</li>
+<li>CPU 调 TensorFlow Lite runtime</li>
+</ul>
+<p><img src="/images/LBTNbklO3oNOnKxY596cgpufn3r.png" title="image"></p>
+<p>input：16 tokens，执行一次生成过程，统计 latency</p>
+<p><img src="/images/DYwbbXAejo05iuxDC9DcXVgBnbc.png" title="image"></p>
+<p>对 REE 来说，一次推理需要 1ms，遇到 38 次 fallback 中断。</p>
+<p>对 ASAGARD 38*0.03&#x3D;1.14ms 和推理时间一个量级</p>
+<p><img src="/images/KANibqMfcoZmkyxwRZ7cWJLmnLb.png" title="image"></p>
+<p>观察内存的使用，exit-coalescing 的优化并不会对内存占用产生负面影响（峰值相同）</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><ul>
+<li>提出 NPU 安全直通方案，主要是由 TEEvisor 进行 MMIOregion 和页表的切换</li>
+<li>识别出 DNN 推理过程中虚拟化带来的开销来源（CPU-fallback 算子导致的 vm-exit），并通过划分计算子图的方式进行优化。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -234,7 +432,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>36 mins.</span>
+      <span>9 mins.</span>
     </span>
 </div>
 
@@ -520,7 +718,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -648,7 +846,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -784,7 +982,7 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>7 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -955,7 +1153,7 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>10 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -1217,7 +1415,7 @@ using result_of = decltype(std::declval&lt;F&gt;()(std::declval&lt;Args&gt;()...
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -1500,7 +1698,7 @@ string fileData(
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>13 mins.</span>
+      <span>3 mins.</span>
     </span>
 </div>
 
@@ -1802,7 +2000,7 @@ string fileData(
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>15 mins.</span>
+      <span>4 mins.</span>
     </span>
 </div>
 
@@ -1927,7 +2125,7 @@ string fileData(
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>2:26</span>
+      <span>36 mins.</span>
     </span>
 </div>
 
@@ -2165,204 +2363,6 @@ string fileData(
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2025/02/04/papers/WESEE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/02/04/papers/WESEE/" class="post-title-link" itemprop="url">WESEE: Using Malicious #VC Interrupts to Break AMD SEV-SNP</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2025-02-04 20:48:29 / Modified: 20:53:17" itemprop="dateCreated datePublished" datetime="2025-02-04T20:48:29+08:00">2025-02-04</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.4k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>9 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="WESEE-Using-Malicious-VC-Interrupts-to-Break-AMD-SEV-SNP"><a href="#WESEE-Using-Malicious-VC-Interrupts-to-Break-AMD-SEV-SNP" class="headerlink" title="WESEE: Using Malicious #VC Interrupts to Break AMD SEV-SNP"></a>WESEE: Using Malicious #VC Interrupts to Break AMD SEV-SNP</h1><p>IEEE S&amp;P 2024</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NjMyMzI3ZjhiYTRjYmU1M2U3MTM1MzIzNTBjZjgwNzdfRW5FMzNOSmlHUkRGQkdzSnpoVlVnSm9ZTG1ZRVBUUVNfVG9rZW46TDVKNmJtTHJIb25Wb1d4RkZXTGM0NXlmbmxmXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>Linux kernel作为最广泛使用的支持CVM的guest OS，攻击面仍然很大，通过精心利用某些漏洞（如恶意中断）可以完成端到端的攻击（root shell）。</p>
-<p><a target="_blank" rel="noopener" href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-25742">&gt; CVE-2024-25742</a></p>
-<h2 id="Background：-VC-exception"><a href="#Background：-VC-exception" class="headerlink" title="Background：#VC exception"></a>Background：#VC exception</h2><h3 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h3><p>SEV-ES保护了寄存器，增加GHCB用于Guest-Host通信</p>
-<p>当发生某些vmexit时，hypervisor需要当前guest的寄存器信息为guest提供服务</p>
-<ul>
-<li>cpuid</li>
-<li>rdtsc</li>
-<li>MMIO</li>
-</ul>
-<p>引入#VC exception（中断号29） 便于拷贝相应的寄存器信息</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=MDBiMjgyYzM4NWEyNDYzM2Q5YjNkN2MzY2ZjNWJiNmNfRXlZUXc3Vmo4cmlaYnBUZ3h2S0paYXJkemNyQUVUcHBfVG9rZW46TzlLdmJWczNmb013NE14ZGRqcWNNamZLbktjXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>exception_number和exit_reason可以由软件配置！</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">svm-&gt;vmcb-&gt;control.event_inj = user_data_npf_ex.exception_number | SVM_EVTINJ_VALID | SVM_EVTINJ_VALID_ERR | SVM_EVTINJ_TYPE_INTR;</span><br><span class="line">svm-&gt;vmcb-&gt;control.event_inj_err = user_data_npf_ex.exception_error_code;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Simple-attack"><a href="#Simple-attack" class="headerlink" title="Simple attack"></a>Simple attack</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmVjZGJjM2RmNDU4MGFjZTZmNzUwMzc2ZDViOGQ1NjVfWEQ0QXBab0Z5aTUyaDBxa3JYYmF1YVIxRjhhQ25NRzVfVG9rZW46V0dJcGJKZTdEb0JqeUx4Z2d2YmNEdUFHbjFlXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YzFhZGRlODIxYWVhYTE0NjQ0OTE4N2ExMGU1ZjcxODNfWGo0cERFWVFQWUppVEN0THhZYjNuWEFiWTllMW1FMFRfVG9rZW46WTdxN2I2TnZob0dZZUJ4dDlWNWM3WWxZbnNiXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<h3 id="VC-ability"><a href="#VC-ability" class="headerlink" title="VC ability"></a>VC ability</h3><ul>
-<li>Chaining multiple #VC</li>
-<li>Nesting #VC in non-critical section</li>
-</ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=Yzk1NGJkYmM5N2Q5MGFmODhhNDhiZDRiZmQzZDBhNzhfQ0tlSE1ZMUg5YTlQV0k5dmdTZnVsVW1iYjRIOEtXUTVfVG9rZW46VDVSa2J4TThEb2hVUlV4NjQwN2N3Qk55bkw3XzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NzYxYTZkYzVlYWYxNzY0YjgzMzBhN2NmODQyY2I5YjlfeTF3TUZEYkx2NkVSa2sxdDFGM2V5OHdpS3NieW5CclpfVG9rZW46Vnc2VWJKZnIxb243VDB4MjJxOWNVSFFBbnBoXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>只用vmmcall和mmio read&#x2F;write 三种情况就可以构造足够强大的attack primitives</p>
-<h2 id="Attack-Primitives"><a href="#Attack-Primitives" class="headerlink" title="Attack Primitives"></a>Attack Primitives</h2><p>利用vanilla linux内vc_handler的处理逻辑配合恶意#VC中断实现更强大的功能。</p>
-<h3 id="Skip-Instructions"><a href="#Skip-Instructions" class="headerlink" title="Skip Instructions"></a>Skip Instructions</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTE1ZjViOTExZDljM2MzYmNmYmI3ZDcwNDBmNmU5YjJfWnM3WklhcXN6SmFudzJ6R2lnbHRteHNXV2M2ZzVtM0NfVG9rZW46WlNmbWJiOUZib0R1cTZ4dk1JMGNpcVBsbk5mXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>guest的VC handler根据hypervisor的处理结果：</p>
-<ul>
-<li>OK：增加rip（执行下一行指令）</li>
-<li>RETRY：不增加rip（重新执行一遍原指令）</li>
-</ul>
-<p>exit_reason为vmmcall，rax不进行修改，返回success</p>
-<p>记为S</p>
-<h3 id="Read-Write-Rax"><a href="#Read-Write-Rax" class="headerlink" title="Read&amp;Write Rax"></a>Read&amp;Write Rax</h3><ul>
-<li>exit_reason为vmmcall，rax进行修改，返回success-&gt;记为 WraxS</li>
-<li>利用nesting VC 跳过line8-line13，共15行汇编，(WraxS).15S &#x3D; Wrax</li>
-</ul>
-<h3 id="Reading-Kernel-Memory"><a href="#Reading-Kernel-Memory" class="headerlink" title="Reading Kernel Memory"></a>Reading Kernel Memory</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov [rdi], rbx</span><br></pre></td></tr></table></figure>
-
-<p>hypervisor需要rdi指向地址的值与rbx的值</p>
-<ul>
-<li>并不是直接mov rbx到GHCB，而是有另一块内存（context）进行中转</li>
-<li>中转的过程中会使用rax保存rbx的值所在的内存地址，然后用memcpy复制到GHCB</li>
-<li>利用Wrax修改rax指向guest secret va，memcpy会把secret 拷贝到GHCB暴露给hypervisor</li>
-<li>利用Wrax绕过后续的检查</li>
-</ul>
-<p>记为Rmem</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YmFkYTlkZGJkZjA4YzFiZDA2ZTdmODMzZTA0NDIxZTJfOWVLZGd3cDlRV0M5YWV2NkdvcUVaR21HVGxlM1czTUNfVG9rZW46SnFHdmJqY216b0gzMEt4UDRIemN3aXRnbkhiXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<h3 id="Writing-Kernel-Memory"><a href="#Writing-Kernel-Memory" class="headerlink" title="Writing Kernel Memory"></a>Writing Kernel Memory</h3><p>Wmem原理同Rmem</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov rbx, [rdi]</span><br></pre></td></tr></table></figure>
-
-<p>guest需要把hypervisor提供的值放到寄存器rbx中</p>
-<ul>
-<li>并不是直接把GHCB内存mov到rbx，而是有另一块内存（context）进行中转</li>
-<li>中转的过程中会使用rax保存rbx的值所在的内存地址，然后用memcpy复制到这块地址</li>
-<li>利用Wrax修改rax指向guest target va，memcpy会把hypervisor准备的恶意值拷贝到guest私有内存</li>
-<li>利用Wrax绕过检查</li>
-</ul>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTA5YmNjNDUyYjQ1NmEyY2EyNjUyOTc4YzNiOWUxMGZfYkp2NEVuVUx5RmRFVHBmc2NVTG9sZ3hoSjFlZUViNDRfVG9rZW46S0JuTmJvWEpSb1o0NDd4MElnOWNzd3FpbnVkXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<h3 id="Arbitrary-Code-Injection"><a href="#Arbitrary-Code-Injection" class="headerlink" title="Arbitrary Code Injection"></a>Arbitrary Code Injection</h3><p>目标：往.text section注入恶意的shellcode</p>
-<ul>
-<li>提前静态分析，得到内核页表基地址所在地址（不考虑地址随机化的情况下）</li>
-<li>Rmem读出页表基地址（CR3的值），Wmem改页表权限</li>
-</ul>
-<h2 id="Problems-To-be-Solved"><a href="#Problems-To-be-Solved" class="headerlink" title="Problems To be Solved"></a>Problems To be Solved</h2><h3 id="Where-To-Inject-？"><a href="#Where-To-Inject-？" class="headerlink" title="Where To Inject ？"></a>Where To Inject ？</h3><p>绕过ASLR</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ODI1NDEwNDNhYWJhMDA0YjllMjBjMTFkN2VmOTJlOTNfOHhxSjJSRUlJZ3VLUzZVRThwTFZOdk9Hd28ydUZYTHFfVG9rZW46WDJjaGJNWUdGb2tLeE14TzRoN2NKcW1CbmhmXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<ul>
-<li>kernel在地址随机化之前，早期的地址是固定的。</li>
-<li>提前分析得出kernel在地址随机化之前的最后一个page地址 （0x7a753000）</li>
-<li>运行时，这个page之后的page地址就可以计算出随机的PKbase</li>
-</ul>
-<h3 id="When-To-Inject？"><a href="#When-To-Inject？" class="headerlink" title="When To Inject？"></a>When To Inject？</h3><ul>
-<li>离线采样得到page序列，同之前的攻击（Heckler等）</li>
-<li>运行时hypervisor修改stage2页表权限，通过page fault得到guest正在执行的page 序列</li>
-<li>直接通过guest的符号表可以找到函数对应的固定地址（同PKbase进行计算）</li>
-</ul>
-<h2 id="Case-studies"><a href="#Case-studies" class="headerlink" title="Case studies"></a>Case studies</h2><h3 id="Leaking-keys-from-Kernel-TLS"><a href="#Leaking-keys-from-Kernel-TLS" class="headerlink" title="Leaking keys from Kernel TLS"></a>Leaking keys from Kernel TLS</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZWNiMGVhNjM3MWI0ODhhZmVhNzQwYjZlNzk3YjE5ZDVfT0pHdXQ2WFpJajZTOVgxRUV6M1VMam9QZDd0VmpIT2JfVG9rZW46WGtBSmJmNnh6b0xOdXB4bDhyV2Mxb01xbndiXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<h3 id="Disabling-Firewall"><a href="#Disabling-Firewall" class="headerlink" title="Disabling Firewall"></a>Disabling Firewall</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YTI3YzJlNWY5MTRkYThjYmFhMGI5ZTM3MGI0YzUxMzRfM1haVkVXbzlONnhsYTJhTEdGNE1QQTNqTTZuR0Z1eG9fVG9rZW46UnNjSWJDUTExb0VJVjV4QmxodWNacmpWbkZiXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>改16bytes</p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDVjNTY2Nzc5YzY4NjQ3MTNlMDUzMDQ4MTQzNTBlYmZfSEU2eGZZRHZLT1ZtNmMzQWVpTmlGNHpVNnZXWnpNNkZfVG9rZW46TjhqM2JwekJ3bzBJNGp4MVlDN2M0dGNCbjliXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>绕过所有iptables的规则</p>
-<h3 id="Gaining-a-Root-Shell-in-the-SEV-SNP-VM"><a href="#Gaining-a-Root-Shell-in-the-SEV-SNP-VM" class="headerlink" title="Gaining a Root Shell in the SEV-SNP VM"></a>Gaining a Root Shell in the SEV-SNP VM</h3><p>利用kernel API：call_usermodehelper</p>
-<p>以root权限创建一个用户态进程，参数为：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/bin/bash -c rm /tmp/t; mknod /tmp/t p;</span><br><span class="line">/bin/sh 0&lt;/tmp/t \| nc -ln 8001 1&gt;/tmp/t</span><br></pre></td></tr></table></figure>
-
-<p>创建一个root shell并通过8001端口向外通信</p>
-<p>作者将这段逻辑构造为shellcode （392bytes）并注入到icmp_rcv中，可以通过ping触发</p>
-<p>暂时无法在飞书文档外展示此内容</p>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><h3 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h3><ul>
-<li>SEV-SNP</li>
-<li>Linux kernel v6.5.0</li>
-<li>Ubuntu 20.04.6 LTS</li>
-<li>QEMU v8.0.0</li>
-</ul>
-<h3 id="Primitives"><a href="#Primitives" class="headerlink" title="Primitives"></a>Primitives</h3><ul>
-<li>216450 instruction skips&#x2F;s </li>
-<li>9.25 memory reads&#x2F;s</li>
-<li>8.95 memory writes&#x2F;s</li>
-</ul>
-<h3 id="Case-studies-1"><a href="#Case-studies-1" class="headerlink" title="Case studies"></a>Case studies</h3><p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=NDAxNmM3ZTg1MjljMGNlMTMzZmNlMTI2NmRlNjc3ZTBfd0U2alJKZnFXUVh3RGs5dVlOZWpCTEt2MGNObU1UVWhfVG9rZW46UXNHOGI0WGdHb0xNNkp4TG13SWNLWDEybndjXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p>分别需要5.97 0.36 8.1s</p>
-<h2 id="Defense"><a href="#Defense" class="headerlink" title="Defense"></a>Defense</h2><p><a target="_blank" rel="noopener" href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e3ef461af35a8c74f2f4ce6616491ddb355a208f">x86&#x2F;sev: Harden #VC instruction emulation somewhat</a></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=YzM1ZTVlMzE1ZTIxZDcxMDMxMTkzNjZkZjQ4NDljNjFfQnhkN1BIdHFoVFRpbUtGcTg5dmxkNTU3UEpKcFh4NFZfVG9rZW46WFkzOWJBU3l6b2xtVHl4a3NRVGNBcVBDbjBnXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-<p><img src="https://h7dbgreydj.feishu.cn/space/api/box/stream/download/asynccode/?code=ZWFjYTcwY2I5MDNmMTkzMjRiMDE3MDYyYTUzZmQ2MzdfcjJZc3BPU1pwV1NYTUlOcWY3eG1mU0QzeXN5MlMyS0xfVG9rZW46S0tXMGJTVWFFb0tBRGN4WUh4WGN1MXAxbjRlXzE3Mzg2NzMyODM6MTczODY3Njg4M19WNA" alt="img"></p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2386,13 +2386,13 @@ string fileData(
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">410k</span>
+    <span title="Word count total">413k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24:52</span>
+    <span title="Reading time total">6:15</span>
   </span>
 </div>
 <div class="busuanzi-count">

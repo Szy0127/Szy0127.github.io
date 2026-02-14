@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege EscalationUsenix Security‘24 https:&#x2F;&#x2F;github.com&#x2F;BadDataLab&#x2F;SCAVY https:&#x2F;&#x2F;xz.aliyun.com&#x2F;news&#x2F;19324 背景 CVE提出的内存漏洞，例如">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege EscalationUsenix Security‘24 https:&#x2F;&#x2F;github.com&#x2F;BadDataLab&#x2F;SCAVY https:&#x2F;&#x2F;xz.aliyun.com&#x2F;news&#x2F;19324 背景 CVE提出的内存漏洞，例如">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-02-14T06:23:42.824Z">
+<meta property="article:modified_time" content="2026-02-14T14:46:23.079Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/","path":"2026/02/14/papers/SCAVY Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation/","title":"SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SCAVY-Automated-Discovery-of-Memory-Corruption-Targets-in-Linux-Kernel-for-Privilege-Escalation"><span class="nav-number">1.</span> <span class="nav-text">SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%8E%AF-%E6%A0%B8%E5%BF%83%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.1.</span> <span class="nav-text">🎯 核心目标</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%A0%E7%BB%9F%E6%96%B9%E6%B3%95%E4%B8%8D%E5%A4%9F%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">一、为什么传统方法不够？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E7%9A%84%E2%80%9C%E4%B8%89%E9%98%B6%E6%AE%B5%E6%A8%A1%E5%9E%8B%E2%80%9D"><span class="nav-number">1.3.</span> <span class="nav-text">二、漏洞利用的“三阶段模型”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.4.</span> <span class="nav-text">三、关键技术详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%A7-%E9%98%B6%E6%AE%B5-1%EF%BC%9A%E6%89%BE%E5%88%B0%E2%80%9C%E5%8F%AF%E5%88%86%E9%85%8D%E7%9A%84%E5%86%85%E6%A0%B8%E7%BB%93%E6%9E%84%E4%BD%93%E2%80%9D%EF%BC%88Allocator-Discovery%EF%BC%89"><span class="nav-number">1.4.1.</span> <span class="nav-text">🔧 阶段 1：找到“可分配的内核结构体”（Allocator Discovery）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%8D-%E9%98%B6%E6%AE%B5-2%EF%BC%9A%E6%89%BE%E5%87%BA%E2%80%9C%E5%8F%AF%E8%A2%AB%E7%A0%B4%E5%9D%8F%E7%9A%84%E5%85%B3%E9%94%AE%E5%AD%97%E6%AE%B5%E2%80%9D%EF%BC%88Field-Discovery%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">🔍 阶段 2：找出“可被破坏的关键字段”（Field Discovery）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9A%94%EF%B8%8F-%E9%98%B6%E6%AE%B5-3%EF%BC%9A%E9%AA%8C%E8%AF%81%E2%80%9C%E7%A0%B4%E5%9D%8F%E5%90%8E%E8%83%BD%E5%90%A6%E6%8F%90%E6%9D%83%E2%80%9D%EF%BC%88Privilege-Escalation-Detection%EF%BC%89"><span class="nav-number">1.4.3.</span> <span class="nav-text">⚔️ 阶段 3：验证“破坏后能否提权”（Privilege Escalation Detection）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%91%E6%88%98%EF%BC%9A"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">挑战：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SCAVY-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9A%E4%B8%89%E6%AC%A1%E5%AF%B9%E6%AF%94%E6%89%A7%E8%A1%8C%EF%BC%88Differential-Analysis%EF%BC%89"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">SCAVY 的解决方案：三次对比执行（Differential Analysis）</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/14/papers/SCAVY%20Automated%20Discovery%20of%20Memory%20Corruption%20Targets%20in%20Linux%20Kernel%20for%20Privilege%20Escalation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-02-14 14:23:42 / Modified: 22:46:23" itemprop="dateCreated datePublished" datetime="2026-02-14T14:23:42+08:00">2026-02-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>2 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="SCAVY-Automated-Discovery-of-Memory-Corruption-Targets-in-Linux-Kernel-for-Privilege-Escalation"><a href="#SCAVY-Automated-Discovery-of-Memory-Corruption-Targets-in-Linux-Kernel-for-Privilege-Escalation" class="headerlink" title="SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation"></a>SCAVY: Automated Discovery of Memory Corruption Targets in Linux Kernel for Privilege Escalation</h1><p>Usenix Security‘24</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/BadDataLab/SCAVY">https://github.com/BadDataLab/SCAVY</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/19324">https://xz.aliyun.com/news/19324</a></p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><ol>
+<li>CVE提出的内存漏洞，例如UAF等，都太小，不足以完成一次提升权限的利用</li>
+<li>一些利用方法 受到传统保护机制 例如SMEP的影响 成功率不高</li>
+<li>因为没有端到端的严重威胁 所以某些CVE并不会受到重视 立即被开发者修复</li>
+</ol>
+<p>本文找内核关键数据结构 可以被CVE利用达到权限提升的目的</p>
+<p>linux漏洞利用思路</p>
+<ol>
+<li>fuzz 找一些内存越界、UAF等导致的crash场景</li>
+<li>找一些这个内存corrupt进一步可拥有的capability</li>
+<li>组合多个POC 完成权限提升</li>
+<li>提高稳定性（触发概率）与能力（绕过更多的安全措施）</li>
+</ol>
+<p>本文目标找到更多的memory target可以给2 3用，不参与1 4</p>
+<p>一个例子：vm_area_struct</p>
+<ol>
+<li>mmap映射&#x2F;etc&#x2F;passwd和另一个普通文件，内核分配两个vm_area_struct</li>
+<li>通过一个已经存在的CVE泄漏&#x2F;etc&#x2F;passwd对应的vm_area_struct的地址，覆盖普通文件的vm_area_struct的值</li>
+<li>msync写回，此时文件是&#x2F;etc&#x2F;passwd 但权限变为可写</li>
+<li>su提权</li>
+</ol>
+<p>千问对于本文工作的解释：</p>
+<hr>
+<h3 id="🎯-核心目标"><a href="#🎯-核心目标" class="headerlink" title="🎯 核心目标"></a>🎯 核心目标</h3><blockquote>
+<p><strong>自动找出内核中哪些内存区域被破坏后，能让普通用户获得 root 权限。</strong></p>
+</blockquote>
+<p>这比传统模糊测试（fuzzing）更进一步——不仅要找崩溃（crash），还要判断这个崩溃是否“有用”（即能否提权）。</p>
+<hr>
+<h2 id="一、为什么传统方法不够？"><a href="#一、为什么传统方法不够？" class="headerlink" title="一、为什么传统方法不够？"></a>一、为什么传统方法不够？</h2><ul>
+<li>像 <strong>Syzkaller</strong> 这样的模糊测试器擅长触发各种代码路径（高覆盖率），但不关心“破坏哪个字段才有用”。</li>
+<li>像 <strong>KOOBE &#x2F; FUZE</strong> 能检测内存越界或破坏，但无法判断破坏后是否能提权。</li>
+<li>手动分析崩溃是否可利用非常耗时。</li>
+</ul>
+<p>👉 <strong>SCAVY 的创新点：把整个利用过程拆成三个阶段，每个阶段用不同的策略精准打击。</strong></p>
+<hr>
+<h2 id="二、漏洞利用的“三阶段模型”"><a href="#二、漏洞利用的“三阶段模型”" class="headerlink" title="二、漏洞利用的“三阶段模型”"></a>二、漏洞利用的“三阶段模型”</h2><p>SCAVY 观察到真实提权漏洞通常分三步：</p>
+<table>
+<thead>
+<tr>
+<th align="left">阶段</th>
+<th align="left">目标</th>
+<th align="left">例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>1. 分配目标对象</strong></td>
+<td align="left">找到内核中可被控制分配的结构体</td>
+<td align="left">创建文件 → 分配 <code>struct file</code></td>
+</tr>
+<tr>
+<td align="left"><strong>2. 破坏关键字段</strong></td>
+<td align="left">修改该结构体中的某个字段（如权限、指针）</td>
+<td align="left">把 <code>file-&gt;f_cred-&gt;uid</code> 改成 0（root）</td>
+</tr>
+<tr>
+<td align="left"><strong>3. 触发提权行为</strong></td>
+<td align="left">使用被破坏的对象执行特权操作</td>
+<td align="left">用被篡改的文件句柄写 <code>/etc/passwd</code></td>
+</tr>
+</tbody></table>
+<p>SCAVY 就围绕这三个阶段设计了对应的自动化技术。</p>
+<hr>
+<h2 id="三、关键技术详解"><a href="#三、关键技术详解" class="headerlink" title="三、关键技术详解"></a>三、关键技术详解</h2><h3 id="🔧-阶段-1：找到“可分配的内核结构体”（Allocator-Discovery）"><a href="#🔧-阶段-1：找到“可分配的内核结构体”（Allocator-Discovery）" class="headerlink" title="🔧 阶段 1：找到“可分配的内核结构体”（Allocator Discovery）"></a>🔧 阶段 1：找到“可分配的内核结构体”（Allocator Discovery）</h3><p><strong>问题</strong>：内核有成千上万个结构体，哪些能被用户通过系统调用分配？</p>
+<p><strong>SCAVY 的做法</strong>：</p>
+<ul>
+<li>在内核中插桩（instrument）所有内存分配函数（如 <code>kmalloc</code>）；</li>
+<li>同时记录<strong>类型转换</strong>（比如 <code>(struct task_struct *)kmalloc(...)</code>），从而知道“这块内存是什么类型”；</li>
+<li>用 <strong>Kprobe</strong> 把分配地址 + 类型信息传到用户空间；</li>
+<li>模糊测试器遍历系统调用，收集所有“用户能触发分配的结构体”。</li>
+</ul>
+<p>✅ <strong>优势</strong>：不用污点分析，轻量高效，可扩展到百万级测试用例。</p>
+<hr>
+<h3 id="🔍-阶段-2：找出“可被破坏的关键字段”（Field-Discovery）"><a href="#🔍-阶段-2：找出“可被破坏的关键字段”（Field-Discovery）" class="headerlink" title="🔍 阶段 2：找出“可被破坏的关键字段”（Field Discovery）"></a>🔍 阶段 2：找出“可被破坏的关键字段”（Field Discovery）</h3><p><strong>问题</strong>：一个结构体有几十个字段，破坏哪个才有用？</p>
+<p><strong>SCAVY 的做法</strong>：</p>
+<ul>
+<li>对每个字段（4~8 字节）注入随机值；</li>
+<li>用 <strong>硬件观察点（watchpoint）</strong> 监控：这个字段是否被读取？</li>
+<li>如果被读了 → 说明它“可能影响程序逻辑” → 标记为潜在目标。</li>
+</ul>
+<p>💡 <strong>为什么有效</strong>？<br>因为如果字段从未被使用，破坏它毫无意义；一旦被读，就可能改变控制流或权限判断。</p>
+<hr>
+<h3 id="⚔️-阶段-3：验证“破坏后能否提权”（Privilege-Escalation-Detection）"><a href="#⚔️-阶段-3：验证“破坏后能否提权”（Privilege-Escalation-Detection）" class="headerlink" title="⚔️ 阶段 3：验证“破坏后能否提权”（Privilege Escalation Detection）"></a>⚔️ 阶段 3：验证“破坏后能否提权”（Privilege Escalation Detection）</h3><p>这是最核心的创新！</p>
+<h4 id="挑战："><a href="#挑战：" class="headerlink" title="挑战："></a>挑战：</h4><ul>
+<li>很多破坏会导致立即崩溃（“过早崩溃”），来不及执行提权操作；</li>
+<li>如何判断“这次崩溃真的能提权”？</li>
+</ul>
+<h4 id="SCAVY-的解决方案：三次对比执行（Differential-Analysis）"><a href="#SCAVY-的解决方案：三次对比执行（Differential-Analysis）" class="headerlink" title="SCAVY 的解决方案：三次对比执行（Differential Analysis）"></a>SCAVY 的解决方案：<strong>三次对比执行（Differential Analysis）</strong></h4><p>对同一个测试用例，运行三次：</p>
+<table>
+<thead>
+<tr>
+<th align="left">运行</th>
+<th align="left">内存状态</th>
+<th align="left">目的</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Run A</strong></td>
+<td align="left">正常（无破坏）</td>
+<td align="left">基线：所有特权操作应失败</td>
+</tr>
+<tr>
+<td align="left"><strong>Run B</strong></td>
+<td align="left">注入<strong>随机值</strong>破坏</td>
+<td align="left">测试是否产生异常行为</td>
+</tr>
+<tr>
+<td align="left"><strong>Run C</strong></td>
+<td align="left">注入<strong>从 root 进程复制的有效值</strong></td>
+<td align="left">模拟“完美伪造”，看能否成功提权</td>
+</tr>
+</tbody></table>
+<p>然后比较三者的：</p>
+<ul>
+<li>系统调用返回值（如 <code>write()</code> 是否成功）</li>
+<li>输出数据（如读到的文件内容）</li>
+<li>访问被破坏内存的指令</li>
+<li>代码覆盖率（用 Jaccard 相似度 &gt;0.9 判同）</li>
+</ul>
+<p>✅ <strong>如果 Run C 和 Run A 行为不同（比如原本失败的 <code>write</code> 成功了）→ 判定为可提权！</strong></p>
+<blockquote>
+<p>举个例子： </p>
+<ul>
+<li>正常时写 <code>/etc/passwd</code> 失败（权限拒绝）； </li>
+<li>破坏 <code>file-&gt;f_cred</code> 后，写成功了 → 说明获得了 root 权限！</li>
+</ul>
+</blockquote>
+<hr>
+<p>核心就是替换某个kernel object的某个field为root所在进程的对应值，看权限是否发生变化</p>
+<p>传统方案只能检测crash，或者监测到能利用的比较少，本文的方法能检测到的可利用位置更多</p>
+<p>本文自动化检测出的位置，仍然需要人工验证</p>
+<ol>
+<li>某个object的某个field 的确能导致权限提升。（实际上存在false positive）</li>
+<li>进一步，利用真实的CVE，完成对于某个object的某个field的覆盖和利用，真正达到提权的效果</li>
+</ol>
+<p>人工验证后的成果：</p>
+<table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>CWE</th>
+<th>Exploited Struct&#x2F;Field</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2017-7308</td>
+<td>Type Conversion</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2017-7184</td>
+<td>Input Validation</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2010-2959</td>
+<td>Int Overflow</td>
+<td><code>kioctx::internal_pages</code></td>
+</tr>
+<tr>
+<td>2016-0728</td>
+<td>Use-After-Free</td>
+<td><code>key::description</code></td>
+</tr>
+<tr>
+<td>2022-27666*</td>
+<td>OOB Write</td>
+<td><code>vm_area_struct::vm_file</code></td>
+</tr>
+<tr>
+<td>2022-27666*</td>
+<td>OOB Write</td>
+<td><code>file::f_mapping</code></td>
+</tr>
+<tr>
+<td>2009-3547</td>
+<td>nullptr deref.</td>
+<td><code>pipe_inode_info::bufs</code></td>
+</tr>
+<tr>
+<td>2014-3153</td>
+<td>Input Validation</td>
+<td><code>cred::euid</code></td>
+</tr>
+<tr>
+<td>2017-11176</td>
+<td>Use-After-Free</td>
+<td><code>task_struct::cred</code></td>
+</tr>
+<tr>
+<td>2004-1235</td>
+<td>Race condition</td>
+<td><code>file_struct::fops</code></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/02/12/papers/SLUBStick%20Arbitrary%20Memory%20Writes%20through%20Practical%20Software%20Cross-Cache%20Attackswithin%20the%20Linux%20Kernel/" rel="prev" title="SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks within the Linux Kernel">
+                  <i class="fa fa-angle-left"></i> SLUBStick: Arbitrary Memory Writes through Practical Software Cross-Cache Attacks within the Linux Kernel
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">413k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">6:15</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
