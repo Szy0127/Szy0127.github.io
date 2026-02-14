@@ -214,7 +214,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2026-02-14 12:30:17" itemprop="dateModified" datetime="2026-02-14T12:30:17+08:00">2026-02-14</time>
+      <time title="Modified: 2026-02-14 12:34:51" itemprop="dateModified" datetime="2026-02-14T12:34:51+08:00">2026-02-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -233,7 +233,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.1k</span>
+      <span>2.2k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
@@ -365,6 +365,13 @@
 <li>此时进行获得了访问1G物理地址的能力，这个物理地址是通过addr访问的，遍历可以找出来</li>
 <li>在大地址下，再次mmap+memset，再次分配大量页表页，在addr可控的1G内根据PTE格式寻找页表页</li>
 <li>修改页表页的PTE，指向任意物理地址</li>
+</ol>
+<p>一些巧妙的地方：</p>
+<ol>
+<li>控制victim object所在的所有slab对象同时被free 使得整个page被free到buddy system 然后通过LIFO再拿出来</li>
+<li>将受控的page作为PUD页表页，通过修改映射的方式获取一个很强的攻击原语</li>
+<li>利用FUSE暂停内核态copy_from_user的处理，控制时间，在内核可利用能力受限的情况下稳定利用。</li>
+<li>遍历整个物理地址空间比较内存数据。</li>
 </ol>
 
       
@@ -2060,7 +2067,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24:51</span>
+    <span title="Reading time total">24:52</span>
   </span>
 </div>
 <div class="busuanzi-count">
