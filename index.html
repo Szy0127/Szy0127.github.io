@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-count">45</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,183 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/19/papers/Vmem%20A%20Lightweight%20Hot-Upgradable%20Memory%20Management%20for%20In-production%20Cloud%20Environment/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/02/19/papers/Vmem%20A%20Lightweight%20Hot-Upgradable%20Memory%20Management%20for%20In-production%20Cloud%20Environment/" class="post-title-link" itemprop="url">Vmem: A Lightweight Hot-Upgradable Memory Management for In-production Cloud Environment</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-02-19 21:14:03 / Modified: 21:27:46" itemprop="dateCreated datePublished" datetime="2026-02-19T21:14:03+08:00">2026-02-19</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>269</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>1 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Vmem-A-Lightweight-Hot-Upgradable-Memory-Management-for-In-production-Cloud-Environment"><a href="#Vmem-A-Lightweight-Hot-Upgradable-Memory-Management-for-In-production-Cloud-Environment" class="headerlink" title="Vmem: A Lightweight Hot-Upgradable Memory Management for In-production Cloud Environment"></a>Vmem: A Lightweight Hot-Upgradable Memory Management for In-production Cloud Environment</h1><p>阿里云</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Hugetlb</th>
+<th>Folio</th>
+<th>HVO</th>
+<th>Dmemfs</th>
+<th>Desired</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hot Upgrade</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Metadata Overhead</td>
+<td>High</td>
+<td>High</td>
+<td>Med.</td>
+<td>Low</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Elastic Resource Pool</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Page Granularity</td>
+<td>2M, 1G</td>
+<td>2ⁿ × 4K</td>
+<td>2M, 1G</td>
+<td>2M, 1G</td>
+<td>2M, 1G</td>
+</tr>
+<tr>
+<td>Shared Page Pools</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Deterministic Alloc.</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Fast Boot</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Kernel Modifications</td>
+<td>Built-in</td>
+<td>Extensive</td>
+<td>Extensive</td>
+<td>Extensive</td>
+<td>Minimal</td>
+</tr>
+</tbody></table>
+<p>五个目标：</p>
+<ol>
+<li>轻量化 只针对云计算</li>
+<li>memory overhead小 可销售的内存多</li>
+<li>支持大页</li>
+<li>内存配置高效</li>
+<li>热升级</li>
+</ol>
+<p>设计：</p>
+<ol>
+<li>memmap+PFNMAP 宿主机启动时直接把大部分内存预留给虚拟机 剩下很多struct page</li>
+<li>内存切片，2M粒度。传统大页提前预留，2M不能组合为1G，1G也不能拆分为2M</li>
+<li>混合大页双向分配。 需要1G的时候从低到高分配低地址，需要2M的时候从高到低分配高地址</li>
+<li>内存映射使用fastmap，四级页表遍历太慢，直接用更简单的数据结构建立映射。</li>
+<li>vmem.ko 转发请求到vmem_mm_i.ko  热升级</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1943,191 +2120,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/02/02/papers/Gramine-TDX%20A%20Lightweight%20OS%20Kernel%20for%20Confidential%20VMs/" class="post-title-link" itemprop="url">Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-02-02 00:56:53 / Modified: 00:57:22" itemprop="dateCreated datePublished" datetime="2026-02-02T00:56:53+08:00">2026-02-02</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>2.3k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>8 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs"><a href="#Gramine-TDX-A-Lightweight-OS-Kernel-for-Confidential-VMs" class="headerlink" title="Gramine-TDX: A Lightweight OS Kernel for Confidential VMs"></a>Gramine-TDX: A Lightweight OS Kernel for Confidential VMs</h1><p><img src="/images/EjhCb11gMoUmnixOxmzcr9KAn0c.png" title="image"></p>
-<p>CCS24</p>
-<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>Linux 内核庞大且复杂，其中很多功能对于机密计算应用来说都是冗余的，除了增大 TCB 与攻击面之外没有意义。</p>
-<p>CVM 攻击面包括：</p>
-<ul>
-<li>Shared memory</li>
-<li>PIO MMIO</li>
-<li>Hypercall</li>
-<li>Interrupts exceptions</li>
-<li>CPUID leaves</li>
-</ul>
-<p>Heckler(Security’24) 是已经公开的利用 int 0x80 恶意中断进行攻击的例子</p>
-<p><img src="/images/KwDzbkJbwoUC7fx5RUtcX0rHnGc.png" title="image"></p>
-<p><img src="/images/T4iPbqDapoadACxheN4czjVDnRb.png" title="image"></p>
-<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p>Gramine-TDX 是一个轻量级的 LibOS（完全代替 Linux 作为 guest kernel）</p>
-<p>Hypervisor 使用 QEMU&#x2F;KVM</p>
-<p><img src="/images/HazHb7kbMoaXPPxGW6lcxJPdnNd.png" title="image"></p>
-<h3 id="LibOS"><a href="#LibOS" class="headerlink" title="LibOS"></a>LibOS</h3><ul>
-<li>不支持多进程 fork 没有 IPC</li>
-<li>不能用硬件 例如 GPU</li>
-<li>不支持 legacy 16&#x2F;32bit 只支持 64bit</li>
-<li>1:1 mapping</li>
-<li>没有 network stack 和 fs stack</li>
-<li>不需要修改 APP，不限语言 例如 C, C++, Rust, Python, Java, Go</li>
-<li>有且仅有三个 virtio 驱动，并且完全按照 TDX 威胁模型重写，过滤不合法输入</li>
-</ul>
-<p><img src="/images/Jf70bwwFcobp6DxTl5Ec5L4ZnGg.png" title="image"></p>
-<h3 id="Deployment-Model"><a href="#Deployment-Model" class="headerlink" title="Deployment Model"></a>Deployment Model</h3><p>不需要虚拟机镜像，需要的文件直接从主机文件系统读取</p>
-<ul>
-<li>配置信息 （manifest）</li>
-<li>共享库（提前准备好的一份 glibc patch 过的）</li>
-<li>其他文件 提前加密好 gramine 负责解密</li>
-</ul>
-<p>不用虚拟网卡 不用网络配置</p>
-<h3 id="Chain-of-Trust"><a href="#Chain-of-Trust" class="headerlink" title="Chain of Trust"></a>Chain of Trust</h3><p><img src="/images/Qwzkbnd9ao9fBXxlctAcQ0j4nAg.png" title="image"></p>
-<ul>
-<li>bios -&gt; MRTD</li>
-<li>gramine kernel 二进制-&gt;RTMR1</li>
-<li>配置文件 manifest 其中包括了其他普通文件的哈希 RTMR2</li>
-</ul>
-<p>td 启动时 tdx module 会验证二进制，记录到这些寄存器中，之后提供给远程验证</p>
-<p>对于 RTMR2 td 可以自己 extend 定制化的内容（使用 tdcall 请求 tdx module）</p>
-<h2 id="Implementation"><a href="#Implementation" class="headerlink" title="Implementation"></a>Implementation</h2><p>manifest 中指定 entry point app hard-code 写死输入 防止 attacker 通过 verbose 等泄漏信息</p>
-<p>提供一个 patch 过的 libc 用于适配 gramine 的内核，提前编译成动态库，然后 mount 给虚拟机</p>
-<h3 id="virtio-fs"><a href="#virtio-fs" class="headerlink" title="virtio-fs"></a>virtio-fs</h3><p>本身用于 host-guest 共享文件  host 是 fuse server，guest 是 fuse client</p>
-<p>gramine-tdx 在 host 上用 virtiofsd</p>
-<p>文件请求通过 fuse 与 virtio 直接转到 host，因此 guest 不需要 fs stack</p>
-<h4 id="intel-protected-fs"><a href="#intel-protected-fs" class="headerlink" title="intel protected fs"></a>intel protected fs</h4><p>intel 基于自己的硬件已经实现了一套软件的加密 fs 协议 host 上的文件数据是加密的 读取的时候 gramine-tdx kernel 自动透明地会进行解密</p>
-<ul>
-<li>manifest 中 fs.mount type&#x3D;”encrypted”</li>
-<li>manifest 中 sgx.trusted_files 可以记录 file 和对应的 sha256 检察 完整性 （manifest 的完整性也会被检察）</li>
-</ul>
-<h3 id="virtio-vsock"><a href="#virtio-vsock" class="headerlink" title="virtio-vsock"></a>virtio-vsock</h3><p>本身用于 host-guest 传输网络包</p>
-<ul>
-<li>guest 上和 host 上都用 socket api 同一套地址 就可以通信</li>
-<li>host&#x2F;guest 上都可以用 socat 进行 socket 包和 TCP 包的转化</li>
-</ul>
-<ol>
-<li>guest 内 app 全都不需要改 正常通过端口提供服务 例如 8080</li>
-<li>gramine-tdx 的 kernel 实现中会进行网络包的转化，并通过 virtio-vsock 转交给 host</li>
-<li>host 上 <code>socat TCP4-LISTEN:8080,reuseaddr,fork VSOCK-CONNECT:123:1234</code> 可以在 host 上的 8080 访问 guest 内的服务</li>
-</ol>
-<h3 id="sum"><a href="#sum" class="headerlink" title="sum"></a>sum</h3><p>无法复制加载中的内容</p>
-<p>减小 TCB 减小攻击面 但是 fuse 和 socat 会带来 overhead</p>
-<h2 id="Security-Analysis"><a href="#Security-Analysis" class="headerlink" title="Security Analysis"></a>Security Analysis</h2><p><img src="/images/NSc3bjOMKoOGaOxBpCFcS98vnTb.png" title="image"></p>
-<p><img src="/images/Bk7zbtaaQoYMGTxNGRyczwqcnyQ.png" title="image"></p>
-<p>基本就是控制 input、检查 input 合法</p>
-<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p>Testbed：</p>
-<ul>
-<li>Intel Xeon Platinum 8570 CPU , 56 cores , 1 TB (16 channels × 64 GB&#x2F;DIMM) DRAM</li>
-<li>Host：Ubuntu 24.04, Intel TDX-enabled Linux kernel v6.8.</li>
-<li>Intel TDX-patched QEMU v8.2.</li>
-<li>Guest： Ubuntu 24.04,intel TDX-enabled guest Linux v6.8</li>
-<li>Intel TDX Module v1.5 (build_num 698).</li>
-<li>vCPU 数量与 Application 需要线程数量相等</li>
-</ul>
-<p>Varaints</p>
-<p><img src="/images/RIR4bVfAooDvwWxmBhPcX40Innh.png" title="image"></p>
-<h3 id="Microbenchmarks"><a href="#Microbenchmarks" class="headerlink" title="Microbenchmarks"></a>Microbenchmarks</h3><p><img src="/images/C6R9bRSsHotWtOxP3uAcSP9znzh.png" title="image"></p>
-<p>In-memory 计算开销小于 5%</p>
-<p>IO 性能差，在于 gramine-tdx 中的 virtio-fs 驱动实现过于简单</p>
-<h3 id="AI-Frameworks"><a href="#AI-Frameworks" class="headerlink" title="AI Frameworks"></a>AI Frameworks</h3><ul>
-<li>PyTorch: AlexNet for image classification.</li>
-<li>OpenVINO,TensorFlow:ResNet-50 for inference</li>
-<li>TensorFlow:BERT for inference</li>
-<li>Candle:LLaMA</li>
-</ul>
-<p><img src="/images/HrjbbXIraoi5GOxjis9chlk8nBg.png" title="image"></p>
-<p>大部分情况下几乎和 native 一致，平均性能 overhead 在 10%</p>
-<p>其他 Application 例如 databse 和 web server，由于需要 socat 的转发，并且 gramine-tdx 的 virito-vsock 设计过于简单，性能会降至 10%</p>
-<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>Gramine-TDX 为 TDX 机密虚拟机定制了 guest kernel，大幅减小了攻击面，提升了安全性。</p>
-<p>由于重点在安全和代码质量上，性能方面看来目前只适合不需要网络的纯计算任务（例如模型推理）</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2157,7 +2149,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">25:01</span>
+    <span title="Reading time total">25:02</span>
   </span>
 </div>
 <div class="busuanzi-count">
