@@ -214,7 +214,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2026-02-20 20:33:38" itemprop="dateModified" datetime="2026-02-20T20:33:38+08:00">2026-02-20</time>
+      <time title="Modified: 2026-02-20 20:47:55" itemprop="dateModified" datetime="2026-02-20T20:47:55+08:00">2026-02-20</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -233,14 +233,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>406</span>
+      <span>483</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>2 mins.</span>
     </span>
 </div>
 
@@ -338,15 +338,25 @@
 </ol>
 <p>设计：</p>
 <ol>
-<li>memmap+PFNMAP 宿主机启动时直接把大部分内存预留给虚拟机 剩下很多struct page<ul>
+<li><p>memmap+PFNMAP 宿主机启动时直接把大部分内存预留给虚拟机 剩下很多struct page</p>
+<ul>
 <li>memmap在内存初始化早期就预留内存，这部分内存都不会进入sparse memory model的管理。对memblock会占用struct page，即使memblock_reserve也没用，只是不进入buddy system而已。</li>
 <li>PFNMAP让内核所有的内存相关函数不使用struct page，对于&#x2F;dev&#x2F;mem的mmap会自动带这个flag</li>
 </ul>
 </li>
-<li>内存切片，2M粒度。传统大页提前预留，2M不能组合为1G，1G也不能拆分为2M</li>
-<li>混合大页双向分配。 需要1G的时候从低到高分配低地址，需要2M的时候从高到低分配高地址</li>
-<li>内存映射使用fastmap，四级页表遍历太慢，直接用更简单的数据结构建立映射。</li>
-<li>vmem.ko 转发请求到vmem_mm_i.ko  热升级。vmem_mm_i.ko提供一些函数指针 用于操作内存，热升级时，vmem.ko负责遍历vma 替换数据结构中的old指针为新指针，将refcnt降为0，这样可以unload掉旧版本</li>
+<li><p>内存切片，2M粒度。传统大页提前预留，2M不能组合为1G，1G也不能拆分为2M</p>
+</li>
+<li><p>混合大页双向分配。 需要1G的时候从低到高分配低地址，需要2M的时候从高到低分配高地址</p>
+</li>
+<li><p>内存映射使用fastmap，四级页表遍历太慢，直接用更简单的数据结构建立映射。</p>
+<blockquote>
+<p>During memory use, it is often necessary to query the mapping between physical and virtual memory, such as VM start&#x2F;stop scenarios. The conventional method traverses page tables for address translation, which is costly. </p>
+</blockquote>
+<p>硬件仍然用页表，但是软件翻译不需要页表，可以用另一个数据结构。</p>
+<p>但是kvm不是有自己的memslot用于翻译吗。</p>
+</li>
+<li><p>vmem.ko 转发请求到vmem_mm_i.ko  热升级。vmem_mm_i.ko提供一些函数指针 用于操作内存，热升级时，vmem.ko负责遍历vma 替换数据结构中的old指针为新指针，将refcnt降为0，这样可以unload掉旧版本</p>
+</li>
 </ol>
 
       
