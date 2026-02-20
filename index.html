@@ -206,9 +206,24 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2026-02-19 21:14:03 / Modified: 21:27:46" itemprop="dateCreated datePublished" datetime="2026-02-19T21:14:03+08:00">2026-02-19</time>
+      <time title="Created: 2026-02-19 21:14:03" itemprop="dateCreated datePublished" datetime="2026-02-19T21:14:03+08:00">2026-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2026-02-20 20:19:42" itemprop="dateModified" datetime="2026-02-20T20:19:42+08:00">2026-02-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
+        </span>
     </span>
 
   
@@ -218,7 +233,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>269</span>
+      <span>352</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
@@ -323,7 +338,11 @@
 </ol>
 <p>设计：</p>
 <ol>
-<li>memmap+PFNMAP 宿主机启动时直接把大部分内存预留给虚拟机 剩下很多struct page</li>
+<li>memmap+PFNMAP 宿主机启动时直接把大部分内存预留给虚拟机 剩下很多struct page<ul>
+<li>memmap在内存初始化早期就预留内存，这部分内存都不会进入sparse memory model的管理。对memblock会占用struct page，即使memblock_reserve也没用，只是不进入buddy system而已。</li>
+<li>PFNMAP让内核所有的内存相关函数不使用struct page，对于&#x2F;dev&#x2F;mem的mmap会自动带这个flag</li>
+</ul>
+</li>
 <li>内存切片，2M粒度。传统大页提前预留，2M不能组合为1G，1G也不能拆分为2M</li>
 <li>混合大页双向分配。 需要1G的时候从低到高分配低地址，需要2M的时候从高到低分配高地址</li>
 <li>内存映射使用fastmap，四级页表遍历太慢，直接用更简单的数据结构建立映射。</li>
@@ -2149,7 +2168,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">25:02</span>
+    <span title="Reading time total">25:03</span>
   </span>
 </div>
 <div class="busuanzi-count">
