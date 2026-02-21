@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-count">46</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,137 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/misc/network/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/misc/network/" class="post-title-link" itemprop="url">Network</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-01-31 14:00:26" itemprop="dateCreated datePublished" datetime="2026-01-31T14:00:26+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2026-02-02 00:55:43" itemprop="dateModified" datetime="2026-02-02T00:55:43+08:00">2026-02-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>15 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Network"><a href="#Network" class="headerlink" title="Network"></a>Network</h1><h2 id="路由器"><a href="#路由器" class="headerlink" title="路由器"></a>路由器</h2><p>tracert 查看到目标主机经过的所有路由器及延迟</p>
+<p>第n行表示第n个经过的路由器 每个测试3次</p>
+<p>3n个测试每个都是独立的</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">tracert i.sjtu.edu.cn</span><br><span class="line">通过最多 <span class="number">30</span> 个跃点跟踪</span><br><span class="line">到 i.sjtu.edu.cn [<span class="number">202.120</span><span class="type">.35.189</span>] 的路由:</span><br><span class="line"></span><br><span class="line">  <span class="number">1</span>     <span class="number">1</span> ms     <span class="number">1</span> ms     <span class="number">1</span> ms  <span class="number">192.168</span>.<span class="number">1.1</span></span><br><span class="line">  <span class="number">2</span>    <span class="number">11</span> ms    <span class="number">11</span> ms     <span class="number">4</span> ms  <span class="number">100.119</span>.<span class="number">0.1</span></span><br><span class="line">  <span class="number">3</span>     *        <span class="number">4</span> ms     <span class="number">3</span> ms  . [<span class="number">117.135</span><span class="type">.51.33</span>]</span><br><span class="line">  <span class="number">4</span>     <span class="number">4</span> ms     <span class="number">3</span> ms     <span class="number">3</span> ms  <span class="number">221.183</span>.<span class="number">53.229</span></span><br><span class="line">  <span class="number">5</span>     <span class="number">5</span> ms     *        *     <span class="number">221.183</span>.<span class="number">90.242</span></span><br><span class="line">  <span class="number">6</span>     <span class="number">6</span> ms     <span class="number">6</span> ms     <span class="number">6</span> ms  <span class="number">221.176</span>.<span class="number">23.98</span></span><br><span class="line">  <span class="number">7</span>     <span class="number">7</span> ms     <span class="number">7</span> ms     <span class="number">6</span> ms  <span class="number">101.4</span>.<span class="number">118.114</span></span><br><span class="line">  <span class="number">8</span>     *        *        *     请求超时。</span><br><span class="line">  <span class="number">9</span>     <span class="number">6</span> ms     <span class="number">5</span> ms     <span class="number">5</span> ms  <span class="number">202.112</span>.<span class="number">27.14</span></span><br><span class="line"> <span class="number">10</span>     <span class="number">6</span> ms     <span class="number">6</span> ms     <span class="number">5</span> ms  LAPTOP<span class="literal">-DFL6S3EU</span> [<span class="number">10.255</span><span class="type">.38.253</span>]</span><br><span class="line"> <span class="number">11</span>     <span class="number">7</span> ms     <span class="number">6</span> ms     <span class="number">6</span> ms  LAPTOP<span class="literal">-DFL6S3EU</span> [<span class="number">10.255</span><span class="type">.38.2</span>]</span><br><span class="line"> <span class="number">12</span>     <span class="number">8</span> ms    <span class="number">13</span> ms    <span class="number">11</span> ms  LAPTOP<span class="literal">-DFL6S3EU</span> [<span class="number">10.255</span><span class="type">.38.57</span>]</span><br><span class="line"> <span class="number">13</span>     *        *        *     请求超时。</span><br><span class="line"> <span class="number">14</span>     *        *        *     请求超时。</span><br><span class="line"> <span class="number">15</span>     <span class="number">6</span> ms     <span class="number">6</span> ms     <span class="number">6</span> ms  <span class="number">202.120</span>.<span class="number">35.189</span></span><br><span class="line"></span><br><span class="line">跟踪完成。</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h2><p>telnet 在指定端口打开TCP连接</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">linux@LAPTOP<span class="literal">-DFL6S3EU</span>:<span class="variable">$</span> telnet <span class="number">119.3</span>.<span class="number">127.254</span> <span class="number">8080</span></span><br><span class="line">Trying <span class="number">119.3</span>.<span class="number">127.254</span>...</span><br><span class="line">Connected to <span class="number">119.3</span>.<span class="number">127.254</span>.</span><br><span class="line">Escape character is <span class="string">&#x27;^]&#x27;</span>.</span><br><span class="line">GET /checkSession HTTP/<span class="number">1.1</span></span><br><span class="line">Host: <span class="number">119.3</span>.<span class="number">127.254</span></span><br><span class="line"></span><br><span class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span></span><br><span class="line">Vary: Origin</span><br><span class="line">Vary: Access<span class="literal">-Control-Request-Method</span></span><br><span class="line">Vary: Access<span class="literal">-Control-Request-Headers</span></span><br><span class="line">Content<span class="literal">-Type</span>: application/json</span><br><span class="line">Transfer<span class="literal">-Encoding</span>: chunked</span><br><span class="line">Date: Thu, <span class="number">11</span> Aug <span class="number">2022</span> <span class="number">06</span>:<span class="number">42</span>:<span class="number">13</span> GMT</span><br><span class="line"></span><br><span class="line"><span class="number">47</span></span><br><span class="line">&#123;<span class="string">&quot;success&quot;</span>:false,<span class="string">&quot;msg&quot;</span>:<span class="string">&quot;登录失效，请重新登录！&quot;</span>,<span class="string">&quot;data&quot;</span>:null&#125;</span><br><span class="line"><span class="number">0</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="SMTP"><a href="#SMTP" class="headerlink" title="SMTP"></a>SMTP</h2><p>不同的mail server有不同的登录方式 </p>
+<p>对于qq邮箱 需要拿到授权码 和qq号分别base64加密 auth login登录</p>
+<p>data后可以通过from to 指定虚假的收件人 发件人</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">linux@LAPTOP<span class="literal">-DFL6S3EU</span>:/mnt/e/books/cs<span class="literal">-computer-networking</span><span class="variable">$</span> telnet smtp.qq.com <span class="number">25</span></span><br><span class="line">Trying <span class="number">2408</span>:<span class="number">8756</span>:<span class="number">2</span>cf2:<span class="number">19</span>::<span class="number">11</span>...</span><br><span class="line">Connected to smtp.qq.com.</span><br><span class="line">Escape character is <span class="string">&#x27;^]&#x27;</span>.</span><br><span class="line"><span class="number">220</span> newxmesmtplogicsvrsza31.qq.com XMail Esmtp QQ Mail Server.</span><br><span class="line">helo jjj</span><br><span class="line"><span class="number">250</span><span class="literal">-newxmesmtplogicsvrsza31</span>.qq.com<span class="literal">-11</span>.<span class="number">149.66</span>.<span class="number">240</span><span class="literal">-71806244</span></span><br><span class="line"><span class="number">250</span><span class="literal">-SIZE</span> <span class="number">73400320</span></span><br><span class="line"><span class="number">250</span> OK</span><br><span class="line">auth login</span><br><span class="line"><span class="number">334</span> VXNlcm5hbWU6</span><br><span class="line">MTc5OTg1MzUyMw==</span><br><span class="line"><span class="number">334</span> UGFzc3dvcmQ6</span><br><span class="line">YWNiaHd4dmJ5anN6ZWZmYg==</span><br><span class="line"><span class="number">235</span> Authentication successful</span><br><span class="line">mail from: &lt;<span class="number">1799853523</span>@qq.com&gt;</span><br><span class="line"><span class="number">250</span> OK</span><br><span class="line">rcpt to: &lt;<span class="number">734595697</span>@qq.com&gt;</span><br><span class="line"><span class="number">250</span> OK</span><br><span class="line"><span class="keyword">data</span></span><br><span class="line"><span class="number">354</span> <span class="keyword">End</span> <span class="keyword">data</span> with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;.</span><br><span class="line">subject: hello</span><br><span class="line">hello</span><br><span class="line"></span><br><span class="line">.</span><br><span class="line"><span class="number">250</span> OK: queued as.</span><br><span class="line">quit</span><br><span class="line"><span class="number">221</span> Bye.</span><br><span class="line">Connection closed by foreign host.</span><br></pre></td></tr></table></figure>
+
+<h2 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h2><p>DNS也算protocal 可在wireshark中捕捉到</p>
+<p>nslookup</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&gt;nslookup i.sjtu.edu.cn</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  fe80::<span class="number">1</span></span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">名称:    i.sjtu.edu.cn</span><br><span class="line">Address:  <span class="number">202.120</span>.<span class="number">35.189</span></span><br><span class="line"></span><br><span class="line">&gt;nslookup <span class="literal">-type</span>=NS sjtu.edu.cn</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  fe80::<span class="number">1</span></span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">sjtu.edu.cn     nameserver = apple.sjtu.edu.cn</span><br><span class="line">sjtu.edu.cn     nameserver = dns.sjtu.edu.cn</span><br><span class="line"></span><br><span class="line">&gt;nslookup i.sjtu.edu.cn apple.sjtu.edu.cn</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  <span class="number">202.112</span>.<span class="number">26.43</span></span><br><span class="line"></span><br><span class="line">名称:    i.sjtu.edu.cn</span><br><span class="line">Address:  <span class="number">202.120</span>.<span class="number">35.189</span></span><br></pre></td></tr></table></figure>
+
+<p>ipconfig</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\Shen&gt;ipconfig /flushdns</span><br><span class="line"></span><br><span class="line">Windows IP 配置</span><br><span class="line"></span><br><span class="line">已成功刷新 DNS 解析缓存。</span><br><span class="line"></span><br><span class="line">C:\Users\Shen&gt;ipconfig /displaydns</span><br><span class="line"></span><br><span class="line">Windows IP 配置</span><br><span class="line"></span><br><span class="line">    <span class="number">153.109</span>.<span class="number">199.185</span>.in<span class="literal">-addr</span>.arpa</span><br><span class="line">    <span class="literal">----------------------------------------</span></span><br><span class="line">    记录名称. . . . . . . : <span class="number">153.109</span>.<span class="number">199.185</span>.in<span class="literal">-addr</span>.arpa.</span><br><span class="line">    记录类型. . . . . . . : <span class="number">12</span></span><br><span class="line">    生存时间. . . . . . . : <span class="number">516448</span></span><br><span class="line">    数据长度. . . . . . . : <span class="number">8</span></span><br><span class="line">    部分. . . . . . . . . : 答案</span><br><span class="line">    PTR 记录  . . . . . . : github.github.io</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#client.py</span></span><br><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line">serverName = <span class="string">&#x27;localhost&#x27;</span></span><br><span class="line">serverPort = <span class="number">12000</span></span><br><span class="line">clientSocket = socket(AF_INET, SOCK_DGRAM)</span><br><span class="line">message = <span class="built_in">input</span>(<span class="string">&quot;Input lowercase sentence:&quot;</span>)</span><br><span class="line">clientSocket.sendto(message.encode(),(serverName, serverPort))</span><br><span class="line">modifiedMessage, serverAddress = clientSocket.recvfrom(<span class="number">2048</span>)</span><br><span class="line"><span class="built_in">print</span>(modifiedMessage.decode())</span><br><span class="line">clientSocket.close()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#server.py</span></span><br><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line">serverPort = <span class="number">12000</span></span><br><span class="line">serverSocket = socket(AF_INET, SOCK_DGRAM)</span><br><span class="line">serverSocket.bind((<span class="string">&#x27;&#x27;</span>, serverPort))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;The server is ready to receive&quot;</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    message, clientAddress = serverSocket.recvfrom(<span class="number">2048</span>)</span><br><span class="line">    <span class="built_in">print</span>(clientAddress)</span><br><span class="line">    modifiedMessage = message.decode().upper()</span><br><span class="line">    serverSocket.sendto(modifiedMessage.encode(), </span><br><span class="line">clientAddress)</span><br></pre></td></tr></table></figure>
+
+<h2 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#client.py</span></span><br><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line">serverName = <span class="string">&#x27;localhost&#x27;</span></span><br><span class="line">serverPort = <span class="number">12000</span></span><br><span class="line">clientSocket = socket(AF_INET, SOCK_STREAM)</span><br><span class="line">clientSocket.connect((serverName,serverPort))</span><br><span class="line">sentence = <span class="built_in">input</span>(<span class="string">&quot;Input lowercase sentence:&quot;</span>)</span><br><span class="line">clientSocket.send(sentence.encode())</span><br><span class="line">modifiedSentence = clientSocket.recv(<span class="number">1024</span>)</span><br><span class="line"><span class="built_in">print</span>(’From Server: ’, modifiedSentence.decode()) </span><br><span class="line">clientSocket.close()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#server.py</span></span><br><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> *</span><br><span class="line">serverPort = <span class="number">12000</span></span><br><span class="line">serverSocket = socket(AF_INET,SOCK_STREAM)</span><br><span class="line">serverSocket.bind((<span class="string">&#x27;&#x27;</span>,serverPort))</span><br><span class="line">serverSocket.listen(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;The server is ready to receive&quot;</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    connectionSocket, addr = serverSocket.accept()</span><br><span class="line">    sentence = connectionSocket.recv(<span class="number">1024</span>).decode()</span><br><span class="line">    capitalizedSentence = sentence.upper()</span><br><span class="line">    connectionSocket.send(capitalizedSentence.encode()) </span><br><span class="line">    connectionSocket.close()</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2097,155 +2228,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/papers/V-probe/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/papers/V-probe/" class="post-title-link" itemprop="url">V-probe</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>3.4k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>13 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="V-probe"><a href="#V-probe" class="headerlink" title="V-probe"></a>V-probe</h1><p>ATC23</p>
-<h2 id="问题与目标"><a href="#问题与目标" class="headerlink" title="问题与目标"></a>问题与目标</h2><p>IO直通的DMA操作与memory overcommitment产生冲突</p>
-<p>因为DMA操作需要保证内存是固定不变的  overcommitment需要动态调整</p>
-<p>现有方案：</p>
-<ul>
-<li>IOPF：DMA会产生pagefault，依赖memory reclaim ，swap慢 balloon通信慢 hyperupcall可能回收了DMA缓冲区导致失败</li>
-<li>vIOMMU coIOMMU 让hypervisor 知道VM的DMA信息 兼容性差</li>
-</ul>
-<p>希望</p>
-<ul>
-<li>保证DMA不会失败</li>
-<li>不需要特殊硬件</li>
-<li>不需要修改guest内核</li>
-<li>性能好</li>
-</ul>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>类似hyperupcall 但是用编译好的二进制</p>
-<p>guest启动后动态加载</p>
-<p>限制只能用rdi rax 不允许访问内存 不允许大于64bytes  不能跳转</p>
-<p>关于page：</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhoutaopower/article/details/87090982">Linux 内存管理窥探（5）：page 数据结构_爱洋葱的博客-CSDN博客</a></p>
-<p><a target="_blank" rel="noopener" href="http://linux.laoqinren.net/kernel/memory-page/">struct page结构体 - Notes about linux and my work (laoqinren.net)</a></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/573338379">linux内核那些事之struct page - 知乎 (zhihu.com)</a></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_MAPCOUNT_OPS(uname, lname)					\</span></span><br><span class="line"><span class="meta">static __always_inline int Page##uname(struct page *page)		\</span></span><br><span class="line"><span class="meta">&#123;									\</span></span><br><span class="line"><span class="meta">	return atomic_read(&amp;page-&gt;_mapcount) ==				\</span></span><br><span class="line"><span class="meta">				PAGE_##lname##_MAPCOUNT_VALUE;		\</span></span><br><span class="line"><span class="meta">&#125;									\</span></span><br><span class="line"><span class="meta">static __always_inline void __SetPage##uname(struct page *page)		\</span></span><br><span class="line"><span class="meta">&#123;									\</span></span><br><span class="line"><span class="meta">	VM_BUG_ON_PAGE(atomic_read(&amp;page-&gt;_mapcount) != -1, page);	\</span></span><br><span class="line"><span class="meta">	atomic_set(&amp;page-&gt;_mapcount, PAGE_##lname##_MAPCOUNT_VALUE);	\</span></span><br><span class="line"><span class="meta">&#125;									\</span></span><br><span class="line"><span class="meta">static __always_inline void __ClearPage##uname(struct page *page)	\</span></span><br><span class="line"><span class="meta">&#123;									\</span></span><br><span class="line"><span class="meta">	VM_BUG_ON_PAGE(!Page##uname(page), page);			\</span></span><br><span class="line"><span class="meta">	atomic_set(&amp;page-&gt;_mapcount, -1);				\</span></span><br><span class="line"><span class="meta">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * PageBuddy() indicate that the page is free and in the buddy system</span></span><br><span class="line"><span class="comment"> * (see mm/page_alloc.c).</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_BUDDY_MAPCOUNT_VALUE		(-128)</span></span><br><span class="line">PAGE_MAPCOUNT_OPS(Buddy, BUDDY)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> page_private(page)		((page)-&gt;private)</span></span><br></pre></td></tr></table></figure>
-
-<p>一个用于拿是否free 一个用于拿order</p>
-<p>这些函数的参数都是page结构体的GVA，所以注册函数的同时需要把guest内核page存放的GPA也一同放入</p>
-<p>由于代码在host上执行，不需要GVA-&gt;GPA 所以这段代码不论是GPA-&gt;HVA还是如何翻译 总能在hypervisor上解决</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"> procedure MEMORYRECLAMATION</span><br><span class="line"><span class="number">2</span>: <span class="keyword">for</span> each GFN in GUEST <span class="keyword">do</span></span><br><span class="line"><span class="number">3</span>: <span class="keyword">if</span> GFN is reclaimed then</span><br><span class="line"><span class="number">4</span>: <span class="keyword">continue</span></span><br><span class="line"><span class="number">5</span>: SP ← <span class="class"><span class="keyword">struct</span> <span class="title">page</span> <span class="title">of</span> <span class="title">GFN</span> <span class="title">in</span> <span class="title">GUEST</span></span></span><br><span class="line"><span class="class">6:</span> FREE ← GUEST.PAGE_FREE(SP)</span><br><span class="line"><span class="number">7</span>: ORD ← GUEST.PAGE_ORD(SP)</span><br><span class="line"><span class="number">8</span>: <span class="keyword">if</span> FREE and ORD ≥ MIN_ORD then</span><br><span class="line"><span class="number">9</span>: Lock MUTEX</span><br><span class="line"><span class="number">10</span>: Make the <span class="class"><span class="keyword">struct</span> <span class="title">page</span> <span class="title">GPA</span> <span class="title">range</span> <span class="title">read</span>-<span class="title">only</span></span></span><br><span class="line"><span class="class">11:</span> SP′ ← <span class="class"><span class="keyword">struct</span> <span class="title">page</span> <span class="title">of</span> <span class="title">GFN</span> <span class="title">in</span> <span class="title">GUEST</span></span></span><br><span class="line"><span class="class">12:</span> FREE′ ← GUEST.PAGE_FREE(SP′)</span><br><span class="line"><span class="number">13</span>: ORD′ ← GUEST.PAGE_ORD(SP′)</span><br><span class="line"><span class="number">14</span>: <span class="keyword">if</span> FREE′ and ORD′ ≥ MIN_ORD then</span><br><span class="line"><span class="number">15</span>: GFNst ← GFN</span><br><span class="line"><span class="number">16</span>: GFNen ← GFN + (<span class="number">1</span> &lt;&lt; ORD′)</span><br><span class="line"><span class="number">17</span>: RANGE ← [GFNst, GFNen)</span><br><span class="line"><span class="number">18</span>: Unmap EPT in RANGE</span><br><span class="line"><span class="number">19</span>: Unmap IOMMU in RANGE</span><br><span class="line"><span class="number">20</span>: Add RANGE to the reclaimed <span class="built_in">set</span></span><br><span class="line"><span class="number">21</span>: Release reclaimed pages to hypervisor</span><br><span class="line"><span class="number">22</span>: Unlock MUTEX</span><br><span class="line"><span class="number">23</span>: <span class="keyword">return</span> SUCCESS</span><br><span class="line"><span class="number">24</span>: Make the <span class="keyword">struct</span> page GPA range read-write</span><br><span class="line"><span class="number">25</span>: Unlock MUTEX</span><br><span class="line"><span class="number">26</span>: <span class="keyword">return</span> FAIL</span><br></pre></td></tr></table></figure>
-
-<p>记录到reclaimed set中 并且解除映射</p>
-<p>一旦解除映射 对应的物理内存就空出来了 满足overcommitment</p>
-<p>回收代码定时触发或者事件触发</p>
-<p>我认为第21行需要完成两件事</p>
-<ul>
-<li>这里光解除映射 实际上host还是不可用 需要用host kernel的对应函数和数据结构修改  但是已经运行在host上 并且知道guest的所有信息 并不难做到(类似qemu 可用madvise) 但是否有不一致问题？</li>
-<li>修改guest struct page 标记不可用 否则guest当作free仍然分配并使用 可能导致触发大量page fault和VMexit</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> procedure PAGEFAULTHANDLER</span><br><span class="line"><span class="number">2</span>: Lock MUTEX</span><br><span class="line"><span class="number">3</span>: RANGE ← GetReclaimedRange(GUEST , GPA)</span><br><span class="line"><span class="number">4</span>: PAGES ← pages reallocated <span class="keyword">for</span> RANGE</span><br><span class="line"><span class="number">5</span>: Map RANGE to PAGES in EPT</span><br><span class="line"><span class="number">6</span>: Map RANGE to PAGES in IOMMU</span><br><span class="line"><span class="number">7</span>: Remove RANGE from the reclaimed <span class="built_in">set</span></span><br><span class="line"><span class="number">8</span>: Make the <span class="class"><span class="keyword">struct</span> <span class="title">page</span> <span class="title">GPA</span> <span class="title">range</span> <span class="title">read</span>-<span class="title">write</span></span></span><br><span class="line"><span class="class">9:</span> Unlock MUTEX</span><br><span class="line"><span class="number">10</span>: <span class="keyword">return</span></span><br><span class="line">Input: GUEST , GPA</span><br><span class="line">Output: RANGE</span><br><span class="line"><span class="number">11</span>: procedure GETRECLAIMEDRANGE</span><br><span class="line"><span class="number">12</span>: <span class="keyword">for</span> each RANGE in the reclaimed <span class="built_in">set</span> of GUEST <span class="keyword">do</span></span><br><span class="line"><span class="number">13</span>: SPst ← the start <span class="keyword">struct</span> page GPA in RANGE</span><br><span class="line"><span class="number">14</span>: SPen ← the end <span class="keyword">struct</span> page GPA in RANGE</span><br><span class="line"><span class="number">15</span>: <span class="keyword">if</span> SPst ≤ GPA ≤ SPen then</span><br><span class="line"><span class="number">16</span>: <span class="keyword">return</span> RANGE</span><br></pre></td></tr></table></figure>
-
-<p>DMA发生page fault 需要重新拿回对应的物理内存</p>
-<p>这时候从reclaimed set中寻找原来的地址判断长度 然后重新映射 保证了DMA用的HPA虽然在动态变化但是仍可用 </p>
-<p>这里的两个函数应该都是加到hypervisor代码中去的(修改host内核)</p>
-<p>普通的page fault和DMA的page fault都使用这个函数</p>
-<p>所以具体实现上仍然需要支持IOPF的硬件  实验中作者是自己修改硬件来支持的</p>
-<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><h3 id="host与guest"><a href="#host与guest" class="headerlink" title="host与guest"></a>host与guest</h3><p>把host需要回收的page结构体都改为read only 随后再进行检查 这样做保证了满足要求的page都不会被guest修改</p>
-<h3 id="reclaim与page-fault"><a href="#reclaim与page-fault" class="headerlink" title="reclaim与page fault"></a>reclaim与page fault</h3><p>用host自己的mutex lock</p>
-<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>这篇文章相当于设备直通场景下的hypercall 因此测试除了常规回收内存之外 还增加了特定的IO测试</p>
-<p>例如tcp udp和redis</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>不管guest怎么操作自己的数据结构 入口一定是在host的</p>
-<p>必须保证host拥有guest数据结构的地址和布局 并且提供给这段代码才可以</p>
-<p>代码其实是修改了host自己的reclaim和page fault逻辑自己执行 不需要VM enter和exit</p>
-<p>这种方式和balloon完全不同 不需要guest自己任何参与 对guest来说 仍然认为自己有着全部内存 不知道二级页表映射已经失效了</p>
-<ul>
-<li>balloon：guest判断free guest标记不可用 host unmap</li>
-<li>v-probe：host判断free (host标记guest不可用) host unmap</li>
-</ul>
-<p>v-probe就算不顺带解决IOPF的问题 从性能上单独来说也是碾压balloon的，因为通过在host访问guest数据结构绕开了virtio这个大框架</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2269,13 +2251,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">413k</span>
+    <span title="Word count total">414k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">25:03</span>
+    <span title="Reading time total">25:04</span>
   </span>
 </div>
 <div class="busuanzi-count">

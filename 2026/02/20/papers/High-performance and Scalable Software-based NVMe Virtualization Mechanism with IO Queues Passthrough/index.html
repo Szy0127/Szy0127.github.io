@@ -19,27 +19,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="CI&#x2F;CDtestgo 覆盖测试工具介绍 - 建站教程 (jiuaidu.com) go test .&#x2F;...可以测试目录下所有的test文件 go test minik8s&#x2F;pkg&#x2F;kubelet&#x2F;container 测试指定包下的测试文件 gitlab runnerdockerdocker run -d --name gitlab-runner --restart always">
+    <meta name="description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead 基">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CI&#x2F;CD">
-<meta property="og:url" content="http://szy0127.github.io/2024/09/17/misc/CICD/index.html">
+<meta property="og:title" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough">
+<meta property="og:url" content="http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/index.html">
 <meta property="og:site_name" content="S blog">
-<meta property="og:description" content="CI&#x2F;CDtestgo 覆盖测试工具介绍 - 建站教程 (jiuaidu.com) go test .&#x2F;...可以测试目录下所有的test文件 go test minik8s&#x2F;pkg&#x2F;kubelet&#x2F;container 测试指定包下的测试文件 gitlab runnerdockerdocker run -d --name gitlab-runner --restart always">
+<meta property="og:description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead 基">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-09-17T11:48:03.351Z">
-<meta property="article:modified_time" content="2024-09-17T11:48:03.364Z">
+<meta property="article:published_time" content="2026-02-20T13:04:03.064Z">
+<meta property="article:modified_time" content="2026-02-21T12:44:51.610Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://szy0127.github.io/2024/09/17/misc/CICD/">
+<link rel="canonical" href="http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2024/09/17/misc/CICD/","path":"2024/09/17/misc/CICD/","title":"CI/CD"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/","path":"2026/02/20/papers/High-performance and Scalable Software-based NVMe Virtualization Mechanism with IO Queues Passthrough/","title":"NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I/O Queues Passthrough"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>CI/CD | S blog</title>
+<title>NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I/O Queues Passthrough | S blog</title>
   
 
 
@@ -138,7 +138,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CI-CD"><span class="nav-number">1.</span> <span class="nav-text">CI&#x2F;CD</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#test"><span class="nav-number">1.0.1.</span> <span class="nav-text">test</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gitlab-runner"><span class="nav-number">1.0.2.</span> <span class="nav-text">gitlab runner</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#docker"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">docker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#host"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">host</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gitlab-ci-yml"><span class="nav-number">1.0.3.</span> <span class="nav-text">.gitlab-ci.yml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%90%8C%E6%AD%A5"><span class="nav-number">1.0.4.</span> <span class="nav-text">代码同步</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough"><span class="nav-number">1.</span> <span class="nav-text">NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">设备虚拟化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">设计</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -184,7 +184,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/misc/CICD/">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -197,12 +197,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="CI/CD | S blog">
+      <meta itemprop="name" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I/O Queues Passthrough | S blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          CI/CD
+          NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I/O Queues Passthrough
         </h1>
 
         <div class="post-meta-container">
@@ -213,7 +213,14 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
+      <time title="Created: 2026-02-20 21:04:03" itemprop="dateCreated datePublished" datetime="2026-02-20T21:04:03+08:00">2026-02-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2026-02-21 20:44:51" itemprop="dateModified" datetime="2026-02-21T20:44:51+08:00">2026-02-21</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -221,7 +228,7 @@
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+          <a href="/categories/papers/" itemprop="url" rel="index"><span itemprop="name">papers</span></a>
         </span>
     </span>
 
@@ -239,14 +246,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>1.4k</span>
+      <span>305</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>5 mins.</span>
+      <span>1 mins.</span>
     </span>
 </div>
 
@@ -256,38 +263,35 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="CI-CD"><a href="#CI-CD" class="headerlink" title="CI&#x2F;CD"></a>CI&#x2F;CD</h1><h3 id="test"><a href="#test" class="headerlink" title="test"></a>test</h3><p><a target="_blank" rel="noopener" href="https://jiuaidu.com/jianzhan/1046052/">go 覆盖测试工具介绍 - 建站教程 (jiuaidu.com)</a></p>
-<p><code>go test ./...</code>可以测试目录下所有的test文件</p>
-<p><code>go test minik8s/pkg/kubelet/container</code> 测试指定包下的测试文件</p>
-<h3 id="gitlab-runner"><a href="#gitlab-runner" class="headerlink" title="gitlab runner"></a>gitlab runner</h3><h4 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h4><p><code>docker run -d --name gitlab-runner --restart always   -v /srv/gitlab-runner/config:/etc/gitlab-runner   -v /var/run/docker.sock:/var/run/docker.sock   gitlab/gitlab-runner:v15.10.1</code></p>
-<p>执行器选择docker 这里镜像需要先在主机上写Dockerfile手动构建好，然后修改<code>config.toml</code>配置文件把<code>pull_policy</code>修改为<code>if-not-present</code></p>
-<p>对于简单测试没问题，但是对于CNI这种复杂的东西，即使加了privilege&#x3D;true，还是会出现和宿主机上不一样的情况。</p>
-<h4 id="host"><a href="#host" class="headerlink" title="host"></a>host</h4><p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/runner/install/">Install GitLab Runner | GitLab</a></p>
-<p>交大云主机安装二进制</p>
-<p><code>nslookup www.ipads.sjtu.edu.cn</code> 安全组开放所有端口</p>
-<p><code>gitlab-runner register</code> 去gitlab网页的settings&#x2F;cicd复制url和token</p>
-<p>执行器选择shell 在主机上给gitlab-runner用户足够的权限</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39940674/article/details/127616784">【汇总】解决GitLab-Runner执行脚本命令无权限_gitlab-runner 提升权限_成为大佬先秃头的博客-CSDN博客</a></p>
-<p>采用这种方法进行CI&#x2F;CD，gitlab-runner会在主机上的某个目录跑脚本，用的都是主机的环境</p>
-<ul>
-<li>优点：不需要手动配一个拥有所有环境的镜像；没有容器导致的与主机不一致，跑不起来的情况。</li>
-<li>缺点：会对主机产生影响；在缺少依赖的情况下无法更换gitlab-runner所在主机。</li>
+    <div class="post-body" itemprop="articleBody"><h1 id="NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough"><a href="#NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough" class="headerlink" title="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough"></a>NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough</h1><p>HPCA’25</p>
+<h2 id="设备虚拟化"><a href="#设备虚拟化" class="headerlink" title="设备虚拟化"></a>设备虚拟化</h2><ol>
+<li>软件虚拟化：<ul>
+<li>全虚拟化 纯qemu模拟 性能差</li>
+<li>半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead</li>
+<li>基于轮询的虚拟化 spdk-vhost 轮询硬件队列  需要额外CPU资源，当虚拟机数量太多的时候延迟高，浪费12%cpu资源</li>
 </ul>
-<h3 id="gitlab-ci-yml"><a href="#gitlab-ci-yml" class="headerlink" title=".gitlab-ci.yml"></a>.gitlab-ci.yml</h3><ol>
-<li><p>prepare: 设置go env，防止go test在download时超时</p>
 </li>
-<li><p>test：<code>go test</code> 如果测试涉及到的api需要权限，需要加sudo</p>
-<p>创建多个tag为shell的runner，使test阶段并行测试 （目前一共3个）</p>
-<p>需要修改手动<code>/etc/gitlab-runner/config.toml</code>的concurrent为3</p>
-</li>
-<li><p>build：<code>go build</code> 生成可执行文件在<code>/home/gitlab-runner/$CI_COMMIT_BRANCH/</code>目录下</p>
-<p>不同分支build出的文件不会互相覆盖</p>
+<li>硬件虚拟化：<ul>
+<li>VFIO 依赖硬件MMIO  不可共享 只能给一个虚拟机</li>
+<li>SR-IOV 依赖硬件PF-VF 宿主机管理PF 每个VF给虚拟机  对硬件要求高 成本高</li>
+</ul>
 </li>
 </ol>
-<h3 id="代码同步"><a href="#代码同步" class="headerlink" title="代码同步"></a>代码同步</h3><p>同时推送到gitee和gitlab，不然无法用gitlab-runner</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hmy-666/p/17304317.html">git push origin master一次提交多个远程仓库 - 兜里还剩五块出头 - 博客园 (cnblogs.com)</a></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@minik8s-1:/mini-k8s# git remote -v</span><br><span class="line">origin  https://gitee.com/szy_0127/mini-k8s.git (fetch)</span><br><span class="line">origin  https://gitee.com/szy_0127/mini-k8s.git (push)</span><br><span class="line">origin  https://ipads.se.sjtu.edu.cn:2020/520021910933/minik8s.git (push)</span><br></pre></td></tr></table></figure>
-
+<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><p>目标：</p>
+<ol>
+<li>性能好 接近原声</li>
+<li>不浪费CPU资源</li>
+<li>可扩展性好，虚拟机密度大时不影响性能</li>
+<li>隔离与安全性好，多个虚拟机的数据不会互相泄漏</li>
+</ol>
+<p>架构和传统的virtio设备一样：</p>
+<ol>
+<li>虚拟机内前端   不需要修改用户态程序</li>
+<li>host&#x2F;hypervisor上的后端和设备驱动</li>
+<li>固件中的保护和检查代码</li>
+</ol>
+<p>控制平面：vmexit到host处理</p>
+<p>数据平面：通过EPT映射IO队列 直接直通。每个虚拟机的LBA和HPA配置的时候都分开</p>
 
     </div>
 
@@ -301,14 +305,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2024/09/17/ctf/SJTU-CTF%202023%20Writeup/" rel="prev" title="SJTU-CTF 2023 Writeup">
-                  <i class="fa fa-angle-left"></i> SJTU-CTF 2023 Writeup
+                <a href="/2026/02/19/papers/Vmem%20A%20Lightweight%20Hot-Upgradable%20Memory%20Management%20for%20In-production%20Cloud%20Environment/" rel="prev" title="Vmem: A Lightweight Hot-Upgradable Memory Management for In-production Cloud Environment">
+                  <i class="fa fa-angle-left"></i> Vmem: A Lightweight Hot-Upgradable Memory Management for In-production Cloud Environment
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2024/09/17/misc/GPU/" rel="next" title="GPU">
-                  GPU <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
