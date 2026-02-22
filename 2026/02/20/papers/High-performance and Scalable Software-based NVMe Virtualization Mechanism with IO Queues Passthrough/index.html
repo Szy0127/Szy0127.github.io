@@ -19,15 +19,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead 基">
+    <meta name="description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 背景设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead">
 <meta property="og:type" content="article">
 <meta property="og:title" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough">
 <meta property="og:url" content="http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/index.html">
 <meta property="og:site_name" content="S blog">
-<meta property="og:description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead 基">
+<meta property="og:description" content="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues PassthroughHPCA’25 背景设备虚拟化 软件虚拟化： 全虚拟化 纯qemu模拟 性能差 半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-02-20T13:04:03.064Z">
-<meta property="article:modified_time" content="2026-02-21T12:44:51.610Z">
+<meta property="article:modified_time" content="2026-02-22T12:36:49.874Z">
 <meta property="article:author" content="szy">
 <meta name="twitter:card" content="summary">
 
@@ -138,7 +138,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough"><span class="nav-number">1.</span> <span class="nav-text">NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">设备虚拟化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">设计</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough"><span class="nav-number">1.</span> <span class="nav-text">NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.1.1.</span> <span class="nav-text">设备虚拟化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NVMe"><span class="nav-number">1.1.2.</span> <span class="nav-text">NVMe</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">设计</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -220,7 +220,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2026-02-21 20:44:51" itemprop="dateModified" datetime="2026-02-21T20:44:51+08:00">2026-02-21</time>
+      <time title="Modified: 2026-02-22 20:36:49" itemprop="dateModified" datetime="2026-02-22T20:36:49+08:00">2026-02-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -246,14 +246,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Word count in article: </span>
-      <span>305</span>
+      <span>1.1k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>1 mins.</span>
+      <span>4 mins.</span>
     </span>
 </div>
 
@@ -264,7 +264,7 @@
     
     
     <div class="post-body" itemprop="articleBody"><h1 id="NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough"><a href="#NVMePass-A-Lightweight-High-performance-and-Scalable-NVMe-Virtualization-Architecture-with-I-O-Queues-Passthrough" class="headerlink" title="NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough"></a>NVMePass: A Lightweight, High-performance and Scalable NVMe Virtualization Architecture with I&#x2F;O Queues Passthrough</h1><p>HPCA’25</p>
-<h2 id="设备虚拟化"><a href="#设备虚拟化" class="headerlink" title="设备虚拟化"></a>设备虚拟化</h2><ol>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><h3 id="设备虚拟化"><a href="#设备虚拟化" class="headerlink" title="设备虚拟化"></a>设备虚拟化</h3><ol>
 <li>软件虚拟化：<ul>
 <li>全虚拟化 纯qemu模拟 性能差</li>
 <li>半虚拟化 virtio 性能差 vmexit 上下文切换 50%overhead</li>
@@ -276,6 +276,16 @@
 <li>SR-IOV 依赖硬件PF-VF 宿主机管理PF 每个VF给虚拟机  对硬件要求高 成本高</li>
 </ul>
 </li>
+</ol>
+<h3 id="NVMe"><a href="#NVMe" class="headerlink" title="NVMe"></a>NVMe</h3><p><a target="_blank" rel="noopener" href="https://www.dingmos.com/index.php/archives/152/">https://www.dingmos.com/index.php/archives/152/</a></p>
+<blockquote>
+<p>The NVMe specification allows one Admin Queue Pair to manage the entire controller, handling<br>functions like creating I&#x2F;O Queue Pairs and namespace management. Up to 65,535 I&#x2F;O Queue Pairs can be associated with each Admin Queue Pair, specifically for executing I&#x2F;O commands(read&#x2F;write). Each Queue Pair (QP) consists of a Submission Queue (SQ) for submitting commands and a Completion Queue (CQ) for receiving completions. SQ and CQ are circular buffers in host memory, shared with the device through DMA. The head or tail pointer of each queue is maintained in its Doorbell Registers (DBs). Furthermore, Controller Memory Buffer is a general-purpose read&#x2F;write memory region on the NVMe device controller that can be utilized for various purposes. </p>
+</blockquote>
+<p>读写过程：</p>
+<ol>
+<li>kernel确定读写的内存地址 即DMA地址 以及数据在设备上的地址 即LBA</li>
+<li>将信息写入SQ&#x2F;CQ </li>
+<li>写doorbell 寄存器 （MMIO）提交请求</li>
 </ol>
 <h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><p>目标：</p>
 <ol>
@@ -290,8 +300,27 @@
 <li>host&#x2F;hypervisor上的后端和设备驱动</li>
 <li>固件中的保护和检查代码</li>
 </ol>
-<p>控制平面：vmexit到host处理</p>
+<p>控制平面：vmexit到host处理 不在关键路径上</p>
 <p>数据平面：通过EPT映射IO队列 直接直通。每个虚拟机的LBA和HPA配置的时候都分开</p>
+<ul>
+<li>直通：虚拟机驱动中的IO队列先不映射到HPA，自然触发EPT page fault，然后映射到host上IO队列的HPA 完成直通</li>
+<li>隔离：每个VM拥有完全属于自己的IO队列、DMA范围、寄存器MMIO地址、LBA<ul>
+<li>IO队列：host的IO队列有很多（65535个），可以直接分给不同的虚拟机，EPT隔离。这是整个设计中最关键最巧合的地方，因为NVMe硬件碰巧支持这么多。</li>
+<li>DMA地址：每个VM使用不同的HPA范围，EPT隔离。然而NVM硬件的IOMMU只有一个，这篇文章的操作是每个VM使用完全不同的GPA范围，这样IOMMU自然可以翻译到不同的HPA范围。下文详细解释。</li>
+<li>doorbell寄存器（MMIO）：配置CAP.DSTRD可控制偏移，不同VM使用不同物理页 EPT隔离</li>
+<li>LBA：先hypervisor划分范围，但vm仍然可以伪造其他vm的LBA提交给硬件，所以在NVM固件中加入检查</li>
+</ul>
+</li>
+</ul>
+<p><strong>相当于把硬件提供的所有能力全部在软件上手动划分开，每个固定范围给一个虚拟机用，然后通过EPT、IOMMU、NVM固件来检查和隔离。</strong></p>
+<p>PRP&#x2F;SGL其实就是写的DMA address，也就是说 在打开IOMMU的情况下，NVMe硬件会自动通过IOMMU把PRP中的信息认为是IOVA（GPA）翻译为HPA，此时是不需要固件去保护隔离的。</p>
+<p>设备只有一个，IOMMU同时只能用一张页表。如果每个虚拟机用自己的页表，IO的时候切换IOMMU的页表，那么就无法完成并行读写，可扩展性差，所以引发了本文的设计：共享IOMMU页表。所有VM的GPA段完全不重复，使得IOMMU的一张页表可以完成所有虚拟机的翻译。</p>
+<p>存在两个问题。</p>
+<ol>
+<li>是否影响VM内核本身的逻辑？还是只改一个PA_BASE就可以？</li>
+<li>某种程序上约束了可扩展性，因为一个VM需要的DMA地址范围*虚拟机数量一定要小于宿主机内存大小。</li>
+</ol>
+<p>本文测试忽略了第二个问题，并没有展示任何有关地址范围和测试环境内存大小的信息，只在图5中以每个虚拟机4G内存为例。</p>
 
     </div>
 
@@ -346,7 +375,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">25:04</span>
+    <span title="Reading time total">25:07</span>
   </span>
 </div>
 <div class="busuanzi-count">
