@@ -146,7 +146,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -169,6 +169,302 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/01/31/cpp/effectiveC++/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/31/cpp/effectiveC++/" class="post-title-link" itemprop="url">Effective C++</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-31 14:01:02 / Modified: 14:22:58" itemprop="dateCreated datePublished" datetime="2026-01-31T14:01:02+08:00">2026-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/cpp/" itemprop="url" rel="index"><span itemprop="name">cpp</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>3.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>13 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="Effective-C"><a href="#Effective-C" class="headerlink" title="Effective C++"></a>Effective C++</h1><h2 id="让自己习惯C"><a href="#让自己习惯C" class="headerlink" title="让自己习惯C++"></a>让自己习惯C++</h2><ol>
+<li><ol>
+<li>c++有4个主要的次语言</li>
+</ol>
+<ul>
+<li>C 没有模板 异常 重载</li>
+<li>C++ 类 封装 继承 多态 虚函数</li>
+<li>Template 泛型</li>
+<li>STL</li>
+</ul>
+<p>不同次语言有不同的规约，需要使用不同的处理方式（例如传值和传引用的效率）</p>
+</li>
+<li><p>#define 直接被替换 报错时找不到信息 并且占用内存可能反而更大</p>
+<ul>
+<li>const 取地址合法</li>
+<li>enum 取地址不合法</li>
+<li>inline</li>
+</ul>
+</li>
+<li><p>用const修饰变量，函数等</p>
+<p>返回的对象可以使用const修饰 避免 <code>if(a*b=c)</code></p>
+<p>const可非const可重载</p>
+<p>非const可转型为const</p>
+</li>
+<li><p>类的成员变量的初始化发生在进入构造函数之前，且一定按声明的顺序</p>
+<p>使用初始化列表，内置类型也使用xx()的形式</p>
+</li>
+</ol>
+<h2 id="构造-析构-赋值运算"><a href="#构造-析构-赋值运算" class="headerlink" title="构造&#x2F;析构&#x2F;赋值运算"></a>构造&#x2F;析构&#x2F;赋值运算</h2><ol start="5">
+<li><p>默认构造函数会初始化基类和非静态成员变量，默认析构会自动调用析构（所以不用写），默认拷贝函数会复制每个非const对象</p>
+<p>三种情况 不会生成默认拷贝函数</p>
+<ul>
+<li>有引用成员变量</li>
+<li>有const成员变量</li>
+<li>基类的拷贝函数为private</li>
+</ul>
+</li>
+<li><p>不想使用默认的函数，可以声明为private</p>
+</li>
+<li><p>多态的基类的析构函数加virtual 避免用基类指针释放派生类对象出现内存泄漏</p>
+<p>虚函数使用虚函数指针管理，会增加内存占用</p>
+<p>如果基类的析构没有virtual 不适合派生，例如STL</p>
+</li>
+<li><p>在析构中catch异常，不向下传递</p>
+</li>
+<li><p>在派生类的构造&#x2F;析构函数调用基类的构造&#x2F;析构函数时，派生类的信息已经消失，所以在基类的构造&#x2F;析构函数中调用虚函数是无效的</p>
+</li>
+<li><p>为了实现连续赋值，让operator&#x3D;返回左值引用</p>
+</li>
+<li><p>operator&#x3D;的两个对象如果相同可能会出现删掉自己的问题 </p>
+<p>解决方法如下：</p>
+<ul>
+<li>开头判断是否相等 如果相等直接返回    增加了取址 条件跳转 影响效率</li>
+<li>调整顺序 先改再删 </li>
+<li>用swap</li>
+</ul>
+</li>
+<li><p>自定义拷贝构造函数和拷贝函数需要保证复制了每个成员变量，编译器不会提醒</p>
+<ul>
+<li>复制自己所有的成员变量</li>
+<li>调用基类的拷贝构造函数 <code>XX::operator=(rhs)</code></li>
+</ul>
+<p>拷贝构造函数和拷贝函数重复的代码可用一个private的init函数来写</p>
+</li>
+</ol>
+<h2 id="资源管理"><a href="#资源管理" class="headerlink" title="资源管理"></a>资源管理</h2><p>除了内存，文件描述符，锁、连接、socket都是资源</p>
+<ol start="13">
+<li><p>在一个函数中，使用指针 最后delete 可能导致由于中间部分的问题而没有delete</p>
+<p>使用智能指针管理，借助离开函数自动调用析构函数的机制 <code>std::auto_ptr&lt;A&gt; p(new A)</code></p>
+<p>智能指针默认执行delete 而不是delete[] 无法管理数组</p>
+<p>需要open close成对出现的资源 可以写在一个类中，close写在类的析构中，出现异常自动调用</p>
+</li>
+<li><p>资源管理类小心复制，可以直接禁止复制</p>
+</li>
+<li><p>虽然智能指针可以通过*或-&gt;像指针一样使用，但是<code>*A</code>与<code>std::auto_ptr&lt;A&gt;</code>类型并不相同，不能被函数接受</p>
+<p>智能指针提供get方法拿到原始指针，但是这样用户会觉得麻烦</p>
+<p>另一种方法是在类中定义隐式转换的函数 但这样会出现非预期的转换 造成bug</p>
+</li>
+<li><p>new delete ； new[]  delete[]  否则都会有bug</p>
+<ul>
+<li>多个构造函数用相同形式的new</li>
+<li>使用typedef 注意是否是数组</li>
+</ul>
+</li>
+<li><p>new得到的指针放入指针智能时使用独立语句，否则可能导致中间步骤的失败丢失new出来的指针</p>
+</li>
+</ol>
+<h2 id="设计与声明"><a href="#设计与声明" class="headerlink" title="设计与声明"></a>设计与声明</h2><ol start="18">
+<li><p>良好的接口不应该被误用，例如返回指针会导致没有delete&#x2F;delete两次&#x2F;错误方式delete等</p>
+<p>可以返回一个智能指针，同时设置好deleter 强制让用户使用智能指针来接受</p>
+<p>防止同类型的参数顺序出错，可以新声明几个类型，强制让用户使用新类型</p>
+</li>
+<li><p>设计class应该像设计type一样 考虑创建销毁 初始化赋值 传递 合法值 转换 操作符 接口等一系列问题</p>
+</li>
+<li><p>函数参数传递是按值传递，会调用构造函数，效率低，尽量使用引用传递，为了防止引用传递的后果 加const</p>
+<p>这样做可以解决对象切割的问题，即使用基类对象接受派生类，依然可以正确找到派生类声明为virtual的函数</p>
+<p>内置类型比较小 用引用涉及到指针反而慢， stl容器也尽量用值传递</p>
+</li>
+<li><p>函数的返回值也会涉及到构造与析构的浪费，但是此处并没有办法节省（除非返回值并不是函数生成的）</p>
+<p>尝试方法与问题如下：</p>
+<ul>
+<li>栈上分配 返回引用   返回时已经销毁 拿到已经销毁的变量</li>
+<li>堆上分配 返回指针   没人delete&#x2F;连续运算时丢失临时变量的指针</li>
+<li>使用static     static对象只看现值 严重bug</li>
+</ul>
+</li>
+<li><p>所有类的成员变量都应该是private 需要的话设置getter和setter通过函数访问</p>
+<p>好处如下：</p>
+<ul>
+<li>提供的接口都是函数，统一使用括号访问</li>
+<li>封装 可以随意修改实现方法</li>
+<li>取消此变量后不会让客户代码与派生类代码发生破坏</li>
+</ul>
+</li>
+<li><p>封装的内容越多，可访问内容的函数越少，改动影响的部分越少，可改动的弹性越大</p>
+<p>所以在两个函数具有相同功能的时候，尽量使用non-member&#x2F;non-friend去替代member(成员)函数</p>
+<p>可以使用namespace把工具函数和类放在同一区域中</p>
+<p>不同的源文件不能切分类，但是可以使用同一个namespace 切分工具函数</p>
+</li>
+<li><p>如果一个函数的所有参数都需要类型转换，应该成为non-member</p>
+<p>member函数一方是this 无法隐式转换</p>
+</li>
+<li><p>？ swap</p>
+</li>
+</ol>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><ol start="26">
+<li><p>尽量延后变量定义式出现的时间，否则可能会由于中途的异常而没有使用却承担了构造析构的成本</p>
+<p>直接给初值，而不是初始化之后再赋值</p>
+<p>循环中需要的变量放在内还是外需要对比构造析构与赋值操作的时间，放内部不影响作用域及可理解性、易维护性</p>
+</li>
+<li><p>少转型 用新式转型替代旧式转型</p>
+<p>转型不是只改变解释方式不改变数据，转型会生成代码（int和double的表示方式都不同）</p>
+<ul>
+<li>static_cast  强迫转型 但是在类的成员函数中转成基类调基类的函数会导致生成函数副本，使用错误的this</li>
+<li>dynamic_cast 向下转型，可以通过基类派生类，但是效率不高，最好用virtual实现相同的功能</li>
+</ul>
+</li>
+<li><p>避免返回handles（引用，指针，迭代器）</p>
+<p>风险如下：</p>
+<ul>
+<li>操作了private成员&#x2F;声明为const的函数&#x2F;变量实际修改了内容</li>
+<li>handles所指内容的主体已经被析构，造成空悬</li>
+</ul>
+<p>例外：string vector等容器的operator&#x3D;返回的是引用</p>
+</li>
+<li><p>函数需要异常安全</p>
+<p>三个等级：</p>
+<ul>
+<li>基本：不破坏数据结构（例如资源泄露，打乱排序数组）</li>
+<li>强烈：保证状态不变 可以通过copy-swap实现，及创建副本 修改在副本上 然后交换 但可能效率较低 复杂程度较高；并且，如果这个函数中调用了其他函数，但是其他函数并没有强烈的异常安全保证，自己也不行。</li>
+<li>不抛异常</li>
+</ul>
+</li>
+<li><p>inline 用函数本体替换每次调用的地方，编译时候完成，编译器会选择（太复杂或者virtual会拒绝）</p>
+<ul>
+<li><p>好处：减小函数调用的开销</p>
+</li>
+<li><p>坏处：可能增大字节码，修改后必须重新编译</p>
+</li>
+</ul>
+</li>
+<li><p>？传统的方式（.h&#x2F;.cpp）并没有编译依存最小化，仅仅修改一部分就需要全部编译</p>
+<p>可通过以下两种方式解耦接口与实现：</p>
+<ul>
+<li>handle classes：通过组合方式，类A使用类AImpl完全其所有的函数</li>
+<li>interface classes：通过继承方式，类A提供接口，全是纯虚函数，类B继承类A实现这些函数。</li>
+</ul>
+</li>
+</ol>
+<h2 id="继承与面向对象设计"><a href="#继承与面向对象设计" class="headerlink" title="继承与面向对象设计"></a>继承与面向对象设计</h2><ol start="32">
+<li><p>public继承必须满足is-a的关系（里氏替换原则）</p>
+</li>
+<li><p>派生类函数会遮蔽基类的函数，具体情况为基类有多个重载的函数，派生类有一个同名的函数，那么基类的多个函数全被遮蔽（与virtual无关），如果是public继承则违反了is-a的关系 </p>
+<p>解决方法是使用<code>using Base::f</code> 但这样会把所有的重载的f都拿到作用域中</p>
+<p>如果只想用某一个，可以先用private继承，然后在同名函数中直接调用<code>Base::f()</code></p>
+</li>
+<li><p>区分接口继承和实现继承</p>
+<p>用virtual 同时继承接口和实现，可以重写各自的实现，但问题是如果忘记重写了编译器并不会报错，而是会使用基类的函数</p>
+<p>用pure virtual 可以强制让派生类提供实现，但是可能会出现相同代码</p>
+<p>在基类中提供一个default版本的代码供派生类调用，但这样会多一个函数，且造成命名混乱</p>
+<p>解决方法：给纯虚函数提供实现，派生类通过<code>Base::f()</code>调用此函数</p>
+</li>
+<li><p>？设计模式   替代virtual</p>
+<p>private  virtual&#x2F;public non-virtual调用virtual</p>
+</li>
+<li><p>non-virtual函数不应该被重新定义</p>
+</li>
+<li><p>函数参数的缺省值是看静态类型的，所以virtual函数的参数缺省值只有基类起作用</p>
+</li>
+<li><p>复合  has-a</p>
+</li>
+<li><p>？private继承</p>
+<p>private继承得到的接口都是private 禁止调用</p>
+<p>在设计层面上无意义，只是方便实现</p>
+<p>尽可能用复合而不是private继承</p>
+<p>空对象也有大小</p>
+</li>
+<li><p>？多重继承</p>
+<p>菱形继承 virtual继承</p>
+</li>
+</ol>
+<h2 id="模板与泛型编程"><a href="#模板与泛型编程" class="headerlink" title="模板与泛型编程"></a>模板与泛型编程</h2><p>41. </p>
+<p>42. </p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -2015,219 +2311,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2024/09/17/virtualization/balloon/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="szy">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="S blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | S blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/09/17/virtualization/balloon/" class="post-title-link" itemprop="url">balloon</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2024-09-17 19:48:03" itemprop="dateCreated datePublished" datetime="2024-09-17T19:48:03+08:00">2024-09-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="Word count in article">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">Word count in article: </span>
-      <span>14k</span>
-    </span>
-    <span class="post-meta-item" title="Reading time">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>51 mins.</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="balloon"><a href="#balloon" class="headerlink" title="balloon"></a>balloon</h1><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><ul>
-<li>guest使用的内核在编译时需要把config_virtio_balloon的选项打开，可以y直接编译进内核 也可以m作为模块手动加载</li>
-<li>qemu启动时加入virtio-balloon选项</li>
-</ul>
-<p>进入虚拟机后ctrl a c进入qemu monitor</p>
-<ul>
-<li>info balloon查看当前balloon大小，默认为qemu启动时指定的最大内存</li>
-<li>balloon xxx(mb) 调整大小</li>
-</ul>
-<p>显示的balloon大小为VM真实可用的内存，剩下的给host</p>
-<ul>
-<li>如果不加入deflate-on-oom参数，VMfree -mh显示内存为balloon大小 超过此大小触发oom killer</li>
-<li>如果加入此参数，VM free -mh显示启动指定的最大参数，但是used显示分给host的值 超过balloon大小会自动调大balloon</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://www.linux-kvm.org/page/Projects/auto-ballooning#TODO">Projects&#x2F;auto-ballooning - KVM (linux-kvm.org)</a></p>
-<p>auto balloon似乎被废弃了</p>
-<p><a target="_blank" rel="noopener" href="https://www.ovirt.org/develop/projects/mom.html">MoM | oVirt</a>这个工具可能可用</p>
-<p>qmp:</p>
-<ul>
-<li>balloon  value</li>
-<li>query-balloon</li>
-</ul>
-<h2 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h2><p>host guest1 guest2均为4G内存</p>
-<ol>
-<li>guest1要2G 从内存分配</li>
-<li>guest2要2G swap掉guest1</li>
-<li>guest1要2G swap掉guest2</li>
-</ol>
-<p><strong>1 正常情况  guest2要内存 host内存不够 回收 但是guest1的2G被swap</strong> 从htop中guest1的qemu 进程mem占用情况可以看出来</p>
-<p>ctrl a c 输入info balloon &#x2F;balloon xxx (MB)</p>
-<p>balloon后面的数字代表VM真实可用内存(不参与balloon) 这个值不能超过qemu启动分配的内存</p>
-<p>balloon目前找不到合适的自动化监控，需要手动用qemu调</p>
-<p><strong>2 guest2需要很多内存的时候手动进guest1的qemu monitor 调小balloon 然后reclaim会直接回收而不是swap</strong></p>
-<p>balloon只会回收guest内存 不会回收host上被swap的guest的页</p>
-<p><a target="_blank" rel="noopener" href="https://zhidao.baidu.com/question/1519495184466483140.html">KVM之四：内存balloon的奇妙_百度知道 (baidu.com)</a></p>
-<blockquote>
-<p>目前没有比较方便的、自动化的机制来管理ballooning，一般都是采用在QEMU monitor中执行balloon命令来实现ballooning的。没有对VM的有效监控，没有自动化的ballooning机制，这可能会让生产环境中实现大规模自动化部署并不很方便。</p>
-</blockquote>
-<p><strong>3 如果memhog后sleep 持续占用内存 那balloon会直接把这个进程kill掉 强行拿掉VM的内存</strong></p>
-<p>所以用balloon和不用在结果上是有很大区别的。不用balloon host会把VM的所有内存都swap掉 不管free与否；用balloon host会强行回收VM内存 如果不够就让VMkill自己的进程 </p>
-<p><strong>4 如果VM配了 swap VM会swap</strong></p>
-<blockquote>
-<p>如果有大量内存从VM系统中回收，Ballooning可能会降低VM操作系统运行的性能。一方面，内存的减少，可能会让VM中作为磁盘数据缓存的内存被放到气球中，从而VM中的磁盘I&#x2F;O访问会增加；另一方面，如果处理机制不够好，也可能让VM中正在运行的进程由于内存不足而执行失败。</p>
-</blockquote>
-<p>[<a target="_blank" rel="noopener" href="https://listman.redhat.com/archives/libvir-list/2015-December/msg00494.html">libvirt] [PATCH 2&#x2F;2] qemu: add support of optional ‘deflate-on-oom’ attribute (redhat.com)</a></p>
-<p>qemu中可以加入deflate-on-oom的选项，这时候配置了balloon并不会让VM的可用内存变小，而是在VM可用内存不变的情况下增加了Used，之后不会影响VM程序的正常使用。<strong>5 当VM需要的内存大于balloon配置之后，会自动进行deflate 向host要内存 此时info balloon可以看到balloon的值被自动调大了</strong>。但是被调大之后是不会再自动缩小的</p>
-<p><strong>6 VM自己swap的优先级是比deflate-on-oom的优先级高的</strong></p>
-<p><strong>7 在VMlogout的时候 balloon进行回收 仍然能回收到</strong></p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/edver/p/14684138.html">virtio简介（二） —— virtio-balloon guest侧驱动 - Edver - 博客园 (cnblogs.com)</a></p>
-<p><a target="_blank" rel="noopener" href="http://ssdxiao.github.io/linux/2017/03/20/Virtio-Balloon.html">Virtio-Balloon超详细分析 (ssdxiao.github.io)</a></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">virtio_driver</span> <span class="title">virtio_balloon_driver</span> =</span> &#123;</span><br><span class="line">	.feature_table = features,</span><br><span class="line">	.feature_table_size = ARRAY_SIZE(features),</span><br><span class="line">	.driver.name =	KBUILD_MODNAME,</span><br><span class="line">	.driver.owner =	THIS_MODULE,</span><br><span class="line">	.id_table =	id_table,</span><br><span class="line">	.validate =	virtballoon_validate,</span><br><span class="line">	.probe =	virtballoon_probe,</span><br><span class="line">	.remove =	virtballoon_remove,</span><br><span class="line">	.config_changed = virtballoon_changed,</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_PM_SLEEP</span></span><br><span class="line">	.freeze	=	virtballoon_freeze,</span><br><span class="line">	.restore =	virtballoon_restore,</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>本身暴露的接口并不多 可以认为就<code>virtballoon_changed</code>一个</p>
-<p>这个内核模块是前端</p>
-<p>需要qemu添加<code>-device virtio-balloon-pci</code>在宿主机上创建一个balloon后端</p>
-<p>qemu monitor中的balloon指令会向VM中的驱动发送指令，从而调用<code>virtballoon_changed</code></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> __virtio_config_changed(<span class="keyword">struct</span> virtio_device *dev)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">virtio_driver</span> *<span class="title">drv</span> =</span> drv_to_virtio(dev-&gt;dev.driver);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!dev-&gt;config_enabled)</span><br><span class="line">		dev-&gt;config_change_pending = <span class="literal">true</span>;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (drv &amp;&amp; drv-&gt;config_changed)</span><br><span class="line">		drv-&gt;config_changed(dev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>update_balloon_size_func</code> 每次<code>virtballoon_changed</code>只会发生一次 但是调整大小的函数会触发很多次 不是一次性调整好的，并且<code>virtballoon_changed</code>是异步。如果每次update输出时间影响效率</p>
-<p>内核启动时<code>vp_find_vqs_intx</code>注册<code>vp_interrupt</code> 之后向队列写入信息时会产生中断</p>
-<p><code>vp_interrupt</code>-&gt;<code>vp_config_changed</code>-&gt;<code>virtio_config_changed</code>-&gt;<code>__virtio_config_changed</code></p>
-<p>注册vp_interrupt的函数 追踪调用 发现是probe的init_vqs probe由virio_bus的probe调用</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">bind_store</span><span class="params">(<span class="keyword">struct</span> device_driver *drv, <span class="type">const</span> <span class="type">char</span> *buf,</span></span><br><span class="line"><span class="params">			  <span class="type">size_t</span> count)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">bus_type</span> *<span class="title">bus</span> =</span> bus_get(drv-&gt;bus);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">dev</span>;</span></span><br><span class="line">	<span class="type">int</span> err = -ENODEV;</span><br><span class="line"></span><br><span class="line">	dev = bus_find_device_by_name(bus, <span class="literal">NULL</span>, buf);</span><br><span class="line">	<span class="keyword">if</span> (dev &amp;&amp; driver_match_device(drv, dev)) &#123;</span><br><span class="line">		err = device_driver_attach(drv, dev);</span><br><span class="line">		<span class="keyword">if</span> (!err) &#123;</span><br><span class="line">			<span class="comment">/* success */</span></span><br><span class="line">			err = count;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	put_device(dev);</span><br><span class="line">	bus_put(bus);</span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> device *<span class="title function_">bus_find_device</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> bus_type *bus,</span></span><br><span class="line"><span class="params">			       <span class="keyword">struct</span> device *start, <span class="type">const</span> <span class="type">void</span> *data,</span></span><br><span class="line"><span class="params">			       <span class="type">int</span> (*match)(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="type">void</span> *data))</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">subsys_private</span> *<span class="title">sp</span> =</span> bus_to_subsys(bus);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">klist_iter</span> <span class="title">i</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span> *<span class="title">dev</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!sp)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	klist_iter_init_node(&amp;sp-&gt;klist_devices, &amp;i,</span><br><span class="line">			     (start ? &amp;start-&gt;p-&gt;knode_bus : <span class="literal">NULL</span>));</span><br><span class="line">	<span class="keyword">while</span> ((dev = next_device(&amp;i)))</span><br><span class="line">		<span class="keyword">if</span> (match(dev, data) &amp;&amp; get_device(dev))</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	klist_iter_exit(&amp;i);</span><br><span class="line">	subsys_put(sp);</span><br><span class="line">	<span class="keyword">return</span> dev;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> <span class="title function_">device_match_name</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="type">void</span> *name)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> sysfs_streq(dev_name(dev), name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>所有device维护在bus这个数据结构中</p>
-<p><code>mdev_device_create</code> 创建device</p>
-<p>对于qemu的info操作 似乎并不会触发内核的函数 如何通过一个接口看一下时间？</p>
-<p>在update size函数中 如果无变化返回之前 加入print</p>
-<p>即想查看的时候同样用修改的接口 输入一个不变的值即可</p>
-<p>从结果来看比较准确且稳定</p>
-<p>fill_balloon会从内核模块alloc page 表示已经拿了这个page 所以guest kernel没法用了</p>
-<p>leak_balloon释放这个page</p>
-<h3 id="fill"><a href="#fill" class="headerlink" title="fill"></a>fill</h3><h4 id="guest"><a href="#guest" class="headerlink" title="guest"></a>guest</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> page *<span class="title function_">balloon_page_alloc</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span> =</span> alloc_page(balloon_mapping_gfp_mask() |</span><br><span class="line">				       __GFP_NOMEMALLOC | __GFP_NORETRY);</span><br><span class="line">	<span class="keyword">return</span> page;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="title function_">fill_balloon</span><span class="params">(<span class="keyword">struct</span> virtio_balloon *vb, <span class="type">size_t</span> num)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> num_allocated_pages;</span><br><span class="line">	<span class="type">unsigned</span> num_pfns;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span></span><br><span class="line">	LIST_HEAD(pages);</span><br><span class="line">	num = min(num, ARRAY_SIZE(vb-&gt;pfns));</span><br><span class="line">	<span class="keyword">for</span> (num_pfns = <span class="number">0</span>; num_pfns &lt; num;</span><br><span class="line">	     num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE) &#123;</span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span> =</span> balloon_page_alloc();</span><br><span class="line">		...</span><br><span class="line">		<span class="comment">//local list 和balloon_page_pop对应 只是一次性全部alloc而已</span></span><br><span class="line">		balloon_page_push(&amp;pages, page);</span><br><span class="line">	&#125;</span><br><span class="line">	mutex_lock(&amp;vb-&gt;balloon_lock);</span><br><span class="line">	vb-&gt;num_pfns = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span> ((page = balloon_page_pop(&amp;pages))) &#123;</span><br><span class="line">        <span class="comment">//把这次拿到的page全部加入balloon中</span></span><br><span class="line">		balloon_page_enqueue(&amp;vb-&gt;vb_dev_info, page);</span><br><span class="line">		set_page_pfns(vb, vb-&gt;pfns + vb-&gt;num_pfns, page);</span><br><span class="line">		vb-&gt;num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;</span><br><span class="line">		<span class="keyword">if</span> (!virtio_has_feature(vb-&gt;vdev,</span><br><span class="line">					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))</span><br><span class="line">            <span class="comment">//如果没开DEFLATE_ON_OOM guest内核可用的page是减少的</span></span><br><span class="line">			adjust_managed_page_count(page, <span class="number">-1</span>);</span><br><span class="line">		vb-&gt;num_pfns += VIRTIO_BALLOON_PAGES_PER_PAGE;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	num_allocated_pages = vb-&gt;num_pfns;</span><br><span class="line">	<span class="keyword">if</span> (vb-&gt;num_pfns != <span class="number">0</span>)</span><br><span class="line">		tell_host(vb, vb-&gt;inflate_vq);</span><br><span class="line">	mutex_unlock(&amp;vb-&gt;balloon_lock);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> num_allocated_pages;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>[<a target="_blank" rel="noopener" href="https://blog.csdn.net/u010923083/article/details/115873669">内核内存] 伙伴系统4—alloc_pages(内存块分配)_早起的虫儿有鹰吃的博客-CSDN博客</a></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">tell_host</span><span class="params">(<span class="keyword">struct</span> virtio_balloon *vb, <span class="keyword">struct</span> virtqueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">scatterlist</span> <span class="title">sg</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> len;</span><br><span class="line">	sg_init_one(&amp;sg, vb-&gt;pfns, <span class="keyword">sizeof</span>(vb-&gt;pfns[<span class="number">0</span>]) * vb-&gt;num_pfns);</span><br><span class="line">	virtqueue_add_outbuf(vq, &amp;sg, <span class="number">1</span>, vb, GFP_KERNEL);</span><br><span class="line">	virtqueue_kick(vq);</span><br><span class="line">	wait_event(vb-&gt;acked, virtqueue_get_buf(vq, &amp;len));</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">virtqueue_notify</span><span class="params">(<span class="keyword">struct</span> virtqueue *_vq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">vring_virtqueue</span> *<span class="title">vq</span> =</span> to_vvq(_vq);</span><br><span class="line">	<span class="keyword">if</span> (unlikely(vq-&gt;broken))</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">if</span> (!vq-&gt;notify(_vq)) &#123;</span><br><span class="line">		vq-&gt;broken = <span class="literal">true</span>;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">bool</span> <span class="title function_">vp_notify</span><span class="params">(<span class="keyword">struct</span> virtqueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">/* we write the queue&#x27;s selector into the notification register to</span></span><br><span class="line"><span class="comment">	 * signal the other end */</span></span><br><span class="line">    <span class="comment">// value, addr</span></span><br><span class="line">	iowrite16(vq-&gt;index, (<span class="type">void</span> __iomem *)vq-&gt;priv);</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里wait_event是一个宏 传入的第二个参数会一直被调用然后sleep</p>
-<p>相当于</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">for(;;)&#123;</span><br><span class="line">	if (virtqueue_get_buf(vq, &amp;len))</span><br><span class="line">		break;</span><br><span class="line">	schedule();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="qemu"><a href="#qemu" class="headerlink" title="qemu"></a>qemu</h4><p>virtio:<a target="_blank" rel="noopener" href="https://blog.csdn.net/xidianjiapei001/article/details/89293914">IO虚拟化 - virtio介绍及代码分析【转】_xidianjiapei001的博客-CSDN博客</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/edver/category/1939743.html">虚拟化 - 随笔分类 - Edver - 博客园 (cnblogs.com)</a></p>
-<p>virtqueue初始化过程：</p>
-<p>virtio_pci_legacy_probe 初始化回调函数</p>
-<p><code>virtballoon_probe</code>-&gt;<code>init_vqs</code>-&gt;<code>virtio_find_vqs</code>-&gt;<code>find_vqs(vp_find_vqs)</code>-&gt;<code>vp_find_vqs_msix</code>-&gt;<code>vp_setup_vq(setup_vq)</code>-&gt;<code>vring_create_virtqueue</code></p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/edver/p/14684117.html">virtio简介（三） —— virtio-balloon qemu设备创建 - Edver - 博客园 (cnblogs.com)</a></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">virtio_balloon_device_realize</span><span class="params">(DeviceState *dev, Error **errp)</span></span><br><span class="line">&#123;</span><br><span class="line">    VirtIODevice *vdev = VIRTIO_DEVICE(dev);</span><br><span class="line">    VirtIOBalloon *s = VIRTIO_BALLOON(dev);</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    virtio_init(vdev, VIRTIO_ID_BALLOON, virtio_balloon_config_size(s));</span><br><span class="line"></span><br><span class="line">    ret = qemu_add_balloon_handler(virtio_balloon_to_target,</span><br><span class="line">                                   virtio_balloon_stat, s);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (ret &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        error_setg(errp, <span class="string">&quot;Only one balloon device is supported&quot;</span>);</span><br><span class="line">        virtio_cleanup(vdev);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (virtio_has_feature(s-&gt;host_features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) &amp;&amp;</span><br><span class="line">        !s-&gt;iothread) &#123;</span><br><span class="line">        error_setg(errp, <span class="string">&quot;&#x27;free-page-hint&#x27; requires &#x27;iothread&#x27; to be set&quot;</span>);</span><br><span class="line">        virtio_cleanup(vdev);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    s-&gt;ivq = virtio_add_queue(vdev, <span class="number">128</span>, virtio_balloon_handle_output);</span><br><span class="line">    s-&gt;dvq = virtio_add_queue(vdev, <span class="number">128</span>, virtio_balloon_handle_output);</span><br><span class="line">    s-&gt;svq = virtio_add_queue(vdev, <span class="number">128</span>, virtio_balloon_receive_stats);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">virtio_queue_notify_vq</span><span class="params">(VirtQueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (vq-&gt;vring.desc &amp;&amp; vq-&gt;handle_output) &#123;</span><br><span class="line">        VirtIODevice *vdev = vq-&gt;vdev;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (unlikely(vdev-&gt;broken)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        trace_virtio_queue_notify(vdev, vq - vdev-&gt;vq, vq);</span><br><span class="line">        vq-&gt;handle_output(vdev, vq);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (unlikely(vdev-&gt;start_on_kick)) &#123;</span><br><span class="line">            virtio_set_started(vdev, <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">virtio_balloon_handle_output</span><span class="params">(VirtIODevice *vdev, VirtQueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">    VirtIOBalloon *s = VIRTIO_BALLOON(vdev);</span><br><span class="line">    VirtQueueElement *elem;</span><br><span class="line">    MemoryRegionSection section;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        PartiallyBalloonedPage pbp = &#123;&#125;;</span><br><span class="line">        <span class="type">size_t</span> offset = <span class="number">0</span>;</span><br><span class="line">        <span class="type">uint32_t</span> pfn;</span><br><span class="line"></span><br><span class="line">        elem = virtqueue_pop(vq, <span class="keyword">sizeof</span>(VirtQueueElement));</span><br><span class="line">        <span class="keyword">if</span> (!elem) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (iov_to_buf(elem-&gt;out_sg, elem-&gt;out_num, offset, &amp;pfn, <span class="number">4</span>) == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">int</span> p = virtio_ldl_p(vdev, &amp;pfn);</span><br><span class="line">            hwaddr pa;</span><br><span class="line"></span><br><span class="line">            pa = (hwaddr) p &lt;&lt; VIRTIO_BALLOON_PFN_SHIFT;</span><br><span class="line">            offset += <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">            section = memory_region_find(get_system_memory(), pa,</span><br><span class="line">                                         BALLOON_PAGE_SIZE);</span><br><span class="line">            <span class="keyword">if</span> (!section.mr) &#123;</span><br><span class="line">                trace_virtio_balloon_bad_addr(pa);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!memory_region_is_ram(section.mr) ||</span><br><span class="line">                memory_region_is_rom(section.mr) ||</span><br><span class="line">                memory_region_is_romd(section.mr)) &#123;</span><br><span class="line">                trace_virtio_balloon_bad_addr(pa);</span><br><span class="line">                memory_region_unref(section.mr);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            trace_virtio_balloon_handle_output(memory_region_name(section.mr),</span><br><span class="line">                                               pa);</span><br><span class="line">            <span class="keyword">if</span> (!virtio_balloon_inhibited()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (vq == s-&gt;ivq) &#123;</span><br><span class="line">                    balloon_inflate_page(s, section.mr,</span><br><span class="line">                                         section.offset_within_region, &amp;pbp);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vq == s-&gt;dvq) &#123;</span><br><span class="line">                    balloon_deflate_page(s, section.mr, section.offset_within_region);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    g_assert_not_reached();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            memory_region_unref(section.mr);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        virtqueue_push(vq, elem, <span class="number">0</span>);</span><br><span class="line">        virtio_notify(vdev, vq);</span><br><span class="line">        g_free(elem);</span><br><span class="line">        virtio_balloon_pbp_free(&amp;pbp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>inflate操作是guest会立即把内存还给host</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">balloon_inflate_page</span><span class="params">(VirtIOBalloon *balloon,</span></span><br><span class="line"><span class="params">                                 MemoryRegion *mr, hwaddr mr_offset,</span></span><br><span class="line"><span class="params">                                 PartiallyBalloonedPage *pbp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *addr = memory_region_get_ram_ptr(mr) + mr_offset;</span><br><span class="line">    <span class="type">ram_addr_t</span> rb_offset, rb_aligned_offset, base_gpa;</span><br><span class="line">    RAMBlock *rb;</span><br><span class="line">    <span class="type">size_t</span> rb_page_size;</span><br><span class="line">    <span class="type">int</span> subpages;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* XXX is there a better way to get to the RAMBlock than via a</span></span><br><span class="line"><span class="comment">     * host address? */</span></span><br><span class="line">    rb = qemu_ram_block_from_host(addr, <span class="literal">false</span>, &amp;rb_offset);</span><br><span class="line">    rb_page_size = qemu_ram_pagesize(rb);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rb_page_size == BALLOON_PAGE_SIZE) &#123;</span><br><span class="line">        <span class="comment">/* Easy case */</span></span><br><span class="line"></span><br><span class="line">        ram_block_discard_range(rb, rb_offset, rb_page_size);</span><br><span class="line">        <span class="comment">/* We ignore errors from ram_block_discard_range(), because it</span></span><br><span class="line"><span class="comment">         * has already reported them, and failing to discard a balloon</span></span><br><span class="line"><span class="comment">         * page is not fatal */</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	...<span class="comment">//经过测试 基本都是easy case</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ram_block_discard_range会调madvice</p>
-<blockquote>
-<p>MADV_WILLNEED<br>Expect access in the near future. (Hence, it might be a good idea to read some pages ahead.)</p>
-<p>MADV_DONTNEED<br>Do not expect access in the near future. (For the time being, the application is finished with the given range, so the kernel can free resources associated with it.) Subsequent accesses of pages in this range will succeed, but will result either in reloading of the memory contents from the underlying mapped file (see mmap(2)) or zero-fill-on-demand pages for mappings without an underlying file.<br>MADV_REMOVE (Since Linux 2.6.16)<br>Free up a given range of pages and its associated backing store. Currently, only shmfs&#x2F;tmpfs supports this; other file systems return with the error ENOSYS.</p>
-</blockquote>
-<p>经过尝试后发现 <strong>通过mmap拿的内存 madvise <code>MADV_DONTNEED</code> 是会立即被回收的</strong></p>
-<p>实际上这里一定需要unmap ept 否则需要相信guest kernel不会访问已经被释放的页 但是VMM不相信VM</p>
-<p>这里没有手动unmap的原因是 madvise之后 内核如果真的free page 也需要修改自己的页表 并且调用mmu notify 最终通知kvm <code>kvm_mmu_notifier_invalidate_range_start</code>host上加输出可以看到</p>
-<p>mm&#x2F;madvise.c </p>
-<p><code>do_madvise</code>-&gt;<code>madvise_vma_behavior</code>-&gt;<code>madvise_dontneed_free</code>-&gt;<code>madvise_dontneed_single_vma</code>-&gt;<code>zap_page_range</code>-&gt;</p>
-<p><code>mmu_notifier_invalidate_range_start</code> 解kvm ept</p>
-<p><code>unmap_single_vma</code> 解kernel</p>
-<p>这里只是unmap 但是并没有free掉相应的物理内存(修改page元数据 还给buddy system) 那不还是用不了？</p>
-<blockquote>
-<p>成功执行<strong>MADV_DONTNEED</strong>操作之后，访问指定区域的语义将发生变化：后续访问这些页面将会成功，但是会导致从底层映射文件中重新填充内容(用于共享文件映射、共享匿名映射及shmem等)或者导致私有映射的零填充按需页面。因此此操作是直接将page给回收了，从对私有映射的处理来看，与swap还是略微不同的。</p>
-<p>需要注意的是，当应用于共享映射时，<strong>MADV_DONTNEED</strong> 可能不会立即释放范围内的页面。内核可以自由地选择合适的时机来释放页面。然而，调用进程的常驻集大小 (RSS) 将立即减少。</p>
-<p>作者：蟹蟹宁<br>链接：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/965b1ed71ae4">https://www.jianshu.com/p/965b1ed71ae4</a><br>来源：简书<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-</blockquote>
-<h3 id="leak"><a href="#leak" class="headerlink" title="leak"></a>leak</h3><p>用的是inflate存下来的page 一模一样的</p>
-<p>其实deflate是无所谓的 根据现有的所有机制 VM想用就用就行了</p>
-<p>qemu</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">virtio_balloon_handle_output</span><span class="params">(VirtIODevice *vdev, VirtQueue *vq)</span></span><br><span class="line">&#123;</span><br><span class="line">    VirtIOBalloon *s = VIRTIO_BALLOON(vdev);</span><br><span class="line">    VirtQueueElement *elem;</span><br><span class="line">    MemoryRegionSection section;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        PartiallyBalloonedPage pbp = &#123;&#125;;</span><br><span class="line">        <span class="type">size_t</span> offset = <span class="number">0</span>;</span><br><span class="line">        <span class="type">uint32_t</span> pfn;</span><br><span class="line"></span><br><span class="line">        elem = virtqueue_pop(vq, <span class="keyword">sizeof</span>(VirtQueueElement));</span><br><span class="line">        <span class="keyword">if</span> (!elem) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (iov_to_buf(elem-&gt;out_sg, elem-&gt;out_num, offset, &amp;pfn, <span class="number">4</span>) == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="type">unsigned</span> <span class="type">int</span> p = virtio_ldl_p(vdev, &amp;pfn);</span><br><span class="line">            hwaddr pa;</span><br><span class="line"></span><br><span class="line">            pa = (hwaddr) p &lt;&lt; VIRTIO_BALLOON_PFN_SHIFT;</span><br><span class="line">            offset += <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">            section = memory_region_find(get_system_memory(), pa,</span><br><span class="line">                                         BALLOON_PAGE_SIZE);</span><br><span class="line">            <span class="keyword">if</span> (!section.mr) &#123;</span><br><span class="line">                trace_virtio_balloon_bad_addr(pa);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!memory_region_is_ram(section.mr) ||</span><br><span class="line">                memory_region_is_rom(section.mr) ||</span><br><span class="line">                memory_region_is_romd(section.mr)) &#123;</span><br><span class="line">                trace_virtio_balloon_bad_addr(pa);</span><br><span class="line">                memory_region_unref(section.mr);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            trace_virtio_balloon_handle_output(memory_region_name(section.mr),</span><br><span class="line">                                               pa);</span><br><span class="line">            <span class="keyword">if</span> (!virtio_balloon_inhibited()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (vq == s-&gt;ivq) &#123;</span><br><span class="line">                    balloon_inflate_page(s, section.mr,</span><br><span class="line">                                         section.offset_within_region, &amp;pbp);</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vq == s-&gt;dvq) &#123;</span><br><span class="line">                    balloon_deflate_page(s, section.mr, section.offset_within_region);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    g_assert_not_reached();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            memory_region_unref(section.mr);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        virtqueue_push(vq, elem, <span class="number">0</span>);</span><br><span class="line">        virtio_notify(vdev, vq);</span><br><span class="line">        g_free(elem);</span><br><span class="line">        virtio_balloon_pbp_free(&amp;pbp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">balloon_deflate_page</span><span class="params">(VirtIOBalloon *balloon,</span></span><br><span class="line"><span class="params">                                 MemoryRegion *mr, hwaddr mr_offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *addr = memory_region_get_ram_ptr(mr) + mr_offset;</span><br><span class="line">    <span class="type">ram_addr_t</span> rb_offset;</span><br><span class="line">    RAMBlock *rb;</span><br><span class="line">    <span class="type">size_t</span> rb_page_size;</span><br><span class="line">    <span class="type">void</span> *host_addr;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* XXX is there a better way to get to the RAMBlock than via a</span></span><br><span class="line"><span class="comment">     * host address? */</span></span><br><span class="line">    rb = qemu_ram_block_from_host(addr, <span class="literal">false</span>, &amp;rb_offset);</span><br><span class="line">    rb_page_size = qemu_ram_pagesize(rb);</span><br><span class="line"></span><br><span class="line">    host_addr = (<span class="type">void</span> *)((<span class="type">uintptr_t</span>)addr &amp; ~(rb_page_size - <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* When a page is deflated, we hint the whole host page it lives</span></span><br><span class="line"><span class="comment">     * on, since we can&#x27;t do anything smaller */</span></span><br><span class="line">    ret = qemu_madvise(host_addr, rb_page_size, QEMU_MADV_WILLNEED);</span><br><span class="line">    <span class="keyword">if</span> (ret != <span class="number">0</span>) &#123;</span><br><span class="line">        warn_report(<span class="string">&quot;Couldn&#x27;t MADV_WILLNEED on balloon deflate: %s&quot;</span>,</span><br><span class="line">                    strerror(errno));</span><br><span class="line">        <span class="comment">/* Otherwise ignore, failing to page hint shouldn&#x27;t be fatal */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>wait_event在include&#x2F;linux&#x2F;wait.h</p>
-<p>___wait_event</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
     <a class="extend prev" rel="prev" title="Previous page" aria-label="Previous page" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" title="Next page" aria-label="Next page" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
@@ -2251,13 +2334,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="Word count total">414k</span>
+    <span title="Word count total">418k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">25:07</span>
+    <span title="Reading time total">25:19</span>
   </span>
 </div>
 <div class="busuanzi-count">

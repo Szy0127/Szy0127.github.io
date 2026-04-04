@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://szy0127.github.io/2026/04/04/virtualization/RKNPU%20driver/</loc>
+    
+    <lastmod>2026-04-04</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://szy0127.github.io/2026/02/20/papers/High-performance%20and%20Scalable%20Software-based%20NVMe%20Virtualization%20Mechanism%20with%20IO%20Queues%20Passthrough/</loc>
     
     <lastmod>2026-02-22</lastmod>
