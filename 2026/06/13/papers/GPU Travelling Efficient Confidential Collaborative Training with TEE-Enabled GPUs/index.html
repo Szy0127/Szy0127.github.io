@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha256-yIDrPSXHZdOZhAqiBP7CKzIwMQmRCJ8UeB8Jo17YC4o=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"szy0127.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.19.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs CCS’25 Background多个彼此不信任的数据持有方，希望一起训练一个模型，但又不能泄露各自的私有数据，原因可能是隐私、法规、版权或商业竞争。 随着现代训练任务尤其是 LLM 的模型和数据集越来越大，现有方案在训练过程中需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs">
+<meta property="og:url" content="http://szy0127.github.io/2026/06/13/papers/GPU%20Travelling%20Efficient%20Confidential%20Collaborative%20Training%20with%20TEE-Enabled%20GPUs/index.html">
+<meta property="og:site_name" content="S blog">
+<meta property="og:description" content="GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs CCS’25 Background多个彼此不信任的数据持有方，希望一起训练一个模型，但又不能泄露各自的私有数据，原因可能是隐私、法规、版权或商业竞争。 随着现代训练任务尤其是 LLM 的模型和数据集越来越大，现有方案在训练过程中需要">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://szy0127.github.io/images/A2Yvbvn5QoxdeLxbiHOcpmzonxd.png">
+<meta property="og:image" content="http://szy0127.github.io/images/NY54bbAXRocQGVxw2kRcrEpOnfc.png">
+<meta property="og:image" content="http://szy0127.github.io/images/AFYIbE0wUoWv2Pxk9G2ch0Edn7g.png">
+<meta property="og:image" content="http://szy0127.github.io/images/LV9DblgdqoLHd4xjZQ7czDRinqb.png">
+<meta property="og:image" content="http://szy0127.github.io/images/KUkKbR1vsoyMlyxbirgcNG0NnAh.png">
+<meta property="og:image" content="http://szy0127.github.io/images/R5yGbVARVo7It7x997ccPpsRn5b.png">
+<meta property="og:image" content="http://szy0127.github.io/images/PwIfbV4bVoZRFvxamYOcUyDQnHf.png">
+<meta property="og:image" content="http://szy0127.github.io/images/XQXlbeCC7oft7NxcmQucYljLn3e.png">
+<meta property="article:published_time" content="2026-06-13T04:59:27.311Z">
+<meta property="article:modified_time" content="2026-06-13T04:59:27.311Z">
+<meta property="article:author" content="szy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://szy0127.github.io/images/A2Yvbvn5QoxdeLxbiHOcpmzonxd.png">
+
+
+<link rel="canonical" href="http://szy0127.github.io/2026/06/13/papers/GPU%20Travelling%20Efficient%20Confidential%20Collaborative%20Training%20with%20TEE-Enabled%20GPUs/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://szy0127.github.io/2026/06/13/papers/GPU%20Travelling%20Efficient%20Confidential%20Collaborative%20Training%20with%20TEE-Enabled%20GPUs/","path":"2026/06/13/papers/GPU Travelling Efficient Confidential Collaborative Training with TEE-Enabled GPUs/","title":"GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs | S blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">S blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GPU-Travelling-Efficient-Confidential-Collaborative-Training-with-TEE-Enabled-GPUs"><span class="nav-number">1.</span> <span class="nav-text">GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Background"><span class="nav-number">1.1.</span> <span class="nav-text">Background</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Transferring-model"><span class="nav-number">1.1.1.</span> <span class="nav-text">Transferring model</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transferring-dataset"><span class="nav-number">1.1.2.</span> <span class="nav-text">Transferring dataset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Confidential-Computing"><span class="nav-number">1.1.3.</span> <span class="nav-text">Confidential Computing</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Insight"><span class="nav-number">1.2.</span> <span class="nav-text">Insight</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Challenge"><span class="nav-number">1.3.</span> <span class="nav-text">Challenge</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Design"><span class="nav-number">1.4.</span> <span class="nav-text">Design</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CVM-Roles"><span class="nav-number">1.4.1.</span> <span class="nav-text">CVM Roles</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PCIe-MUX"><span class="nav-number">1.4.2.</span> <span class="nav-text">PCIe MUX</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Confidential-Context"><span class="nav-number">1.4.3.</span> <span class="nav-text">Confidential Context</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evaluation"><span class="nav-number">1.5.</span> <span class="nav-text">Evaluation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Breakdown"><span class="nav-number">1.5.1.</span> <span class="nav-text">Breakdown</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Benchmarks"><span class="nav-number">1.5.2.</span> <span class="nav-text">Benchmarks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Application"><span class="nav-number">1.5.3.</span> <span class="nav-text">Application</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Outlooks"><span class="nav-number">1.6.</span> <span class="nav-text">Outlooks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Conclusion"><span class="nav-number">1.7.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">szy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://szy0127.github.io/2026/06/13/papers/GPU%20Travelling%20Efficient%20Confidential%20Collaborative%20Training%20with%20TEE-Enabled%20GPUs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="szy">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="S blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs | S blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-06-13 12:59:27" itemprop="dateCreated datePublished" datetime="2026-06-13T12:59:27+08:00">2026-06-13</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="Word count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Word count in article: </span>
+      <span>1.4k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>5 mins.</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="GPU-Travelling-Efficient-Confidential-Collaborative-Training-with-TEE-Enabled-GPUs"><a href="#GPU-Travelling-Efficient-Confidential-Collaborative-Training-with-TEE-Enabled-GPUs" class="headerlink" title="GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs"></a>GPU Travelling: Efficient Confidential Collaborative Training with TEE-Enabled GPUs</h1><p><img src="/images/A2Yvbvn5QoxdeLxbiHOcpmzonxd.png" title="image"></p>
+<p>CCS’25</p>
+<h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>多个彼此不信任的数据持有方，希望一起训练一个模型，但又不能泄露各自的私有数据，原因可能是隐私、法规、版权或商业竞争。</p>
+<p>随着现代训练任务尤其是 LLM 的模型和数据集越来越大，现有方案在训练过程中需要频繁交换数据或模型，而这些交换通常走的是较慢的常规链路，通信成本会变得非常高。</p>
+<h3 id="Transferring-model"><a href="#Transferring-model" class="headerlink" title="Transferring model"></a>Transferring model</h3><p>中心节点先把基础模型发给各数据方，各自用本地数据训练，再把梯度或模型参数传回中心聚合。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> each epoch:</span><br><span class="line">    send model to each data holder</span><br><span class="line">    each data holder trains locally</span><br><span class="line">    each data holder sends update back</span><br><span class="line">    aggregate updates</span><br></pre></td></tr></table></figure>
+
+<p>问题：</p>
+<ul>
+<li>模型越大，梯度&#x2F;参数更新越大，通信开销很高</li>
+<li>每个数据方都必须拥有足够的本地算力和显存来训练整模型</li>
+</ul>
+<h3 id="Transferring-dataset"><a href="#Transferring-dataset" class="headerlink" title="Transferring dataset"></a>Transferring dataset</h3><p>把各方数据集传到一个中心训练节点，在那里做统一训练，并依靠 TEE 等机制保护数据机密性。</p>
+<p>然而数据持有方是不希望自己的数据是被集中保存的，本文考虑的场景是，数据训练方和数据存储方不在同一个物理节点上</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">send each data holder dataset to central trainer</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> each epoch:</span><br><span class="line">    <span class="keyword">for</span> each data holder:</span><br><span class="line">        load one batch <span class="keyword">from</span> stored central dataset</span><br><span class="line">        compute gradients</span><br><span class="line">        update model</span><br></pre></td></tr></table></figure>
+
+<p>每次训练需要用到不同的数据集时，需要通过网络进行传输，效率低</p>
+<h3 id="Confidential-Computing"><a href="#Confidential-Computing" class="headerlink" title="Confidential Computing"></a>Confidential Computing</h3><p><img src="/images/NY54bbAXRocQGVxw2kRcrEpOnfc.png" title="image"></p>
+<p>传统的 CVM 方案是不信任设备的，但是 NVIDIA 提出了 GPU TEE  可以与 CVM 例如 Intel TDX 协同工作</p>
+<p>GPU 和 CVM 的驱动会协商一个密钥用于通信，CVM 将 private memory 加密后放置于 bounce buffer，GPU DMA 后用对应的 key 进行解密，然后放入 VRAM</p>
+<h2 id="Insight"><a href="#Insight" class="headerlink" title="Insight"></a>Insight</h2><blockquote>
+<p>Never underestimate the bandwidth of a station wagon full of tapes hurtling down the highway<br>——Andrew S. Tanenbaum</p>
+</blockquote>
+<p>永远不要低估一辆载满磁带的在高速公路上飞驰的卡车的带宽</p>
+<p>多个数据提供方把数据提前传到处于一台连接了 GPU 的物理机的多个 CVM 中</p>
+<p>GPU 所有权在多个 CVM 中切换，数据通过 PCIe 拷贝到 GPU 上，而不是通过网络</p>
+<p><img src="/images/AFYIbE0wUoWv2Pxk9G2ch0Edn7g.png" title="image"></p>
+<p>orchestrator 是负责训练的 可信的 CVM</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">each</span> data holder initialize a CVM <span class="keyword">and</span> send dataset <span class="keyword">to</span> it</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> <span class="keyword">each</span> epoch:</span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">each</span> data holder:</span><br><span class="line">        load <span class="keyword">one</span> batch <span class="keyword">from</span> this data holder <span class="keyword">into</span> GPU</span><br><span class="line">        switch GPU back <span class="keyword">to</span> orchestrator</span><br><span class="line">        compute gradients</span><br><span class="line">        <span class="keyword">update</span> model</span><br></pre></td></tr></table></figure>
+
+<h2 id="Challenge"><a href="#Challenge" class="headerlink" title="Challenge"></a>Challenge</h2><ol>
+<li>现有的 GPU 架构设计中，如果让 GPU 在不同 CVM 间切换，会去除所有的数据（模型也会被丢掉）</li>
+<li>CVM 与 GPU 的通信依赖协商好的 key、Initial Vector 以及正确的 driver 上下文状态。</li>
+</ol>
+<h2 id="Design"><a href="#Design" class="headerlink" title="Design"></a>Design</h2><p><img src="/images/LV9DblgdqoLHd4xjZQ7czDRinqb.png" title="image"></p>
+<h3 id="CVM-Roles"><a href="#CVM-Roles" class="headerlink" title="CVM Roles"></a>CVM Roles</h3><ul>
+<li>One Orchestrator：可信的中心节点，在这个节点上进行训练。训练过程中需要发起请求，让数据提供者拷贝数据到 GPU 上</li>
+<li>Multiple Data Holder：私有数据提供者，通过远程验证信任 Orchestrator 与 GPU 的 CC 环境，随后在训练过程中提供拷贝数据的服务。</li>
+</ul>
+<h3 id="PCIe-MUX"><a href="#PCIe-MUX" class="headerlink" title="PCIe MUX"></a>PCIe MUX</h3><p>负责在硬件上把一个 GPU 动态切换给不同的 CVM 使用</p>
+<ul>
+<li>中断：将中断路由到不同的 CVM 中</li>
+<li>DMA mapping：配置 IOMMU 页表</li>
+</ul>
+<h3 id="Confidential-Context"><a href="#Confidential-Context" class="headerlink" title="Confidential Context"></a>Confidential Context</h3><p>GPU 会维护自己的 key 和 IV 等状态，需要和 CVM 中 driver 的状态一致，才可以正常通信。</p>
+<p>在 CVM 的 GPU driver 中增加 export 和 import 接口，可以导入&#x2F;导出 key IV 以及 driver context 等信息。</p>
+<p>当 GPU 在 CVM 之间切换的时候，上一个 CVM 需要 export，下一个 CVM import，使得下一个 CVM 可以正常与 GPU 通信。</p>
+<p>为了上一个 CVM 无法使用 key 窃取下一个 CVM 的数据，在进行了一次切换后，会进行 key rotation 更新 key。</p>
+<p><img src="/images/KUkKbR1vsoyMlyxbirgcNG0NnAh.png" title="image"></p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><ul>
+<li>dual Intel Xeon Silver 4516Y+ 2.2GHz 24-Core CPUs , 256 GiB of RAM</li>
+<li>a NVIDIA H100 GPU</li>
+<li>Both the CVMs and the hypervisor run Ubuntu 24.0.1 LTS.</li>
+<li>CVMs are protected under Intel TDX with a stock Linux Kernel 6.8.12  4 CPU cores, 8 GiB of RAM</li>
+</ul>
+<h3 id="Breakdown"><a href="#Breakdown" class="headerlink" title="Breakdown"></a>Breakdown</h3><p><img src="/images/R5yGbVARVo7It7x997ccPpsRn5b.png" title="image"></p>
+<p>主要开销如下：</p>
+<ul>
+<li>PCIe MUX 切换，单次 150ms</li>
+<li>Read Dataset，baseline 也需要，不算 GPU travelling 的 overhead</li>
+<li>GPU write，baseline 也需要，不算 GPU travelling 的 overhead</li>
+<li>SSL overhead：export&#x2F;import key 中 CVM 和 GPU 通信 的耗时，稳定在 40ms</li>
+</ul>
+<h3 id="Benchmarks"><a href="#Benchmarks" class="headerlink" title="Benchmarks"></a>Benchmarks</h3><p>测试不同网络带宽、不同 buffer size 下的数据传输时间</p>
+<p><img src="/images/PwIfbV4bVoZRFvxamYOcUyDQnHf.png" title="image"></p>
+<p>在 512M 带宽 4M 的情况下，GPU travelling 取得高达一千倍的优势</p>
+<p>只要 buffer size&gt;4M 或者 bandwidth &lt; 500M GPU travalling 都会优于 baseline</p>
+<p>在实际应用中</p>
+<ul>
+<li>GPU VRAM 80G 不会每次只分配 4M</li>
+<li>不会给每个 data holder 高达 500M 的带宽</li>
+</ul>
+<h3 id="Application"><a href="#Application" class="headerlink" title="Application"></a>Application</h3><p>llm.c: an open-source CUDA-based LLM training project using the GPT-2 model</p>
+<p>测试 fine-tuning 过程的耗时</p>
+<p><img src="/images/XQXlbeCC7oft7NxcmQucYljLn3e.png" title="image"></p>
+<p>GPU travelling 压缩了训练过程中的数据传输时间，占用训练时间的占比不超过千分之一，且与网络带宽无关</p>
+<h2 id="Outlooks"><a href="#Outlooks" class="headerlink" title="Outlooks"></a>Outlooks</h2><p>本文场景目前的限制是，所有 data holder 所在的 CVM 必须在同一个连接 GPU 的物理机器上。</p>
+<p>Hardware PCIe switches (PCIe fabric)</p>
+<p>使用 PCIe switch 在物理上支持将一个 GPU 连接到不同的物理机上使用</p>
+<p>broadcom 已有具有此功能的产品</p>
+<p>可扩展至数据中心级别的场景，而非单个物理机</p>
+<h2 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h2><p>本文提出了 GPU Travelling，通过允许 GPU 安全地切换至数据持有者处以收集数据集，消除了通过较慢连接传输加密大型数据集或模型的需求，利用支持 TEE 的 GPU 实现高效的机密协同训练。对于常见的数据缓冲区大小和网络带宽，GPU Travelling 优于传统方法，并且能够为像 LLM 这样的现代协同训练工作负载在相对性能和绝对时间节省方面带来显著收益。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/04/04/virtualization/RKNPU%20driver/" rel="prev" title="RKNPU driver">
+                  <i class="fa fa-angle-left"></i> RKNPU driver
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/06/13/misc/Linux%20Security/" rel="next" title="Linux Security">
+                  Linux Security <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">szy</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Word count total">422k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">25:35</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
